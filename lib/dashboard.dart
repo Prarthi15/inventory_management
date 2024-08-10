@@ -35,7 +35,11 @@ class _DashboardPageState extends State<DashboardPage> {
           key: _scaffoldKey,
           drawer: isSmallScreen
               ? Drawer(
-                  child: _buildDrawerContent(),
+                  child: Container(
+                    color:
+                        Colors.grey[200], // Grey background for small screens
+                    child: _buildDrawerContent(),
+                  ),
                 )
               : null,
           body: Row(
@@ -283,7 +287,7 @@ class _DashboardPageState extends State<DashboardPage> {
         ),
         const SizedBox(height: 10),
         const Text(
-          "Here's what's happening to your store today",
+          "Here's what's happening with your store today",
           style: TextStyle(
             fontSize: 16,
             color: Color.fromRGBO(135, 135, 135, 1),
