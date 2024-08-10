@@ -46,30 +46,33 @@ class LoginPage extends StatelessWidget {
             );
           } else {
             return SingleChildScrollView(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: LoginForm(),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 300,
-                    color: const Color.fromRGBO(6, 90, 216, 1),
-                    child: const Center(
-                      child: Text(
-                        "Katyayani",
-                        style: TextStyle(
-                          fontSize:
-                              40, // Slightly smaller font size for small screens
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+              child: Container(
+                color: Colors.white, // Background color for small screens
+                child: Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: LoginForm(),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 300,
+                      color: const Color.fromRGBO(6, 90, 216, 1),
+                      child: const Center(
+                        child: Text(
+                          "Katyayani",
+                          style: TextStyle(
+                            fontSize:
+                                40, // Slightly smaller font size for small screens
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }
@@ -96,17 +99,14 @@ class _LoginFormState extends State<LoginForm> {
     final bool isSmallScreen = MediaQuery.of(context).size.width <= 800;
 
     // Define responsive font size
-    double textSize = isSmallScreen ? 27.0 : 32.0;
+    double textSize = isSmallScreen ? 29.0 : 32.0;
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(30.0), // Padding around the form
+        padding: const EdgeInsets.all(40.0), // Padding around the form
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(
-              height: 40,
-            ),
             Text(
               "Katyayani Organics",
               style: TextStyle(
@@ -118,7 +118,7 @@ class _LoginFormState extends State<LoginForm> {
             const SizedBox(height: 15),
             const Text(
               "Log in to your Account",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const Text("Welcome back! Select method to log in:"),
@@ -151,9 +151,7 @@ class _LoginFormState extends State<LoginForm> {
                       color: Color.fromRGBO(24, 119, 242, 1),
                       size: 18,
                     ),
-                    label: const Text(
-                      "Facebook",
-                    ),
+                    label: const Text("Facebook"),
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.black,
                       backgroundColor: Colors.white,
