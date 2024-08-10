@@ -34,11 +34,14 @@ class _DashboardPageState extends State<DashboardPage> {
         return Scaffold(
           key: _scaffoldKey,
           drawer: isSmallScreen
-              ? Drawer(
-                  child: Container(
-                    color:
-                        Colors.grey[200], // Grey background for small screens
-                    child: _buildDrawerContent(),
+              ? SizedBox(
+                  width: 220, // Adjust this width to make the drawer narrower
+                  child: Drawer(
+                    child: Container(
+                      color:
+                          Colors.grey[200], // Grey background for small screens
+                      child: _buildDrawerContent(),
+                    ),
                   ),
                 )
               : null,
@@ -56,6 +59,9 @@ class _DashboardPageState extends State<DashboardPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
                       Row(
                         children: <Widget>[
                           if (isSmallScreen)
@@ -130,12 +136,15 @@ class _DashboardPageState extends State<DashboardPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        const SizedBox(
+          height: 20,
+        ),
         const Padding(
           padding: EdgeInsets.all(20.0),
           child: Text(
             'Katyayani',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 27,
               fontWeight: FontWeight.bold,
               color: Color.fromRGBO(6, 90, 216, 1),
             ),
