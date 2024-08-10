@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'dashboard.dart';
-import 'forgot_password.dart';
-import 'login_page.dart';
+import 'package:inventory_management/dashboard.dart';
+import 'package:inventory_management/forgot_password.dart';
+import 'package:inventory_management/login_page.dart';
+import 'package:inventory_management/products.dart';
+import 'package:inventory_management/test.dart';
+
 import 'create_account.dart';
 
 void main() {
