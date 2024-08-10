@@ -275,15 +275,15 @@ class _DashboardPageState extends State<DashboardPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const Text(
-          'Welcome to the Dashboard!',
+          'Hello, Prarthi',
           style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Color.fromRGBO(6, 90, 216, 1)),
         ),
         const SizedBox(height: 10),
         const Text(
-          'Here is an overview of your latest activities and statistics.',
+          "Here's what's happening to your store today",
           style: TextStyle(
             fontSize: 16,
             color: Color.fromRGBO(135, 135, 135, 1),
