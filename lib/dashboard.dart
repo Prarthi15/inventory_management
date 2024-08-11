@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:inventory_management/products.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -40,7 +41,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     child: Container(
                       color:
                           Colors.grey[200], // Grey background for small screens
-                      child: _buildDrawerContent(),
+                      child: _buildDrawerContent(isSmallScreen),
                     ),
                   ),
                 )
@@ -51,7 +52,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 Container(
                   width: 200,
                   color: const Color.fromRGBO(240, 240, 240, 1),
-                  child: _buildDrawerContent(),
+                  child: _buildDrawerContent(isSmallScreen),
                 ),
               Expanded(
                 child: Container(
@@ -132,7 +133,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildDrawerContent() {
+  Widget _buildDrawerContent(bool isSmallScreen) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -155,49 +156,31 @@ class _DashboardPageState extends State<DashboardPage> {
           icon: Icons.dashboard,
           text: 'Dashboard',
           isSelected: selectedDrawerItem == 'Dashboard',
-          onTap: () => setState(() => selectedDrawerItem = 'Dashboard'),
+          onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
+        ),
+        _buildDrawerItem(
+          icon: Icons.shopping_cart,
+          text: 'Orders',
+          isSelected: selectedDrawerItem == 'Orders',
+          onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
         ),
         _buildDrawerItem(
           icon: Icons.inventory,
           text: 'Inventory',
           isSelected: selectedDrawerItem == 'Inventory',
-          onTap: () => setState(() => selectedDrawerItem = 'Inventory'),
-        ),
-        _buildDrawerItem(
-          icon: Icons.analytics,
-          text: 'Analytics',
-          isSelected: selectedDrawerItem == 'Analytics',
-          onTap: () => setState(() => selectedDrawerItem = 'Analytics'),
-        ),
-        _buildDrawerItem(
-          icon: Icons.shopping_cart,
-          text: 'Sales Orders',
-          isSelected: selectedDrawerItem == 'Sales Orders',
-          onTap: () => setState(() => selectedDrawerItem = 'Sales Orders'),
-        ),
-        _buildDrawerItem(
-          icon: Icons.business,
-          text: 'B2B eCommerce',
-          isSelected: selectedDrawerItem == 'B2B eCommerce',
-          onTap: () => setState(() => selectedDrawerItem = 'B2B eCommerce'),
+          onTap: () => _onDrawerItemTapped('Inventory', isSmallScreen),
         ),
         _buildDrawerItem(
           icon: Icons.production_quantity_limits,
           text: 'Products',
           isSelected: selectedDrawerItem == 'Products',
-          onTap: () => setState(() => selectedDrawerItem = 'Products'),
+          onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
         ),
         _buildDrawerItem(
-          icon: Icons.people,
-          text: 'Customers',
-          isSelected: selectedDrawerItem == 'Customers',
-          onTap: () => setState(() => selectedDrawerItem = 'Customers'),
-        ),
-        _buildDrawerItem(
-          icon: Icons.apps,
-          text: 'Browse Apps',
-          isSelected: selectedDrawerItem == 'Browse Apps',
-          onTap: () => setState(() => selectedDrawerItem = 'Browse Apps'),
+          icon: Icons.analytics,
+          text: 'Accounting',
+          isSelected: selectedDrawerItem == 'Accounting',
+          onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
         ),
         const Spacer(),
         Padding(
@@ -208,13 +191,22 @@ class _DashboardPageState extends State<DashboardPage> {
                 icon: Icons.settings,
                 text: 'Settings',
                 isSelected: selectedDrawerItem == 'Settings',
-                onTap: () => setState(() => selectedDrawerItem = 'Settings'),
+                onTap: () => _onDrawerItemTapped('Settings', isSmallScreen),
               ),
             ],
           ),
         ),
       ],
     );
+  }
+
+  void _onDrawerItemTapped(String item, bool isSmallScreen) {
+    setState(() {
+      selectedDrawerItem = item;
+      if (isSmallScreen) {
+        Navigator.pop(context); // Close the drawer on small screens
+      }
+    });
   }
 
   Widget _buildDrawerItem({
@@ -262,20 +254,15 @@ class _DashboardPageState extends State<DashboardPage> {
     switch (selectedDrawerItem) {
       case 'Dashboard':
         return _buildDashboardContent(isSmallScreen);
-      case 'Inventory':
-        return const Center(child: Text("Inventory content goes here"));
-      case 'Analytics':
-        return const Center(child: Text("Analytics content goes here"));
       case 'Sales Orders':
         return const Center(child: Text("Sales Orders content goes here"));
-      case 'B2B eCommerce':
-        return const Center(child: Text("B2B eCommerce content goes here"));
+      case 'Inventory':
+        return const Center(child: Text("Inventory content goes here"));
       case 'Products':
-        return const Center(child: Text("Products content goes here"));
-      case 'Customers':
-        return const Center(child: Text("Customers content goes here"));
-      case 'Browse Apps':
-        return const Center(child: Text("Browse Apps content goes here"));
+        return const Products();
+      case 'Accounting':
+        return const Center(child: Text("Accounting content goes here"));
+
       case 'Settings':
         return const Center(child: Text("Settings content goes here"));
       default:
@@ -319,12 +306,18 @@ class _DashboardPageState extends State<DashboardPage> {
             ElevatedButton(
               onPressed: _refreshData,
               style: ElevatedButton.styleFrom(
-                minimumSize: const Size(40, 40), // Adjusted width
+                minimumSize: const Size(40, 40),
                 backgroundColor: const Color.fromRGBO(6, 90, 216, 1),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
               child: const Text(
-                'Refresh Data',
-                style: TextStyle(fontSize: 14),
+                'Refresh',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
           ],
@@ -335,27 +328,30 @@ class _DashboardPageState extends State<DashboardPage> {
 }
 
 class DashboardCards extends StatelessWidget {
-  const DashboardCards({super.key});
+  const DashboardCards({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Expanded(child: DashboardCard(label: 'Sales', value: '\$4000')),
-            SizedBox(width: 10),
-            Expanded(
-                child: DashboardCard(label: 'Orders', value: '200 Orders')),
-          ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: const [
+        DashboardCard(
+          color: Colors.red,
+          icon: Icons.shopping_cart,
+          title: 'Orders',
+          value: '20',
         ),
-        SizedBox(height: 10),
-        Row(
-          children: <Widget>[
-            Expanded(child: DashboardCard(label: 'Visitors', value: '3000')),
-            SizedBox(width: 10),
-            Expanded(child: DashboardCard(label: 'Customers', value: '1500')),
-          ],
+        DashboardCard(
+          color: Colors.blue,
+          icon: Icons.attach_money,
+          title: 'Revenue',
+          value: '\$2000',
+        ),
+        DashboardCard(
+          color: Colors.green,
+          icon: Icons.inventory,
+          title: 'Inventory',
+          value: '50',
         ),
       ],
     );
@@ -363,46 +359,47 @@ class DashboardCards extends StatelessWidget {
 }
 
 class DashboardCard extends StatelessWidget {
-  final String label;
+  final Color color;
+  final IconData icon;
+  final String title;
   final String value;
 
-  const DashboardCard({super.key, required this.label, required this.value});
+  const DashboardCard({
+    Key? key,
+    required this.color,
+    required this.icon,
+    required this.title,
+    required this.value,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              color: Color.fromRGBO(135, 135, 135, 1),
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: Colors.white, size: 32),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(color: Colors.white, fontSize: 16),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(6, 90, 216, 1),
+            const SizedBox(height: 5),
+            Text(
+              value,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
