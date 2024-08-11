@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 
 class Products extends StatefulWidget {
@@ -191,31 +192,29 @@ class _ProductsState extends State<Products> {
                             height: 250,
                             width: 550,
                             decoration: BoxDecoration(border: Border.all()),
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      fieldTitle('   Dipu', height: 51),
-                                      const SizedBox(height: 8.0),
-                                      fieldTitle('Patidar', height: 51),
-                                    ],
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        textFiled(controller: _productIdentifierController),
-                                        const SizedBox(height: 8.0),
-                                        textFiled(controller: _productIdentifierController),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              // crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:CrossAxisAlignment.end,
+                                  children: [
+                                    fieldTitle('SKU', height: 51),
+                                    const SizedBox(height: 8.0),
+                                    fieldTitle('EAM/UPC', height: 51),
+                                  ],
+                                ),
+                                const SizedBox(width:4,),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    textFiled(controller: _productIdentifierController,width:200),
+                                    const SizedBox(height: 8.0),
+                                    textFiled(controller: _productIdentifierController,width:200),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                           const SizedBox(height: 8.0),
@@ -256,21 +255,21 @@ class _ProductsState extends State<Products> {
                                 children: [
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:CrossAxisAlignment.end,
                                     children: [
-                                      fieldTitle('   Dipu', height: 30),
-                                      const SizedBox(height: 8.0),
-                                      fieldTitle('Patidar', height: 30),
+                                      fieldTitle('Size', height: 30,),
+                                      const SizedBox(height: 33.0),
+                                      fieldTitle('Color', height: 30),
                                     ],
                                   ),
-                                  Expanded(
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        textFiled(controller: _productSpecificationController, height:51),
-                                        const SizedBox(height: 8.0),
-                                        textFiled(controller: _productSpecificationController, height:51),
-                                      ],
-                                    ),
+                                  const SizedBox(width:2,),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      textFiled(controller: _productSpecificationController, height:51,width:200),
+                                      const SizedBox(height: 8.0),
+                                      textFiled(controller: _productSpecificationController, height:51,width:200),
+                                    ],
                                   ),
                                 ],
                               ),
