@@ -6,8 +6,7 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      
+    return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 800) {
@@ -47,30 +46,33 @@ class LoginPage extends StatelessWidget {
             );
           } else {
             return SingleChildScrollView(
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: LoginForm(),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    height: 300,
-                    color: const Color.fromRGBO(6, 90, 216, 1),
-                    child: const Center(
-                      child: Text(
-                        "Katyayani",
-                        style: TextStyle(
-                          fontSize:
-                              40, // Slightly smaller font size for small screens
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+              child: Container(
+                color: Colors.white, // Background color for small screens
+                child: Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: LoginForm(),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      height: 300,
+                      color: const Color.fromRGBO(6, 90, 216, 1),
+                      child: const Center(
+                        child: Text(
+                          "Katyayani",
+                          style: TextStyle(
+                            fontSize:
+                                40, // Slightly smaller font size for small screens
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           }
@@ -97,14 +99,15 @@ class _LoginFormState extends State<LoginForm> {
     final bool isSmallScreen = MediaQuery.of(context).size.width <= 800;
 
     // Define responsive font size
-    double textSize = isSmallScreen ? 29.0 : 32.0;
+    double textSize = isSmallScreen ? 30.0 : 32.0;
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(40.0), // Padding around the form
+        padding: const EdgeInsets.all(31.0), // Padding around the form
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const SizedBox(height: 35),
             Text(
               "Katyayani Organics",
               style: TextStyle(
@@ -113,7 +116,7 @@ class _LoginFormState extends State<LoginForm> {
                 color: const Color.fromRGBO(37, 128, 69, 1),
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             const Text(
               "Log in to your Account",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

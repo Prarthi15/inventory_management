@@ -3,7 +3,6 @@ import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
 import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/products.dart';
-import 'package:inventory_management/test.dart';
 
 import 'create_account.dart';
 
@@ -37,7 +36,8 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/createAccount': (context) => const CreateAccountPage(),
         '/forgotPassword': (context) => const ForgotPasswordPage(),
-        '/dashboard': (context) => const DashboardPage()
+        '/dashboard': (context) => const DashboardPage(),
+        '/products': (context) => const Products()
       },
     );
   }
