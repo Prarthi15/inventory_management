@@ -35,10 +35,9 @@ class _DashboardCardsState extends State<DashboardCards> {
       builder: (context, constraints) {
         bool isSmallScreen = constraints.maxWidth < 800;
 
-        // Calculate card widths
         double threeCardWidth = isSmallScreen
             ? constraints.maxWidth * 0.9
-            : (constraints.maxWidth - 32) / 3; // Wider for large screens
+            : (constraints.maxWidth - 32) / 3;
         double fiveCardWidth = isSmallScreen
             ? constraints.maxWidth * 0.8 / 5
             : (constraints.maxWidth - 32) / 5;
@@ -46,47 +45,44 @@ class _DashboardCardsState extends State<DashboardCards> {
 
         return Column(
           children: [
-            // Top Three Cards
             Wrap(
               spacing: 8.0,
               runSpacing: 8.0,
               alignment: WrapAlignment.center,
               children: [
                 DashboardCard(
-                  icon: Icons.analytics,
-                  title: 'Total Sales',
+                  title: "Today's Gross Revenue",
                   value: '₹45,000',
-                  color: Colors.blueAccent,
+                  subtitle: 'Yesterday: ₹60,000',
+                  percentageChange: '-25%',
+                  changeColor: Colors.redAccent,
+                  chartData: const [1.0, 0.9, 0.8, 0.7],
                   width: threeCardWidth,
                   height: cardHeight,
-                  backgroundColor:
-                      Colors.white, // Set background color to white
                 ),
                 DashboardCard(
-                  icon: Icons.shopping_cart,
-                  title: 'Orders',
+                  title: "Today's Orders",
                   value: '120',
-                  color: Colors.greenAccent,
+                  subtitle: 'Yesterday: 140',
+                  percentageChange: '-14%',
+                  changeColor: Colors.redAccent,
+                  chartData: [1.0, 0.95, 0.85, 0.7],
                   width: threeCardWidth,
                   height: cardHeight,
-                  backgroundColor:
-                      Colors.white, // Set background color to white
                 ),
                 DashboardCard(
-                  icon: Icons.account_balance_wallet,
-                  title: 'Revenue',
-                  value: '₹90,000',
-                  color: Colors.deepOrangeAccent,
+                  title: "Today's Return",
+                  value: '₹0',
+                  subtitle: 'Yesterday: ₹0',
+                  percentageChange: '0%',
+                  changeColor: Colors.greenAccent,
+                  chartData: [1.0, 0.9, 0.85, 0.8],
                   width: threeCardWidth,
                   height: cardHeight,
-                  backgroundColor:
-                      Colors.white, // Set background color to white
                 ),
               ],
             ),
             const SizedBox(height: 16.0),
-
-            // Bottom Five Cards
             if (isSmallScreen)
               SizedBox(
                 height: cardHeight + 50,
@@ -101,42 +97,52 @@ class _DashboardCardsState extends State<DashboardCards> {
                         controller: _pageController,
                         children: [
                           DashboardCard(
-                            icon: Icons.people,
-                            title: 'Customers',
+                            title: 'Total Sub-Orders',
                             value: '30',
-                            color: Colors.purpleAccent,
+                            subtitle: 'Yesterday: 35',
+                            percentageChange: '-14%',
+                            changeColor: Colors.redAccent,
+                            chartData: const [1.0, 0.8, 0.7, 0.5],
                             width: fiveCardWidth,
                             height: cardHeight,
                           ),
                           DashboardCard(
-                            icon: Icons.thumb_up,
-                            title: 'Likes',
+                            title: 'Distinct SKU Sold',
                             value: '1,200',
-                            color: Colors.redAccent,
+                            subtitle: 'Yesterday: 1,500',
+                            percentageChange: '-20%',
+                            changeColor: Colors.redAccent,
+                            chartData: [1.0, 0.85, 0.75, 0.6],
                             width: fiveCardWidth,
                             height: cardHeight,
                           ),
                           DashboardCard(
-                            icon: Icons.star,
-                            title: 'Reviews',
+                            title: 'Pending Orders',
                             value: '850',
-                            color: Colors.amberAccent,
+                            subtitle: 'Yesterday: 950',
+                            percentageChange: 'NA',
+                            changeColor: Colors.grey,
+                            chartData: [1.0, 0.92, 0.85, 0.7],
                             width: fiveCardWidth,
                             height: cardHeight,
                           ),
                           DashboardCard(
-                            icon: Icons.trending_up,
-                            title: 'Growth',
+                            title: 'Hold Orders',
                             value: '25%',
-                            color: Colors.tealAccent,
+                            subtitle: 'Yesterday: 30%',
+                            percentageChange: '-16%',
+                            changeColor: Colors.redAccent,
+                            chartData: [1.0, 0.95, 0.85, 0.7],
                             width: fiveCardWidth,
                             height: cardHeight,
                           ),
                           DashboardCard(
-                            icon: Icons.settings,
-                            title: 'Settings',
+                            title: 'Avg. Order Value',
                             value: '5',
-                            color: Colors.grey,
+                            subtitle: 'Yesterday: 5',
+                            percentageChange: '0%',
+                            changeColor: Colors.grey,
+                            chartData: [1.0, 1.0, 1.0, 1.0],
                             width: fiveCardWidth,
                             height: cardHeight,
                           ),
@@ -157,42 +163,52 @@ class _DashboardCardsState extends State<DashboardCards> {
                 alignment: WrapAlignment.start,
                 children: [
                   DashboardCard(
-                    icon: Icons.people,
                     title: 'Customers',
                     value: '30',
-                    color: Colors.purpleAccent,
+                    subtitle: 'Yesterday: 35',
+                    percentageChange: '-14%',
+                    changeColor: Colors.redAccent,
+                    chartData: [1.0, 0.8, 0.7, 0.5],
                     width: fiveCardWidth,
                     height: cardHeight,
                   ),
                   DashboardCard(
-                    icon: Icons.thumb_up,
                     title: 'Likes',
                     value: '1,200',
-                    color: Colors.redAccent,
+                    subtitle: 'Yesterday: 1,500',
+                    percentageChange: '-20%',
+                    changeColor: Colors.redAccent,
+                    chartData: [1.0, 0.85, 0.75, 0.6],
                     width: fiveCardWidth,
                     height: cardHeight,
                   ),
                   DashboardCard(
-                    icon: Icons.star,
                     title: 'Reviews',
                     value: '850',
-                    color: Colors.amberAccent,
+                    subtitle: 'Yesterday: 950',
+                    percentageChange: '-11%',
+                    changeColor: Colors.redAccent,
+                    chartData: [1.0, 0.92, 0.85, 0.7],
                     width: fiveCardWidth,
                     height: cardHeight,
                   ),
                   DashboardCard(
-                    icon: Icons.trending_up,
                     title: 'Growth',
                     value: '25%',
-                    color: Colors.tealAccent,
+                    subtitle: 'Yesterday: 30%',
+                    percentageChange: '-16%',
+                    changeColor: Colors.redAccent,
+                    chartData: [1.0, 0.95, 0.85, 0.7],
                     width: fiveCardWidth,
                     height: cardHeight,
                   ),
                   DashboardCard(
-                    icon: Icons.settings,
                     title: 'Settings',
                     value: '5',
-                    color: Colors.grey,
+                    subtitle: 'Yesterday: 5',
+                    percentageChange: '0%',
+                    changeColor: Colors.grey,
+                    chartData: [1.0, 1.0, 1.0, 1.0],
                     width: fiveCardWidth,
                     height: cardHeight,
                   ),
@@ -206,23 +222,25 @@ class _DashboardCardsState extends State<DashboardCards> {
 }
 
 class DashboardCard extends StatelessWidget {
-  final IconData icon;
   final String title;
   final String value;
-  final Color color;
-  final Color backgroundColor; // Add backgroundColor parameter
+  final String subtitle;
+  final String percentageChange;
+  final Color changeColor;
+  final List<double> chartData;
   final double width;
   final double height;
 
   const DashboardCard({
     super.key,
-    required this.icon,
     required this.title,
     required this.value,
-    required this.color,
+    required this.subtitle,
+    required this.percentageChange,
+    required this.changeColor,
+    required this.chartData,
     required this.width,
     required this.height,
-    this.backgroundColor = Colors.white, // Default to white
   });
 
   @override
@@ -232,32 +250,58 @@ class DashboardCard extends StatelessWidget {
       height: height,
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: backgroundColor, // Use backgroundColor
+        color: Colors.white,
         borderRadius: BorderRadius.circular(8.0),
-        border: Border.all(color: color.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: 2,
+            blurRadius: 5,
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: color, size: 30.0),
-          const SizedBox(height: 12.0),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 16.0,
-              color: color.withOpacity(0.7),
-              fontWeight: FontWeight.bold,
-            ),
+          Row(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromRGBO(6, 90, 216, 1),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8.0),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 22.0,
-              color: color,
+            style: const TextStyle(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: Colors.black,
             ),
           ),
+          const SizedBox(height: 4.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                subtitle,
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+              Text(
+                percentageChange,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: changeColor,
+                ),
+              ),
+            ],
+          ),
+          // Optionally, you can add a graph or a progress bar here using chartData.
         ],
       ),
     );
