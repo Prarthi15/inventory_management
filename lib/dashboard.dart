@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/products.dart';
+import 'package:inventory_management/dashboard_cards.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -164,18 +165,7 @@ class _DashboardPageState extends State<DashboardPage> {
           isSelected: selectedDrawerItem == 'Orders',
           onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
         ),
-        _buildDrawerItem(
-          icon: Icons.inventory,
-          text: 'Inventory',
-          isSelected: selectedDrawerItem == 'Inventory',
-          onTap: () => _onDrawerItemTapped('Inventory', isSmallScreen),
-        ),
-        _buildDrawerItem(
-          icon: Icons.production_quantity_limits,
-          text: 'Products',
-          isSelected: selectedDrawerItem == 'Products',
-          onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
-        ),
+        _buildInventorySection(isSmallScreen),
         _buildDrawerItem(
           icon: Icons.analytics,
           text: 'Accounting',
@@ -200,6 +190,54 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  Widget _buildInventorySection(bool isSmallScreen) {
+    return Theme(
+      data: ThemeData(
+        dividerColor: Colors.transparent, // Remove divider color
+        splashColor: Colors.transparent, // Remove splash color
+        highlightColor: Colors.transparent, // Remove highlight color
+      ),
+      child: ExpansionTile(
+        tilePadding:
+            EdgeInsets.symmetric(horizontal: 20.0), // Consistent padding
+        title: Text(
+          'Inventory',
+          style: TextStyle(
+            color: selectedDrawerItem == 'Inventory'
+                ? Colors.white
+                : const Color.fromRGBO(6, 90, 216, 1),
+            fontSize: 16, // Ensure font size consistency
+          ),
+        ),
+        leading: Icon(
+          Icons.inventory,
+          color: selectedDrawerItem == 'Inventory'
+              ? Colors.white
+              : const Color.fromRGBO(6, 90, 216, 1),
+          size: 24, // Ensure icon size consistency
+        ),
+        backgroundColor: selectedDrawerItem == 'Inventory'
+            ? const Color.fromRGBO(6, 90, 216, 0.1)
+            : null,
+        children: <Widget>[
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 10.0), // Ensure consistent padding
+            child: _buildDrawerItem(
+              icon: Icons.production_quantity_limits,
+              text: 'Products',
+              isSelected: selectedDrawerItem == 'Products',
+              onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
+              isIndented: true, // Pass the indentation flag
+              iconSize: 20, // Adjust icon size
+              fontSize: 14, // Adjust font size
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _onDrawerItemTapped(String item, bool isSmallScreen) {
     setState(() {
       selectedDrawerItem = item;
@@ -214,16 +252,20 @@ class _DashboardPageState extends State<DashboardPage> {
     required String text,
     required bool isSelected,
     required VoidCallback onTap,
+    bool isIndented = false,
+    double iconSize = 24, // Optional parameter for icon size
+    double fontSize = 16, // Optional parameter for font size
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: EdgeInsets.only(
+          left: isIndented ? 32.0 : 8.0), // Add left padding if indented
       child: Container(
         decoration: isSelected
             ? BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
                     Color.fromRGBO(6, 90, 216, 0.7),
-                    Color.fromRGBO(6, 90, 216, 1)
+                    Color.fromRGBO(6, 90, 216, 1),
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -233,16 +275,20 @@ class _DashboardPageState extends State<DashboardPage> {
             : null,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
-          leading: Icon(icon,
-              color: isSelected
-                  ? Colors.white
-                  : const Color.fromRGBO(6, 90, 216, 1)),
+          leading: Icon(
+            icon,
+            color:
+                isSelected ? Colors.white : const Color.fromRGBO(6, 90, 216, 1),
+            size: iconSize, // Adjust icon size
+          ),
           title: Text(
             text,
             style: TextStyle(
-                color: isSelected
-                    ? Colors.white
-                    : const Color.fromRGBO(6, 90, 216, 1)),
+              color: isSelected
+                  ? Colors.white
+                  : const Color.fromRGBO(6, 90, 216, 1),
+              fontSize: fontSize, // Adjust font size
+            ),
           ),
           onTap: onTap,
         ),
@@ -271,135 +317,53 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildDashboardContent(bool isSmallScreen) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        const Text(
-          'Hello, Prarthi',
-          style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(6, 90, 216, 1)),
-        ),
-        const SizedBox(height: 10),
-        const Text(
-          "Here's what's happening with your store today",
-          style: TextStyle(
-            fontSize: 16,
-            color: Color.fromRGBO(135, 135, 135, 1),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const Text(
+            'Hello, Prarthi',
+            style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Color.fromRGBO(6, 90, 216, 1)),
           ),
-        ),
-        const SizedBox(height: 20),
-        const DashboardCards(),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              'Last updated: ${lastUpdatedTime != null ? DateFormat('hh:mm a').format(lastUpdatedTime!) : 'N/A'}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color.fromRGBO(135, 135, 135, 1),
-              ),
+          const SizedBox(height: 10),
+          const Text(
+            "Here's what's happening with your store today",
+            style: TextStyle(
+              fontSize: 16,
+              color: Color.fromRGBO(135, 135, 135, 1),
             ),
-            const SizedBox(width: 10),
-            ElevatedButton(
-              onPressed: _refreshData,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(40, 40),
-                backgroundColor: const Color.fromRGBO(6, 90, 216, 1),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-              child: const Text(
-                'Refresh',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+          ),
+          const SizedBox(height: 20),
+          const DashboardCards(),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'Last updated: ${lastUpdatedTime != null ? DateFormat('hh:mm a').format(lastUpdatedTime!) : 'N/A'}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: Color.fromRGBO(135, 135, 135, 1),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class DashboardCards extends StatelessWidget {
-  const DashboardCards({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: const [
-        DashboardCard(
-          color: Colors.red,
-          icon: Icons.shopping_cart,
-          title: 'Orders',
-          value: '20',
-        ),
-        DashboardCard(
-          color: Colors.blue,
-          icon: Icons.attach_money,
-          title: 'Revenue',
-          value: '\$2000',
-        ),
-        DashboardCard(
-          color: Colors.green,
-          icon: Icons.inventory,
-          title: 'Inventory',
-          value: '50',
-        ),
-      ],
-    );
-  }
-}
-
-class DashboardCard extends StatelessWidget {
-  final Color color;
-  final IconData icon;
-  final String title;
-  final String value;
-
-  const DashboardCard({
-    Key? key,
-    required this.color,
-    required this.icon,
-    required this.title,
-    required this.value,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: Colors.white, size: 32),
-            const SizedBox(height: 10),
-            Text(
-              title,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-            const SizedBox(height: 5),
-            Text(
-              value,
-              style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: _refreshData,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(100, 50),
+                  backgroundColor: const Color.fromRGBO(6, 90, 216, 1),
+                ),
+                child: const Text(
+                  'Refresh',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
