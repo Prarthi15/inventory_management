@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/dashboard_cards.dart';
+import 'package:inventory_management/resposive/product-mob.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -11,7 +12,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String selectedDrawerItem = 'Dashboard';
+  String selectedDrawerItem = 'Products';
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
