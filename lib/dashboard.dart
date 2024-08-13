@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/dashboard_cards.dart';
+import 'package:inventory_management/resposive/product-mob.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
