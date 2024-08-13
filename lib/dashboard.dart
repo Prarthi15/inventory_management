@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/dashboard_cards.dart';
-import 'package:inventory_management/resposive/product-mob.dart';
+import 'Custom-Files/colors.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -12,7 +12,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String selectedDrawerItem = 'Products';
+  String selectedDrawerItem = 'Dashboard';
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -38,11 +38,10 @@ class _DashboardPageState extends State<DashboardPage> {
           key: _scaffoldKey,
           drawer: isSmallScreen
               ? SizedBox(
-                  width: 220, // Adjust this width to make the drawer narrower
+                  width: 220,
                   child: Drawer(
                     child: Container(
-                      color:
-                          Colors.grey[200], // Grey background for small screens
+                      color: Colors.grey[200],
                       child: _buildDrawerContent(isSmallScreen),
                     ),
                   ),
@@ -53,12 +52,12 @@ class _DashboardPageState extends State<DashboardPage> {
               if (!isSmallScreen)
                 Container(
                   width: 200,
-                  color: const Color.fromRGBO(240, 240, 240, 1),
+                  color: AppColors.lightGrey,
                   child: _buildDrawerContent(isSmallScreen),
                 ),
               Expanded(
                 child: Container(
-                  color: Colors.white,
+                  color: AppColors.white,
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
@@ -69,7 +68,8 @@ class _DashboardPageState extends State<DashboardPage> {
                         children: <Widget>[
                           if (isSmallScreen)
                             IconButton(
-                              icon: const Icon(Icons.menu, color: Colors.grey),
+                              icon:
+                                  const Icon(Icons.menu, color: AppColors.grey),
                               onPressed: () {
                                 _scaffoldKey.currentState?.openDrawer();
                               },
@@ -85,22 +85,23 @@ class _DashboardPageState extends State<DashboardPage> {
                                   borderSide: BorderSide.none,
                                 ),
                                 filled: true,
-                                fillColor: Color.fromRGBO(238, 238, 238, 1),
+                                fillColor: AppColors.greyBackground,
                               ),
                             ),
                           ),
                           const SizedBox(width: 20),
                           IconButton(
                             icon: const Icon(Icons.notifications,
-                                color: Colors.grey),
+                                color: AppColors.grey),
                             onPressed: () {},
                           ),
                           const SizedBox(width: 10),
                           Row(
                             children: [
                               const CircleAvatar(
-                                backgroundColor: Colors.grey,
-                                child: Icon(Icons.person, color: Colors.white),
+                                backgroundColor: AppColors.grey,
+                                child:
+                                    Icon(Icons.person, color: AppColors.white),
                               ),
                               const SizedBox(width: 10),
                               const Text(
@@ -108,7 +109,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(6, 90, 216, 1),
+                                  color: AppColors.primaryBlue,
                                 ),
                               ),
                               const SizedBox(width: 5),
@@ -149,7 +150,7 @@ class _DashboardPageState extends State<DashboardPage> {
             style: TextStyle(
               fontSize: 27,
               fontWeight: FontWeight.bold,
-              color: Color.fromRGBO(6, 90, 216, 1),
+              color: AppColors.primaryBlue,
             ),
           ),
         ),
@@ -205,16 +206,16 @@ class _DashboardPageState extends State<DashboardPage> {
           'Inventory',
           style: TextStyle(
             color: selectedDrawerItem == 'Inventory'
-                ? Colors.white
-                : const Color.fromRGBO(6, 90, 216, 1),
+                ? AppColors.white
+                : AppColors.primaryBlue,
             fontSize: 16, // Ensure font size consistency
           ),
         ),
         leading: Icon(
           Icons.inventory,
           color: selectedDrawerItem == 'Inventory'
-              ? Colors.white
-              : const Color.fromRGBO(6, 90, 216, 1),
+              ? AppColors.white
+              : AppColors.primaryBlue,
           size: 24, // Ensure icon size consistency
         ),
         backgroundColor: selectedDrawerItem == 'Inventory'
@@ -265,8 +266,8 @@ class _DashboardPageState extends State<DashboardPage> {
             ? BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
-                    Color.fromRGBO(6, 90, 216, 0.7),
-                    Color.fromRGBO(6, 90, 216, 1),
+                    AppColors.primaryBlueLight,
+                    AppColors.primaryBlue,
                   ],
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
@@ -278,16 +279,13 @@ class _DashboardPageState extends State<DashboardPage> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
           leading: Icon(
             icon,
-            color:
-                isSelected ? Colors.white : const Color.fromRGBO(6, 90, 216, 1),
+            color: isSelected ? AppColors.white : AppColors.primaryBlue,
             size: iconSize, // Adjust icon size
           ),
           title: Text(
             text,
             style: TextStyle(
-              color: isSelected
-                  ? Colors.white
-                  : const Color.fromRGBO(6, 90, 216, 1),
+              color: isSelected ? AppColors.white : AppColors.primaryBlue,
               fontSize: fontSize, // Adjust font size
             ),
           ),
@@ -327,14 +325,14 @@ class _DashboardPageState extends State<DashboardPage> {
             style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Color.fromRGBO(6, 90, 216, 1)),
+                color: AppColors.primaryBlue),
           ),
           const SizedBox(height: 10),
           const Text(
             "Here's what's happening with your store today",
             style: TextStyle(
               fontSize: 16,
-              color: Color.fromRGBO(135, 135, 135, 1),
+              color: AppColors.greyText,
             ),
           ),
           const SizedBox(height: 20),
@@ -347,7 +345,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 'Last updated: ${lastUpdatedTime != null ? DateFormat('hh:mm a').format(lastUpdatedTime!) : 'N/A'}',
                 style: const TextStyle(
                   fontSize: 14,
-                  color: Color.fromRGBO(135, 135, 135, 1),
+                  color: AppColors.greyText,
                 ),
               ),
               const SizedBox(width: 10),
@@ -355,7 +353,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 onPressed: _refreshData,
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(100, 50),
-                  backgroundColor: const Color.fromRGBO(6, 90, 216, 1),
+                  backgroundColor: AppColors.primaryBlue,
                 ),
                 child: const Text(
                   'Refresh',

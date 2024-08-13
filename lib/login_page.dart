@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Custom-Files/colors.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -15,11 +16,11 @@ class LoginPage extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    color: Colors.white,
-                    padding: const EdgeInsets.all(40.0), // Padding on all sides
+                    color: AppColors.white,
+                    padding: const EdgeInsets.all(40.0),
                     child: Center(
                       child: Container(
-                        width: 400, // Width of the login form
+                        width: 400,
                         child: const LoginForm(),
                       ),
                     ),
@@ -28,13 +29,13 @@ class LoginPage extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    color: const Color.fromRGBO(6, 90, 216, 1),
+                    color: AppColors.primaryBlue,
                     child: const Center(
                       child: Text(
                         "Katyayani",
                         style: TextStyle(
                           fontSize: 60,
-                          color: Colors.white,
+                          color: AppColors.white,
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center,
@@ -47,7 +48,7 @@ class LoginPage extends StatelessWidget {
           } else {
             return SingleChildScrollView(
               child: Container(
-                color: Colors.white, // Background color for small screens
+                color: AppColors.white,
                 child: Column(
                   children: [
                     const Padding(
@@ -57,14 +58,13 @@ class LoginPage extends StatelessWidget {
                     Container(
                       width: double.infinity,
                       height: 300,
-                      color: const Color.fromRGBO(6, 90, 216, 1),
+                      color: AppColors.primaryBlue,
                       child: const Center(
                         child: Text(
                           "Katyayani",
                           style: TextStyle(
-                            fontSize:
-                                40, // Slightly smaller font size for small screens
-                            color: Colors.white,
+                            fontSize: 40,
+                            color: AppColors.white,
                             fontWeight: FontWeight.bold,
                           ),
                           textAlign: TextAlign.center,
@@ -91,19 +91,17 @@ class LoginForm extends StatefulWidget {
 
 class _LoginFormState extends State<LoginForm> {
   bool _rememberMe = false;
-  bool _obscurePassword = true; // State to manage password visibility
+  bool _obscurePassword = true;
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final bool isSmallScreen = MediaQuery.of(context).size.width <= 800;
-
-    // Define responsive font size
     double textSize = isSmallScreen ? 30.0 : 32.0;
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(31.0), // Padding around the form
+        padding: const EdgeInsets.all(31.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -111,9 +109,9 @@ class _LoginFormState extends State<LoginForm> {
             Text(
               "Katyayani Organics",
               style: TextStyle(
-                fontSize: textSize, // Use the responsive text size
+                fontSize: textSize,
                 fontWeight: FontWeight.bold,
-                color: const Color.fromRGBO(37, 128, 69, 1),
+                color: AppColors.primaryGreen,
               ),
             ),
             const SizedBox(height: 10),
@@ -131,14 +129,14 @@ class _LoginFormState extends State<LoginForm> {
                     onPressed: () {},
                     icon: const Icon(
                       FontAwesomeIcons.google,
-                      color: Color.fromRGBO(219, 68, 55, 1),
+                      color: AppColors.googleColor,
                       size: 18,
                     ),
                     label: const Text("Google"),
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: Colors.white,
-                      shadowColor: Colors.grey,
+                      foregroundColor: AppColors.black,
+                      backgroundColor: AppColors.white,
+                      shadowColor: AppColors.grey,
                       elevation: 5,
                     ),
                   ),
@@ -149,14 +147,14 @@ class _LoginFormState extends State<LoginForm> {
                     onPressed: () {},
                     icon: const Icon(
                       FontAwesomeIcons.facebook,
-                      color: Color.fromRGBO(24, 119, 242, 1),
+                      color: AppColors.facebookColor,
                       size: 18,
                     ),
                     label: const Text("Facebook"),
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: Colors.white,
-                      shadowColor: Colors.grey,
+                      foregroundColor: AppColors.black,
+                      backgroundColor: AppColors.white,
+                      shadowColor: AppColors.grey,
                       elevation: 5,
                     ),
                   ),
@@ -166,11 +164,11 @@ class _LoginFormState extends State<LoginForm> {
             const SizedBox(height: 20),
             const Row(
               children: [
-                Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                Expanded(child: Divider(thickness: 1, color: AppColors.grey)),
                 SizedBox(width: 10),
                 Text("or continue with email"),
                 SizedBox(width: 10),
-                Expanded(child: Divider(thickness: 1, color: Colors.grey)),
+                Expanded(child: Divider(thickness: 1, color: AppColors.grey)),
               ],
             ),
             const SizedBox(height: 10),
@@ -215,7 +213,7 @@ class _LoginFormState extends State<LoginForm> {
                             _rememberMe = value!;
                           });
                         },
-                        activeColor: const Color.fromRGBO(6, 90, 216, 1),
+                        activeColor: AppColors.primaryBlue,
                       ),
                       const Text("Remember me"),
                     ],
@@ -226,7 +224,7 @@ class _LoginFormState extends State<LoginForm> {
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(color: Color.fromRGBO(6, 90, 216, 1)),
+                      style: TextStyle(color: AppColors.primaryBlue),
                     ),
                   ),
                 ],
@@ -244,7 +242,7 @@ class _LoginFormState extends State<LoginForm> {
                             _rememberMe = value!;
                           });
                         },
-                        activeColor: const Color.fromRGBO(6, 90, 216, 1),
+                        activeColor: AppColors.primaryBlue,
                       ),
                       const Text("Remember me"),
                     ],
@@ -255,7 +253,7 @@ class _LoginFormState extends State<LoginForm> {
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(color: Color.fromRGBO(6, 90, 216, 1)),
+                      style: TextStyle(color: AppColors.primaryBlue),
                     ),
                   ),
                 ],
@@ -269,8 +267,8 @@ class _LoginFormState extends State<LoginForm> {
                   Navigator.pushNamed(context, '/dashboard');
                 },
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: const Color.fromRGBO(6, 90, 216, 1),
+                  foregroundColor: AppColors.white,
+                  backgroundColor: AppColors.primaryBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
@@ -285,16 +283,14 @@ class _LoginFormState extends State<LoginForm> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      "Don't have an account?",
-                    ),
+                    const Text("Don't have an account?"),
                     TextButton(
                       onPressed: () {
                         Navigator.pushNamed(context, '/createAccount');
                       },
                       child: const Text(
                         "Create an account",
-                        style: TextStyle(color: Color.fromRGBO(6, 90, 216, 1)),
+                        style: TextStyle(color: AppColors.primaryBlue),
                       ),
                     ),
                   ],
@@ -304,16 +300,14 @@ class _LoginFormState extends State<LoginForm> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Don't have an account?",
-                  ),
+                  const Text("Don't have an account?"),
                   TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, '/createAccount');
                     },
                     child: const Text(
                       "Create an account",
-                      style: TextStyle(color: Color.fromRGBO(6, 90, 216, 1)),
+                      style: TextStyle(color: AppColors.primaryBlue),
                     ),
                   ),
                 ],

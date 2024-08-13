@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import 'Custom-Files/colors.dart';
 
 class CreateAccountPage extends StatelessWidget {
   const CreateAccountPage({super.key});
@@ -18,7 +18,7 @@ class CreateAccountPage extends StatelessWidget {
                   child: Stack(
                     children: [
                       Container(
-                        color: const Color.fromRGBO(6, 90, 216, 1),
+                        color: AppColors.primaryBlue,
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.all(30.0),
@@ -30,7 +30,7 @@ class CreateAccountPage extends StatelessWidget {
                                   "Welcome Back!",
                                   style: TextStyle(
                                     fontSize: 32,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -39,7 +39,7 @@ class CreateAccountPage extends StatelessWidget {
                                   "To keep connected with us please login with your personal info",
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -49,9 +49,8 @@ class CreateAccountPage extends StatelessWidget {
                                     Navigator.pop(context);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    foregroundColor:
-                                        const Color.fromRGBO(6, 90, 216, 1),
-                                    backgroundColor: Colors.white,
+                                    foregroundColor: AppColors.primaryBlue,
+                                    backgroundColor: AppColors.white,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 20.0, horizontal: 20.0),
                                     shape: RoundedRectangleBorder(
@@ -69,8 +68,8 @@ class CreateAccountPage extends StatelessWidget {
                         top: 40,
                         left: 20,
                         child: IconButton(
-                          icon:
-                              const Icon(Icons.arrow_back, color: Colors.white),
+                          icon: const Icon(Icons.arrow_back,
+                              color: AppColors.white),
                           onPressed: () {
                             Navigator.pop(context);
                           },
@@ -82,7 +81,7 @@ class CreateAccountPage extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    color: Colors.white,
+                    color: AppColors.white,
                     padding: const EdgeInsets.all(40.0),
                     child: const Center(
                       child: CreateAccountForm(),
@@ -100,7 +99,7 @@ class CreateAccountPage extends StatelessWidget {
                       Container(
                         width: double.infinity,
                         height: 300,
-                        color: const Color.fromRGBO(6, 90, 216, 1),
+                        color: AppColors.primaryBlue,
                         child: Center(
                           child: Padding(
                             padding: const EdgeInsets.all(40.0),
@@ -112,7 +111,7 @@ class CreateAccountPage extends StatelessWidget {
                                   "Welcome Back!",
                                   style: TextStyle(
                                     fontSize: 32,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
@@ -121,7 +120,7 @@ class CreateAccountPage extends StatelessWidget {
                                   "To keep connected with us please login with your personal info",
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -131,9 +130,8 @@ class CreateAccountPage extends StatelessWidget {
                                     Navigator.pop(context);
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    foregroundColor:
-                                        const Color.fromRGBO(6, 90, 216, 1),
-                                    backgroundColor: Colors.white,
+                                    foregroundColor: AppColors.primaryBlue,
+                                    backgroundColor: AppColors.white,
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 20.0, horizontal: 20.0),
                                     shape: RoundedRectangleBorder(
@@ -158,7 +156,7 @@ class CreateAccountPage extends StatelessWidget {
                   top: 40,
                   left: 20,
                   child: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    icon: const Icon(Icons.arrow_back, color: AppColors.white),
                     onPressed: () {
                       Navigator.pop(context);
                     },
@@ -201,7 +199,7 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(6, 90, 216, 1),
+                  color: AppColors.primaryBlue,
                 ),
               ),
               const SizedBox(height: 20),
@@ -210,19 +208,19 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                 children: [
                   IconButton(
                     icon: const Icon(FontAwesomeIcons.facebook,
-                        color: Color.fromRGBO(24, 119, 242, 1)),
+                        color: AppColors.facebookColor),
                     onPressed: () {},
                   ),
                   const SizedBox(width: 10),
                   IconButton(
                     icon: const Icon(FontAwesomeIcons.google,
-                        color: Color.fromRGBO(219, 68, 55, 1)),
+                        color: AppColors.googleColor),
                     onPressed: () {},
                   ),
                   const SizedBox(width: 10),
                   IconButton(
                     icon: const Icon(FontAwesomeIcons.linkedin,
-                        color: Color.fromRGBO(0, 119, 181, 1)),
+                        color: AppColors.linkedinColor),
                     onPressed: () {},
                   ),
                 ],
@@ -255,7 +253,7 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                       _obscurePassword
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      color: Colors.grey,
+                      color: AppColors.grey,
                     ),
                     onPressed: () {
                       setState(() {
@@ -283,7 +281,7 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                       _obscureConfirmPassword
                           ? Icons.visibility
                           : Icons.visibility_off,
-                      color: Colors.grey,
+                      color: AppColors.grey,
                     ),
                     onPressed: () {
                       setState(() {
@@ -307,9 +305,8 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                     if (_formKey.currentState!.validate()) {}
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor:
-                        const Color.fromRGBO(6, 90, 216, 1), // Updated color
+                    foregroundColor: AppColors.white,
+                    backgroundColor: AppColors.primaryBlue,
                     padding: const EdgeInsets.symmetric(vertical: 16.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),

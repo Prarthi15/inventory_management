@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Custom-Files/colors.dart';
 
 class DashboardCards extends StatefulWidget {
   const DashboardCards({super.key});
@@ -55,7 +56,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                   value: '₹45,000',
                   subtitle: 'Yesterday: ₹60,000',
                   percentageChange: '-25%',
-                  changeColor: Colors.redAccent,
+                  changeColor: AppColors.cardsred,
                   chartData: const [1.0, 0.9, 0.8, 0.7],
                   width: threeCardWidth,
                   height: cardHeight,
@@ -65,7 +66,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                   value: '120',
                   subtitle: 'Yesterday: 140',
                   percentageChange: '-14%',
-                  changeColor: Colors.redAccent,
+                  changeColor: AppColors.cardsred,
                   chartData: [1.0, 0.95, 0.85, 0.7],
                   width: threeCardWidth,
                   height: cardHeight,
@@ -75,7 +76,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                   value: '₹0',
                   subtitle: 'Yesterday: ₹0',
                   percentageChange: '0%',
-                  changeColor: Colors.greenAccent,
+                  changeColor: AppColors.cardsgreen,
                   chartData: [1.0, 0.9, 0.85, 0.8],
                   width: threeCardWidth,
                   height: cardHeight,
@@ -101,7 +102,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                             value: '30',
                             subtitle: 'Yesterday: 35',
                             percentageChange: '-14%',
-                            changeColor: Colors.redAccent,
+                            changeColor: AppColors.cardsred,
                             chartData: const [1.0, 0.8, 0.7, 0.5],
                             width: fiveCardWidth,
                             height: cardHeight,
@@ -111,7 +112,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                             value: '1,200',
                             subtitle: 'Yesterday: 1,500',
                             percentageChange: '-20%',
-                            changeColor: Colors.redAccent,
+                            changeColor: AppColors.cardsred,
                             chartData: [1.0, 0.85, 0.75, 0.6],
                             width: fiveCardWidth,
                             height: cardHeight,
@@ -121,7 +122,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                             value: '850',
                             subtitle: 'Yesterday: 950',
                             percentageChange: 'NA',
-                            changeColor: Colors.grey,
+                            changeColor: AppColors.grey,
                             chartData: [1.0, 0.92, 0.85, 0.7],
                             width: fiveCardWidth,
                             height: cardHeight,
@@ -131,7 +132,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                             value: '25%',
                             subtitle: 'Yesterday: 30%',
                             percentageChange: '-16%',
-                            changeColor: Colors.redAccent,
+                            changeColor: AppColors.cardsred,
                             chartData: [1.0, 0.95, 0.85, 0.7],
                             width: fiveCardWidth,
                             height: cardHeight,
@@ -141,7 +142,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                             value: '5',
                             subtitle: 'Yesterday: 5',
                             percentageChange: '0%',
-                            changeColor: Colors.grey,
+                            changeColor: AppColors.grey,
                             chartData: [1.0, 1.0, 1.0, 1.0],
                             width: fiveCardWidth,
                             height: cardHeight,
@@ -167,7 +168,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                     value: '30',
                     subtitle: 'Yesterday: 35',
                     percentageChange: '-14%',
-                    changeColor: Colors.redAccent,
+                    changeColor: AppColors.cardsred,
                     chartData: [1.0, 0.8, 0.7, 0.5],
                     width: fiveCardWidth,
                     height: cardHeight,
@@ -177,7 +178,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                     value: '1,200',
                     subtitle: 'Yesterday: 1,500',
                     percentageChange: '-20%',
-                    changeColor: Colors.redAccent,
+                    changeColor: AppColors.cardsred,
                     chartData: [1.0, 0.85, 0.75, 0.6],
                     width: fiveCardWidth,
                     height: cardHeight,
@@ -187,7 +188,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                     value: '850',
                     subtitle: 'Yesterday: 950',
                     percentageChange: '-11%',
-                    changeColor: Colors.redAccent,
+                    changeColor: AppColors.cardsred,
                     chartData: [1.0, 0.92, 0.85, 0.7],
                     width: fiveCardWidth,
                     height: cardHeight,
@@ -197,7 +198,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                     value: '25%',
                     subtitle: 'Yesterday: 30%',
                     percentageChange: '-16%',
-                    changeColor: Colors.redAccent,
+                    changeColor: AppColors.cardsred,
                     chartData: [1.0, 0.95, 0.85, 0.7],
                     width: fiveCardWidth,
                     height: cardHeight,
@@ -207,7 +208,7 @@ class _DashboardCardsState extends State<DashboardCards> {
                     value: '5',
                     subtitle: 'Yesterday: 5',
                     percentageChange: '0%',
-                    changeColor: Colors.grey,
+                    changeColor: AppColors.grey,
                     chartData: [1.0, 1.0, 1.0, 1.0],
                     width: fiveCardWidth,
                     height: cardHeight,
@@ -250,11 +251,11 @@ class DashboardCard extends StatelessWidget {
       height: height,
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.white,
         borderRadius: BorderRadius.circular(8.0),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            color: AppColors.grey.withOpacity(0.3),
             spreadRadius: 2,
             blurRadius: 5,
           ),
@@ -270,7 +271,7 @@ class DashboardCard extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(6, 90, 216, 1),
+                  color: AppColors.primaryBlue,
                 ),
               ),
             ],
@@ -281,7 +282,7 @@ class DashboardCard extends StatelessWidget {
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: AppColors.black,
             ),
           ),
           const SizedBox(height: 4.0),
@@ -290,7 +291,7 @@ class DashboardCard extends StatelessWidget {
             children: [
               Text(
                 subtitle,
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
+                style: const TextStyle(fontSize: 12, color: AppColors.grey),
               ),
               Text(
                 percentageChange,
@@ -301,7 +302,6 @@ class DashboardCard extends StatelessWidget {
               ),
             ],
           ),
-          // Optionally, you can add a graph or a progress bar here using chartData.
         ],
       ),
     );

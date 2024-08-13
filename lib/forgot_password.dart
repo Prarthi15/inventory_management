@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Custom-Files/colors.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -14,7 +15,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(6, 90, 216, 1),
+      backgroundColor: AppColors.primaryBlue,
       body: Stack(
         children: [
           LayoutBuilder(
@@ -42,13 +43,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             style: TextStyle(
                               fontSize: 25,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.white,
                             ),
                           ),
                           const SizedBox(height: 10),
                           const Text(
                             'Please enter your email',
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(color: AppColors.white),
                           ),
                           const SizedBox(height: 20),
                           Form(
@@ -57,17 +58,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               width: MediaQuery.of(context).size.width * 0.8,
                               child: TextFormField(
                                 controller: _emailController,
-                                style: const TextStyle(color: Colors.white),
-                                cursorColor: Colors.white,
-                                decoration: InputDecoration(
+                                style: const TextStyle(color: AppColors.white),
+                                cursorColor: AppColors.white,
+                                decoration: const InputDecoration(
                                   labelText: 'Email',
-                                  labelStyle:
-                                      const TextStyle(color: Colors.white),
+                                  labelStyle: TextStyle(color: AppColors.white),
                                   enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white),
+                                    borderSide:
+                                        BorderSide(color: AppColors.white),
                                   ),
                                   focusedBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.white),
+                                    borderSide:
+                                        BorderSide(color: AppColors.white),
                                   ),
                                 ),
                                 keyboardType: TextInputType.emailAddress,
@@ -98,9 +100,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              foregroundColor:
-                                  const Color.fromRGBO(6, 90, 216, 1),
-                              backgroundColor: Colors.white,
+                              foregroundColor: AppColors.primaryBlue,
+                              backgroundColor: AppColors.white,
                             ),
                             child: const Text('Send Reset Link'),
                           ),
@@ -120,7 +121,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   style: TextStyle(
                                     fontSize: isLargeScreen ? 60 : 40,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -128,7 +129,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   'Please enter your email',
                                   style: TextStyle(
                                     fontSize: isLargeScreen ? 20 : 16,
-                                    color: Colors.white,
+                                    color: AppColors.white,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -139,20 +140,20 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         0.28,
                                     child: TextFormField(
                                       controller: _emailController,
-                                      style:
-                                          const TextStyle(color: Colors.white),
-                                      cursorColor: Colors.white,
-                                      decoration: InputDecoration(
+                                      style: const TextStyle(
+                                          color: AppColors.white),
+                                      cursorColor: AppColors.white,
+                                      decoration: const InputDecoration(
                                         labelText: 'Email',
-                                        labelStyle: const TextStyle(
-                                            color: Colors.white),
+                                        labelStyle:
+                                            TextStyle(color: AppColors.white),
                                         enabledBorder: UnderlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
+                                          borderSide: BorderSide(
+                                              color: AppColors.white),
                                         ),
                                         focusedBorder: UnderlineInputBorder(
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
+                                          borderSide: BorderSide(
+                                              color: AppColors.white),
                                         ),
                                       ),
                                       keyboardType: TextInputType.emailAddress,
@@ -185,9 +186,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     }
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    foregroundColor:
-                                        const Color.fromRGBO(6, 90, 216, 1),
-                                    backgroundColor: Colors.white,
+                                    foregroundColor: AppColors.primaryBlue,
+                                    backgroundColor: AppColors.white,
                                   ),
                                   child: const Text('Send Reset Link'),
                                 ),
@@ -216,7 +216,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             top: 40,
             left: 20,
             child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: const Icon(Icons.arrow_back, color: AppColors.white),
               onPressed: () {
                 Navigator.pop(context);
               },
