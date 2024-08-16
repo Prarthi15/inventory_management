@@ -89,12 +89,14 @@ class LoginForm extends StatefulWidget {
   @override
   _LoginFormState createState() => _LoginFormState();
 }
-
 class _LoginFormState extends State<LoginForm> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  
+  // Add a flag to switch between API and hardcoded values for testing
+  final bool _useHardcodedValues = true;
 
   @override
   Widget build(BuildContext context) {
@@ -267,35 +269,61 @@ class _LoginFormState extends State<LoginForm> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
-                  // Obtain the AuthProvider instance
-                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-                  // Perform login
-                  await authProvider.login(
-                    _emailController.text,
-                    _passwordController.text,
-                  );
-
-                  if (authProvider.token != null) {
-                    // Navigate to dashboard on successful login
-                    Navigator.pushNamed(context, '/dashboard');
+                  if (_useHardcodedValues) {
+                    // Hardcoded values for testing
+                    if (_emailController.text == 'prar@gmail.com' &&
+                        _passwordController.text == 'prarthi123') {
+                      // Navigate to dashboard on successful login
+                      Navigator.pushNamed(context, '/dashboard');
+                    } else {
+                      // Show error message for hardcoded values
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Login Error"),
+                          content: const Text("Invalid email or password."),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                   } else {
-                    // Show error message if login fails
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text("Login Error"),
-                        content: Text(authProvider.errorMessage ?? "An unknown error occurred."),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("OK"),
-                          ),
-                        ],
-                      ),
+                    // Obtain the AuthProvider instance
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+                    // Perform login via API
+                    await authProvider.login(
+                      _emailController.text,
+                      _passwordController.text,
                     );
+
+                    if (authProvider.token != null) {
+                      // Navigate to dashboard on successful login
+                      Navigator.pushNamed(context, '/dashboard');
+                    } else {
+                      // Show error message if login fails
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Login Error"),
+                          content: Text(authProvider.errorMessage ?? "An unknown error occurred."),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("OK"),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                   }
                 },
                 style: ElevatedButton.styleFrom(
