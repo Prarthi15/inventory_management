@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'Custom-Files/colors.dart';
+import 'package:provider/provider.dart';
+import 'package:inventory_management/Custom-Files/colors.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 
 class CreateAccountPage extends StatelessWidget {
   const CreateAccountPage({super.key});
@@ -183,6 +185,8 @@ class CreateAccountFormState extends State<CreateAccountForm> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  String? _password;
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -230,6 +234,20 @@ class CreateAccountFormState extends State<CreateAccountForm> {
               const SizedBox(height: 20),
               TextFormField(
                 decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.person),
+                  labelText: "Username",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your username';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.mail),
                   labelText: "Email",
                   border: OutlineInputBorder(),
@@ -266,6 +284,7 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
                   }
+                  _password = value; // Store the password
                   return null;
                 },
               ),
@@ -294,6 +313,10 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please confirm your password';
                   }
+                  if (value != _password) {
+                    return 'Passwords do not match';
+                  }
+
                   return null;
                 },
               ),
@@ -301,8 +324,33 @@ class CreateAccountFormState extends State<CreateAccountForm> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {}
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      try {
+                        await authProvider.register(
+                          'username', // Replace with actual username input
+                          'email', // Replace with actual email input
+                          _password!,
+                        );
+
+                        // Display snackbar and navigate on success
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Account created successfully!'),
+                          ),
+                        );
+                        await Future.delayed(const Duration(seconds: 1));
+                        Navigator.pushNamed(context, '/login'); // Ensure '/login' route exists
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to create account: $e'),
+                          ),
+                        );
+                      }
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: AppColors.white,

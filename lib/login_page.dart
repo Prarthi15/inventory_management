@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -81,7 +83,6 @@ class LoginPage extends StatelessWidget {
     );
   }
 }
-
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
@@ -92,6 +93,7 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -172,8 +174,9 @@ class _LoginFormState extends State<LoginForm> {
               ],
             ),
             const SizedBox(height: 10),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.mail),
                 labelText: "Email",
                 border: OutlineInputBorder(),
@@ -263,8 +266,37 @@ class _LoginFormState extends State<LoginForm> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/dashboard');
+                onPressed: () async {
+                  // Obtain the AuthProvider instance
+                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+                  // Perform login
+                  await authProvider.login(
+                    _emailController.text,
+                    _passwordController.text,
+                  );
+
+                  if (authProvider.token != null) {
+                    // Navigate to dashboard on successful login
+                    Navigator.pushNamed(context, '/dashboard');
+                  } else {
+                    // Show error message if login fails
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Login Error"),
+                        content: Text(authProvider.errorMessage ?? "An unknown error occurred."),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("OK"),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   foregroundColor: AppColors.white,
