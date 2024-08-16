@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget{
   final IconData? icon;
   final String? unit;
   final String? prefix;
+  final String? label;
   // final IconData? icon;
   final TextInputType keyboardType;
   final TextEditingController controller;
@@ -22,7 +23,7 @@ class CustomTextField extends StatelessWidget{
     this.prefix,
     this.keyboardType = TextInputType.text,
     required this.controller,
-    this.validator,
+    this.validator, this.label,
   });
 
   // Method to build the TextFormField
@@ -39,24 +40,25 @@ class CustomTextField extends StatelessWidget{
           controller: controller,
           maxLines: maxLines,
           keyboardType: keyboardType,
+          
           decoration: InputDecoration(
             prefixIcon: icon != null && prefix == null
-                ? Icon(icon)
+                ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(icon),
+                )
                 : prefix != null
                     ? Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(9.0),
                         child: Text(prefix!),
                       )
                     : null,
             suffix: unit != null ? Text(unit!) : const Text(''),
             errorStyle:const TextStyle(height: 0.1),
-            fillColor:Colors.blue.shade50,
+            fillColor:Colors.blue.shade100,
             filled:true,
-            border:OutlineInputBorder(
-              borderRadius:BorderRadius.circular(10),
-              borderSide:BorderSide.none,
-             
-            )
+            hintText: label??'',
+            border:InputBorder.none,
             
             
             

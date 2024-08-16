@@ -3,7 +3,9 @@ import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
 import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/products.dart';
+import 'package:provider/provider.dart';
 
+import 'Api/loginApi.dart';
 import 'create_account.dart';
 
 void main() {
@@ -31,7 +33,12 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginPage(),
+      home: MultiProvider(
+        providers: [
+ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ],
+        child: const LoginPage()
+        ),
       routes: {
         '/login': (context) => const LoginPage(),
         '/createAccount': (context) => const CreateAccountPage(),
