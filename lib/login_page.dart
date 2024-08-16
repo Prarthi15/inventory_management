@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Api/loginApi.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 
 class LoginPage extends StatelessWidget {
@@ -263,7 +264,8 @@ class _LoginFormState extends State<LoginForm> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async{
+                  await AuthProvider().register('','','');
                   Navigator.pushNamed(context, '/dashboard');
                 },
                 style: ElevatedButton.styleFrom(
