@@ -47,7 +47,7 @@ class AuthProvider with ChangeNotifier {
         _errorMessage = 'Failed to register. Status code: ${response.statusCode}';
       }
     } catch (error) {
-      print("aosjjknknjkn $_baseUrl");
+      print("aosjjknknjkn $error");
       _errorMessage = 'Error during registration: $error';
     } finally {
       _isLoading = false;
