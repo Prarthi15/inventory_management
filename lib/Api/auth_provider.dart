@@ -70,4 +70,61 @@ class AuthProvider with ChangeNotifier {
       throw Exception('Failed to verify OTP: $error');
     }
   }
+
+  Future<void> forgotPassword(String email) async {
+    final url = Uri.parse('$_baseUrl/forgot-password');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Password reset email sent');
+      } else {
+        print('Password reset failed: ${response.body}');
+      }
+    } catch (error) {
+      throw Exception('Failed to send password reset email: $error');
+    }
+  }
+
+  Future<void> verifyOtp(String email, String otp) async {
+    final url = Uri.parse('$_baseUrl/verify-otp');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email, 'otp': otp}),
+      );
+
+      if (response.statusCode == 200) {
+        print('OTP verification successful');
+      } else {
+        print('OTP verification failed: ${response.body}');
+      }
+    } catch (error) {
+      throw Exception('Failed to verify OTP: $error');
+    }
+  }
+
+  Future<void> resetPassword(String email, String newPassword) async {
+    final url = Uri.parse('$_baseUrl/reset-password');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email, 'newPassword': newPassword}),
+      );
+
+      if (response.statusCode == 200) {
+        print('Password reset successful');
+      } else {
+        print('Password reset failed: ${response.body}');
+      }
+    } catch (error) {
+      throw Exception('Failed to reset password: $error');
+    }
+  }
 }
