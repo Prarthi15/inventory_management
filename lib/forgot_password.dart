@@ -61,6 +61,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           Form(
                             key: _formKey,
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
                                   width:
@@ -100,77 +101,84 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: _otpController,
-                                        enabled: _isOtpSent,
-                                        style: const TextStyle(
-                                            color: AppColors.white),
-                                        cursorColor: AppColors.white,
-                                        decoration: const InputDecoration(
-                                          labelText: 'OTP',
-                                          labelStyle:
-                                              TextStyle(color: AppColors.white),
-                                          enabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _otpController,
+                                          enabled: _isOtpSent,
+                                          style: const TextStyle(
+                                              color: AppColors.white),
+                                          cursorColor: AppColors.white,
+                                          decoration: const InputDecoration(
+                                            labelText: 'OTP',
+                                            labelStyle: TextStyle(
                                                 color: AppColors.white),
-                                          ),
-                                          focusedBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide(
-                                                color: AppColors.white),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppColors.white),
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppColors.white),
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    ElevatedButton(
-                                      onPressed: _emailController
-                                                  .text.isNotEmpty &&
-                                              !_isOtpSent
-                                          ? () async {
-                                              setState(() {
-                                                _isSendingOtp = true;
-                                              });
+                                      const SizedBox(width: 10),
+                                      ElevatedButton(
+                                        onPressed: _emailController
+                                                    .text.isNotEmpty &&
+                                                !_isOtpSent
+                                            ? () async {
+                                                setState(() {
+                                                  _isSendingOtp = true;
+                                                });
 
-                                              await Provider.of<AuthProvider>(
-                                                      context,
-                                                      listen: false)
-                                                  .forgotPassword(
-                                                      _emailController.text);
+                                                await Provider.of<AuthProvider>(
+                                                        context,
+                                                        listen: false)
+                                                    .forgotPassword(
+                                                        _emailController.text);
 
-                                              setState(() {
-                                                _isOtpSent = true;
-                                                _isSendingOtp = false;
-                                              });
-                                            }
-                                          : _isOtpSent && !_isOtpVerified
-                                              ? () async {
-                                                  await Provider.of<
-                                                              AuthProvider>(
-                                                          context,
-                                                          listen: false)
-                                                      .verifyOtp(
-                                                          _emailController.text,
-                                                          _otpController.text);
+                                                setState(() {
+                                                  _isOtpSent = true;
+                                                  _isSendingOtp = false;
+                                                });
+                                              }
+                                            : _isOtpSent && !_isOtpVerified
+                                                ? () async {
+                                                    await Provider.of<
+                                                                AuthProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .verifyOtp(
+                                                            _emailController
+                                                                .text,
+                                                            _otpController
+                                                                .text);
 
-                                                  setState(() {
-                                                    _isOtpVerified = true;
-                                                  });
-                                                }
-                                              : null,
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: AppColors.primaryBlue,
-                                        backgroundColor: AppColors.white,
+                                                    setState(() {
+                                                      _isOtpVerified = true;
+                                                    });
+                                                  }
+                                                : null,
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor:
+                                              AppColors.primaryBlue,
+                                          backgroundColor: AppColors.white,
+                                        ),
+                                        child: Text(_isSendingOtp
+                                            ? 'Sending...'
+                                            : _isOtpSent
+                                                ? 'Verify'
+                                                : 'Send OTP'),
                                       ),
-                                      child: Text(_isSendingOtp
-                                          ? 'Sending...'
-                                          : _isOtpSent
-                                              ? 'Verify'
-                                              : 'Send OTP'),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                                 const SizedBox(height: 20),
                                 ElevatedButton(
@@ -224,6 +232,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 Form(
                                   key: _formKey,
                                   child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(
                                         width:
@@ -266,84 +276,93 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                         ),
                                       ),
                                       const SizedBox(height: 20),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: TextFormField(
-                                              controller: _otpController,
-                                              enabled: _isOtpSent,
-                                              style: const TextStyle(
-                                                  color: AppColors.white),
-                                              cursorColor: AppColors.white,
-                                              decoration: const InputDecoration(
-                                                labelText: 'OTP',
-                                                labelStyle: TextStyle(
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.28,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller: _otpController,
+                                                enabled: _isOtpSent,
+                                                style: const TextStyle(
                                                     color: AppColors.white),
-                                                enabledBorder:
-                                                    UnderlineInputBorder(
-                                                  borderSide: BorderSide(
+                                                cursorColor: AppColors.white,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: 'OTP',
+                                                  labelStyle: TextStyle(
                                                       color: AppColors.white),
-                                                ),
-                                                focusedBorder:
-                                                    UnderlineInputBorder(
-                                                  borderSide: BorderSide(
-                                                      color: AppColors.white),
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: AppColors.white),
+                                                  ),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: AppColors.white),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          ElevatedButton(
-                                            onPressed: _emailController
-                                                        .text.isNotEmpty &&
-                                                    !_isOtpSent
-                                                ? () async {
-                                                    setState(() {
-                                                      _isSendingOtp = true;
-                                                    });
+                                            const SizedBox(width: 10),
+                                            ElevatedButton(
+                                              onPressed: _emailController
+                                                          .text.isNotEmpty &&
+                                                      !_isOtpSent
+                                                  ? () async {
+                                                      setState(() {
+                                                        _isSendingOtp = true;
+                                                      });
 
-                                                    await Provider.of<
-                                                                AuthProvider>(
-                                                            context,
-                                                            listen: false)
-                                                        .forgotPassword(
-                                                            _emailController
-                                                                .text);
+                                                      await Provider.of<
+                                                                  AuthProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .forgotPassword(
+                                                              _emailController
+                                                                  .text);
 
-                                                    setState(() {
-                                                      _isOtpSent = true;
-                                                      _isSendingOtp = false;
-                                                    });
-                                                  }
-                                                : _isOtpSent && !_isOtpVerified
-                                                    ? () async {
-                                                        await Provider.of<
-                                                                    AuthProvider>(
-                                                                context,
-                                                                listen: false)
-                                                            .verifyOtp(
-                                                                _emailController
-                                                                    .text,
-                                                                _otpController
-                                                                    .text);
+                                                      setState(() {
+                                                        _isOtpSent = true;
+                                                        _isSendingOtp = false;
+                                                      });
+                                                    }
+                                                  : _isOtpSent &&
+                                                          !_isOtpVerified
+                                                      ? () async {
+                                                          await Provider.of<
+                                                                      AuthProvider>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .verifyOtp(
+                                                                  _emailController
+                                                                      .text,
+                                                                  _otpController
+                                                                      .text);
 
-                                                        setState(() {
-                                                          _isOtpVerified = true;
-                                                        });
-                                                      }
-                                                    : null,
-                                            style: ElevatedButton.styleFrom(
-                                              foregroundColor:
-                                                  AppColors.primaryBlue,
-                                              backgroundColor: AppColors.white,
+                                                          setState(() {
+                                                            _isOtpVerified =
+                                                                true;
+                                                          });
+                                                        }
+                                                      : null,
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor:
+                                                    AppColors.primaryBlue,
+                                                backgroundColor:
+                                                    AppColors.white,
+                                              ),
+                                              child: Text(_isSendingOtp
+                                                  ? 'Sending...'
+                                                  : _isOtpSent
+                                                      ? 'Verify'
+                                                      : 'Send OTP'),
                                             ),
-                                            child: Text(_isSendingOtp
-                                                ? 'Sending...'
-                                                : _isOtpSent
-                                                    ? 'Verify'
-                                                    : 'Send OTP'),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                       const SizedBox(height: 20),
                                       ElevatedButton(
@@ -370,33 +389,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 20),
                           Expanded(
-                            flex: 1,
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: SizedBox(
-                                width: constraints.maxWidth * 0.5,
-                                height: constraints.maxHeight * 0.6,
-                                child: Image.asset('assets/forgotPass.png',
-                                    fit: BoxFit.contain),
-                              ),
+                            flex: 2,
+                            child: SizedBox(
+                              width: 500,
+                              height: 500,
+                              child: Image.asset('assets/forgotPass.png',
+                                  fit: BoxFit.contain),
                             ),
                           ),
                         ],
                       ),
               );
             },
-          ),
-          Positioned(
-            top: 40,
-            left: 20,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.white),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
           ),
         ],
       ),
