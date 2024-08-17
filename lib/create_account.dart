@@ -10,6 +10,7 @@ class CreateAccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       body: LayoutBuilder(
         builder: (context, constraints) {
           if (constraints.maxWidth > 800) {
@@ -185,7 +186,71 @@ class CreateAccountFormState extends State<CreateAccountForm> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
+  String? _username;
+  String? _email;
   String? _password;
+  String? _confirmPassword;
+  bool _isOtpEnabled = false;
+  bool _isOtpSent = false;
+  bool _isOtpVerified = false;
+
+  final TextEditingController _otpController = TextEditingController();
+
+  @override
+  void dispose() {
+    _otpController.dispose();
+    super.dispose();
+  }
+
+  void _checkIfOtpCanBeEnabled() {
+    setState(() {
+      _isOtpEnabled = _username != null &&
+          _username!.isNotEmpty &&
+          _email != null &&
+          _email!.isNotEmpty &&
+          _password != null &&
+          _password!.isNotEmpty &&
+          _password == _confirmPassword;
+    });
+  }
+
+  Future<void> _sendOtp() async {
+    if (!_isOtpEnabled) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      await authProvider.register(_email!, _password!);
+      setState(() {
+        _isOtpSent = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP sent successfully!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send OTP: $error')),
+      );
+    }
+  }
+
+  Future<void> _verifyOtp() async {
+    if (_otpController.text.isEmpty) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      await authProvider.registerOtp(_email!, _otpController.text);
+      setState(() {
+        _isOtpVerified = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP verified successfully!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to verify OTP: $error')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -244,6 +309,10 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                   }
                   return null;
                 },
+                onChanged: (value) {
+                  _username = value;
+                  _checkIfOtpCanBeEnabled();
+                },
               ),
               const SizedBox(height: 10),
               TextFormField(
@@ -257,6 +326,10 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                     return 'Please enter your email';
                   }
                   return null;
+                },
+                onChanged: (value) {
+                  _email = value;
+                  _checkIfOtpCanBeEnabled();
                 },
               ),
               const SizedBox(height: 10),
@@ -284,8 +357,11 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your password';
                   }
-                  _password = value; // Store the password
                   return null;
+                },
+                onChanged: (value) {
+                  _password = value;
+                  _checkIfOtpCanBeEnabled();
                 },
               ),
               const SizedBox(height: 10),
@@ -316,52 +392,82 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                   if (value != _password) {
                     return 'Passwords do not match';
                   }
-
                   return null;
+                },
+                onChanged: (value) {
+                  _confirmPassword = value;
+                  _checkIfOtpCanBeEnabled();
                 },
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final authProvider =
-                          Provider.of<AuthProvider>(context, listen: false);
-                      try {
-                        await authProvider.register(
-                          'username', // Replace with actual username input
-                          'email', // Replace with actual email input
-                          _password!,
-                        );
-
-                        // Display snackbar and navigate on success
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('Account created successfully!'),
-                          ),
-                        );
-                        await Future.delayed(const Duration(seconds: 1));
-                        Navigator.pushNamed(context, '/login'); // Ensure '/login' route exists
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Failed to create account: $e'),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: AppColors.white,
-                    backgroundColor: AppColors.primaryBlue,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _otpController,
+                      enabled: _isOtpEnabled,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.sms),
+                        labelText: "OTP",
+                        border: OutlineInputBorder(),
+                      ),
+                      validator: (value) {
+                        if (_isOtpEnabled && (value == null || value.isEmpty)) {
+                          return 'Please enter the OTP';
+                        }
+                        return null;
+                      },
                     ),
                   ),
-                  child: const Text("SIGN UP"),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: _isOtpSent ? _verifyOtp : _sendOtp,
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 20.0, horizontal: 20.0),
+                      backgroundColor: AppColors.primaryBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Text(_isOtpSent ? "Verify" : "Send OTP"),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _isOtpVerified
+                    ? () async {
+                        if (_formKey.currentState!.validate()) {
+                          final authProvider =
+                              Provider.of<AuthProvider>(context, listen: false);
+                          try {
+                            await authProvider.register(_email!, _password!);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Account created successfully!')),
+                            );
+                            Navigator.pop(context);
+                          } catch (error) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content:
+                                      Text('Failed to create account: $error')),
+                            );
+                          }
+                        }
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 20.0, horizontal: 40.0),
+                  backgroundColor: AppColors.primaryBlue,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                 ),
+                child: const Text("Sign Up"),
               ),
             ],
           ),

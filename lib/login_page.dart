@@ -83,20 +83,19 @@ class LoginPage extends StatelessWidget {
     );
   }
 }
+
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
 
   @override
   _LoginFormState createState() => _LoginFormState();
 }
+
 class _LoginFormState extends State<LoginForm> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
-  // Add a flag to switch between API and hardcoded values for testing
-  final bool _useHardcodedValues = true;
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +228,10 @@ class _LoginFormState extends State<LoginForm> {
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(color: AppColors.primaryBlue),
+                      style: TextStyle(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -258,121 +260,73 @@ class _LoginFormState extends State<LoginForm> {
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(color: AppColors.primaryBlue),
+                      style: TextStyle(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
             ],
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  if (_useHardcodedValues) {
-                    // Hardcoded values for testing
-                    if (_emailController.text == 'prar@gmail.com' &&
-                        _passwordController.text == 'prarthi123') {
-                      // Navigate to dashboard on successful login
-                      Navigator.pushNamed(context, '/dashboard');
-                    } else {
-                      // Show error message for hardcoded values
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Login Error"),
-                          content: const Text("Invalid email or password."),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("OK"),
-                            ),
-                          ],
+            Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    String email = _emailController.text.trim();
+                    String password = _passwordController.text.trim();
+
+                    await authProvider.login(email, password);
+
+                    if (authProvider.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(authProvider.errorMessage!),
+                          backgroundColor: Colors.red,
                         ),
                       );
-                    }
-                  } else {
-                    // Obtain the AuthProvider instance
-                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-                    // Perform login via API
-                    await authProvider.login(
-                      _emailController.text,
-                      _passwordController.text,
-                    );
-
-                    if (authProvider.token != null) {
-                      // Navigate to dashboard on successful login
-                      Navigator.pushNamed(context, '/dashboard');
                     } else {
-                      // Show error message if login fails
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text("Login Error"),
-                          content: Text(authProvider.errorMessage ?? "An unknown error occurred."),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: const Text("OK"),
-                            ),
-                          ],
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Login successful"),
+                          backgroundColor: AppColors.primaryGreen,
                         ),
                       );
+                      Navigator.pushNamed(context, '/dashboard');
                     }
-                  }
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: AppColors.white,
-                  backgroundColor: AppColors.primaryBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBlue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 100.0, vertical: 20.0),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                ),
-                child: const Text("Log in"),
-              ),
+                  child: const Text("Log in"),
+                );
+              },
             ),
-            const SizedBox(height: 10),
-            if (isSmallScreen) ...[
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Don't have an account?"),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/createAccount');
-                      },
-                      child: const Text(
-                        "Create an account",
-                        style: TextStyle(color: AppColors.primaryBlue),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ] else ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Don't have an account?"),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/createAccount');
-                    },
-                    child: const Text(
-                      "Create an account",
-                      style: TextStyle(color: AppColors.primaryBlue),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Don't have an account?"),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/createAccount');
+                  },
+                  child: const Text(
+                    "Create Account",
+                    style: TextStyle(
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
-            ]
+                ),
+              ],
+            ),
           ],
         ),
       ),
