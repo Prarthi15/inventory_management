@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:inventory_management/products.dart';
 import 'package:inventory_management/dashboard_cards.dart';
 import 'Custom-Files/colors.dart';
-import 'package:inventory_management/product_master.dart';
+import 'package:inventory_management/product_manager.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -226,18 +225,6 @@ class _DashboardPageState extends State<DashboardPage> {
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
-              text: 'Products',
-              isSelected: selectedDrawerItem == 'Products',
-              onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
-              isIndented: true,
-              iconSize: 20,
-              fontSize: 14,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: _buildDrawerItem(
-              icon: Icons.production_quantity_limits,
               text: 'Product Master',
               isSelected: selectedDrawerItem == 'Product Master',
               onTap: () => _onDrawerItemTapped('Product Master', isSmallScreen),
@@ -313,10 +300,8 @@ class _DashboardPageState extends State<DashboardPage> {
         return const Center(child: Text("Sales Orders content goes here"));
       case 'Inventory':
         return const Center(child: Text("Inventory content goes here"));
-      case 'Products':
-        return const Products();
       case 'Product Master':
-        return const ProductMaster();
+        return const ProductDashboardPage();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
 

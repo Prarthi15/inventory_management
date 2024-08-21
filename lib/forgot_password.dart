@@ -24,6 +24,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       backgroundColor: AppColors.primaryBlue,
       body: Stack(
         children: [
+          Positioned(
+            top: 16,
+            left: 16,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
           LayoutBuilder(
             builder: (context, constraints) {
               final isSmallScreen = constraints.maxWidth < 600;
@@ -390,12 +400,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             ),
                           ),
                           Expanded(
-                            flex: 2,
-                            child: SizedBox(
-                              width: 500,
-                              height: 500,
-                              child: Image.asset('assets/forgotPass.png',
-                                  fit: BoxFit.contain),
+                            flex: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: SizedBox(
+                                width: 500,
+                                height: 500,
+                                child: Image.asset(
+                                  'assets/forgotPass.png',
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
                             ),
                           ),
                         ],
