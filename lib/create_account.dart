@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Api/loginApi.dart';
 import 'Custom-Files/colors.dart';
 
 class CreateAccountPage extends StatelessWidget {
@@ -302,7 +303,8 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {}
+                    // if (_formKey.currentState!.validate()) {}
+                    AuthProvider().register('','', '');
                   },
                   style: ElevatedButton.styleFrom(
                     foregroundColor: AppColors.white,

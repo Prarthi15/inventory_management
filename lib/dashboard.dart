@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/order-page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/dashboard_cards.dart';
 import 'Custom-Files/colors.dart';
@@ -14,7 +15,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String selectedDrawerItem = 'Products';
+  String selectedDrawerItem = 'Orders';
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -203,7 +204,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: ExpansionTile(
         tilePadding:
-            EdgeInsets.symmetric(horizontal: 20.0), // Consistent padding
+           const EdgeInsets.symmetric(horizontal: 20.0), // Consistent padding
         title: Text(
           'Inventory',
           style: TextStyle(
@@ -323,6 +324,8 @@ class _DashboardPageState extends State<DashboardPage> {
         return const Products();
       case 'Manage Inventory':
         return const ManageInventory();
+      case 'Orders':
+        return const OrdersPage();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
 

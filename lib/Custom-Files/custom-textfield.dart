@@ -21,6 +21,7 @@ class CustomTextField extends StatelessWidget{
     this.icon,
     this.unit,
     this.prefix,
+    
     this.keyboardType = TextInputType.text,
     required this.controller,
     this.validator, this.label,

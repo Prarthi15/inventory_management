@@ -265,7 +265,7 @@ class _LoginFormState extends State<LoginForm> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async{
-                  await AuthProvider().register('','','');
+                  // await AuthProvider().register('','','');
                   Navigator.pushNamed(context, '/dashboard');
                 },
                 style: ElevatedButton.styleFrom(
