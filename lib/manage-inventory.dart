@@ -5,6 +5,7 @@ import 'package:http/retry.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
+import 'package:pagination_flutter/pagination.dart';
 
 class ManageInventory extends StatefulWidget {
   const ManageInventory({super.key});
@@ -15,6 +16,7 @@ class ManageInventory extends StatefulWidget {
 
 class _ManageInventoryState extends State<ManageInventory> {
   int firstval=0,lastval=10;
+  int selectedPage=1;
   int size=40,currentPage=0,jump=5;
   @override
   Widget build(BuildContext context) {
@@ -433,40 +435,60 @@ class _ManageInventoryState extends State<ManageInventory> {
                 ),
               ),
                const SizedBox(height:10,),
-               SingleChildScrollView(
-                scrollDirection:Axis.horizontal,
-                 child: Row(
-                  mainAxisAlignment:MainAxisAlignment.start,
-                   children:[
-                    for(int i=0;i<size/jump;i++)
-                     Padding(
-                       padding: const EdgeInsets.symmetric(horizontal:8),
-                       child: InkWell(
-                         child: CircleAvatar(
-                            backgroundColor:AppColors.primaryBlue,
-                            child:Text('${i+1}',style:const TextStyle(color:AppColors.white),),       
-                         ),
-                         onTap:(){
-                          firstval=i*jump;
-                          lastval=(i+1)*jump;
-                          setState(() {
-                            
-                          });
-                         },
-                       ),
-                     ),
-                   
-                   ],
-                 ),
-               ),
-               InkWell(child: const Text('Load More'),
-               onTap:(){
-                size=size+20;
+               Pagination(
+              numOfPages: 10,
+              selectedPage: selectedPage,
+              pagesVisible: 5,
+              spacing: 10,
+              onPageChanged: (page) {
                 setState(() {
-                  print("size is here $size");
+                  firstval=(page-1)*5;
+                  lastval=firstval+5;
+                  selectedPage = page;
                 });
-               },
-               )
+              },
+              nextIcon: const Icon(
+                Icons.chevron_right_rounded,
+                color:AppColors.primaryBlue,
+                size: 20,
+              ),
+              previousIcon: const Icon(
+                Icons.chevron_left_rounded,
+                color: AppColors.primaryBlue,
+                size: 20,
+              ),
+              activeTextStyle: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+              activeBtnStyle: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(AppColors.primaryBlue),
+                shape: MaterialStateProperty.all(const CircleBorder(
+                  side: BorderSide(
+                    color: AppColors.primaryBlue,
+                    width: 1,
+                  ),
+                )),
+              ),
+              inactiveBtnStyle: ButtonStyle(
+                elevation: MaterialStateProperty.all(0),
+                backgroundColor: MaterialStateProperty.all(Colors.white),
+                shape: MaterialStateProperty.all(const CircleBorder(
+                  side: BorderSide(
+                    color: AppColors.primaryBlue,
+                    width: 1,
+                  ),
+                )),
+              ),
+              inactiveTextStyle: const TextStyle(
+                fontSize: 14,
+                color: AppColors.primaryBlue,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+              
+               
             ],
           ),
         ),
