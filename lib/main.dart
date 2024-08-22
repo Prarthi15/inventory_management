@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
 import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/products.dart';
-
-import 'create_account.dart';
+import 'package:inventory_management/reset_password.dart';
+import 'package:provider/provider.dart';
+import 'package:inventory_management/create_account.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -37,7 +44,8 @@ class MyApp extends StatelessWidget {
         '/createAccount': (context) => const CreateAccountPage(),
         '/forgotPassword': (context) => const ForgotPasswordPage(),
         '/dashboard': (context) => const DashboardPage(),
-        '/products': (context) => const Products()
+        '/products': (context) => const Products(),
+        '/reset_password': (context) => const ResetPasswordPage(),
       },
     );
   }
