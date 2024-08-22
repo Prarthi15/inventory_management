@@ -5,6 +5,7 @@ import 'package:inventory_management/order-page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/dashboard_cards.dart';
 import 'Custom-Files/colors.dart';
+import 'package:inventory_management/product_manager.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -198,20 +199,19 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildInventorySection(bool isSmallScreen) {
     return Theme(
       data: ThemeData(
-        dividerColor: Colors.transparent, // Remove divider color
-        splashColor: Colors.transparent, // Remove splash color
-        highlightColor: Colors.transparent, // Remove highlight color
+        dividerColor: Colors.transparent,
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
       ),
       child: ExpansionTile(
-        tilePadding:
-           const EdgeInsets.symmetric(horizontal: 20.0), // Consistent padding
+        tilePadding: const EdgeInsets.symmetric(horizontal: 20.0),
         title: Text(
           'Inventory',
           style: TextStyle(
             color: selectedDrawerItem == 'Inventory'
                 ? AppColors.white
                 : AppColors.primaryBlue,
-            fontSize: 16, // Ensure font size consistency
+            fontSize: 16,
           ),
         ),
         leading: Icon(
@@ -219,23 +219,22 @@ class _DashboardPageState extends State<DashboardPage> {
           color: selectedDrawerItem == 'Inventory'
               ? AppColors.white
               : AppColors.primaryBlue,
-          size: 24, // Ensure icon size consistency
+          size: 24,
         ),
         backgroundColor: selectedDrawerItem == 'Inventory'
             ? const Color.fromRGBO(6, 90, 216, 0.1)
             : null,
         children: <Widget>[
           Padding(
-            padding:
-                const EdgeInsets.only(left: 10.0), // Ensure consistent padding
+            padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
-              text: 'Products',
-              isSelected: selectedDrawerItem == 'Products',
-              onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
-              isIndented: true, // Pass the indentation flag
-              iconSize: 20, // Adjust icon size
-              fontSize: 14, // Adjust font size
+              text: 'Product Master',
+              isSelected: selectedDrawerItem == 'Product Master',
+              onTap: () => _onDrawerItemTapped('Product Master', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
             ),
           ),
          const  SizedBox(height:4,),
@@ -261,7 +260,7 @@ class _DashboardPageState extends State<DashboardPage> {
     setState(() {
       selectedDrawerItem = item;
       if (isSmallScreen) {
-        Navigator.pop(context); // Close the drawer on small screens
+        Navigator.pop(context);
       }
     });
   }
@@ -272,12 +271,11 @@ class _DashboardPageState extends State<DashboardPage> {
     required bool isSelected,
     required VoidCallback onTap,
     bool isIndented = false,
-    double iconSize = 24, // Optional parameter for icon size
-    double fontSize = 16, // Optional parameter for font size
+    double iconSize = 24,
+    double fontSize = 16,
   }) {
     return Padding(
-      padding: EdgeInsets.only(
-          left: isIndented ? 32.0 : 8.0), // Add left padding if indented
+      padding: EdgeInsets.only(left: isIndented ? 32.0 : 8.0),
       child: Container(
         decoration: isSelected
             ? BoxDecoration(
