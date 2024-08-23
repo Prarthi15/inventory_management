@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
         providers: [
 ChangeNotifierProvider(create: (context) => AuthProvider()),
         ],
-        child: const LoginPage()
+        child: const DashboardPage()
         ),
       routes: {
         '/login': (context) => const LoginPage(),

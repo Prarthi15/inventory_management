@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
+import 'package:textfields/textfields.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -78,6 +80,20 @@ class _OrdersPageState extends State<OrdersPage>
               Expanded(
                 child: Column(
                   children: [
+                    Container(
+                      height:12,
+                      width:50,
+                      color:Colors.amber,
+                      child: TextField(
+                        controller:TextEditingController(text:'12',),
+                        style:TextStyle(fontSize:10),
+                        decoration:InputDecoration(
+                          isDense: true,
+                          border:InputBorder.none,
+                          contentPadding:EdgeInsets.all(0)
+                        ),
+                        )
+                        ),
                     Row(
                       children: [
                         Checkbox.adaptive(
@@ -167,113 +183,121 @@ class _OrdersPageState extends State<OrdersPage>
                                   children: [
                                     Expanded(
                                       child: Column(
-                                        children: List.generate(
-                                          3, 
-                                          (i) {
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(vertical:15),
-                                              child: Row(
-                                                mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                                               children: [
-                                                  SizedBox(
-                                                    height: 150,
-                                                    width: 100,
-                                                    child: Column(
-                                                      children: [
-                                                        Container(
-                                                          height: 80,
-                                                          width: 100,
-                                                          color: Colors.amber,
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child:
-                                                              const Text("Image"),
+                                        children: [
+                                          Column(
+                                            children: List.generate(
+                                              index%2==0?1:2, 
+                                              (i) {
+                                                return Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical:15),
+                                                  child: Row(
+                                                    mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                                                   children: [
+                                                      SizedBox(
+                                                        height: 150,
+                                                        width: 100,
+                                                        child: Column(
+                                                          children: [
+                                                            Container(
+                                                              height: 80,
+                                                              width: 100,
+                                                              color: Colors.amber,
+                                                              alignment:
+                                                                  Alignment.center,
+                                                              child:
+                                                                  const Text("Image"),
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 2,
+                                                            ),
+                                                            const Text(
+                                                              "Daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                                              overflow: TextOverflow
+                                                                  .ellipsis,
+                                                              maxLines: 3,
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 2,
+                                                            )
+                                                          ],
                                                         ),
-                                                        const SizedBox(
-                                                          height: 2,
+                                                      ),
+                                                      SizedBox(
+                                                        child: Column(
+                                                          children: [
+                                                            _buildRow(
+                                                                'SKU', '123456'),
+                                                            SizedBox(height: 8.0),
+                                                            _buildRow(
+                                                                'Quantity', '10'),
+                                                            SizedBox(height: 8.0),
+                                                            _buildRow(
+                                                                'Brand', 'BrandName'),
+                                                            SizedBox(height: 8.0),
+                                                            _buildRow('Order Item Id',
+                                                                'ABC123'),
+                                                            SizedBox(height: 8.0),
+                                                          ],
                                                         ),
-                                                        const Text(
-                                                          "Daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 3,
+                                                      ),
+                                                      SizedBox(
+                                                        child: Column(children: [
+                                                          _buildRow('Total MRP',
+                                                              '\$100.00'),
+                                                          SizedBox(height: 8.0),
+                                                          _buildRow('Selling Price',
+                                                              '\$90.00'),
+                                                          SizedBox(height: 8.0),
+                                                          _buildRow('Payment Mode',
+                                                              'Credit Card'),
+                                                          SizedBox(height: 8.0),
+                                                          _buildRow('Shipping Method',
+                                                              'Standard Shipping'),
+                                                          SizedBox(height: 8.0),
+                                                          _buildRow('Shipping Mode',
+                                                              'Ground'),
+                                                          SizedBox(height: 8.0),
+                                                          _buildRow('Payment Status',
+                                                              'Paid'),
+                                                        ]),
+                                                      ),
+                                                      SizedBox(
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: <Widget>[
+                                                            _buildRow('Order Date',
+                                                                '2024-08-22'),
+                                                            SizedBox(height: 8.0),
+                                                            _buildRow('Import Date',
+                                                                '2024-08-20'),
+                                                            SizedBox(height: 8.0),
+                                                            _buildRow(
+                                                                'TAT', '3 Days'),
+                                                            SizedBox(height: 8.0),
+                                                            _buildRow(
+                                                                'QC Confirmation Date',
+                                                                '2024-08-21'),
+                                                            SizedBox(height: 8.0),
+                                                            _buildRow(
+                                                                'Inventory Assigned',
+                                                                '✔️',
+                                                                isCheckmark: true),
+                                                          ],
                                                         ),
-                                                        const SizedBox(
-                                                          height: 2,
-                                                        )
-                                                      ],
-                                                    ),
+                                                      )
+                                                    ],
                                                   ),
-                                                  SizedBox(
-                                                    child: Column(
-                                                      children: [
-                                                        _buildRow(
-                                                            'SKU', '123456'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'Quantity', '10'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'Brand', 'BrandName'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow('Order Item Id',
-                                                            'ABC123'),
-                                                        SizedBox(height: 8.0),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    child: Column(children: [
-                                                      _buildRow('Total MRP',
-                                                          '\$100.00'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Selling Price',
-                                                          '\$90.00'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Payment Mode',
-                                                          'Credit Card'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Shipping Method',
-                                                          'Standard Shipping'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Shipping Mode',
-                                                          'Ground'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Payment Status',
-                                                          'Paid'),
-                                                    ]),
-                                                  ),
-                                                  SizedBox(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        _buildRow('Order Date',
-                                                            '2024-08-22'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow('Import Date',
-                                                            '2024-08-20'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'TAT', '3 Days'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'QC Confirmation Date',
-                                                            '2024-08-21'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'Inventory Assigned',
-                                                            '✔️',
-                                                            isCheckmark: true),
-                                                      ],
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                         const Divider(
+                                            height:12,
+                                            color:Colors.amber,
+                                          ),
+                                        ],
                                       ),
                                     )
                                   ]),
