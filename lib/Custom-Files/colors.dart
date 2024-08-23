@@ -26,4 +26,10 @@ class AppColors {
       fontWeight:FontWeight.w600,
     );
   }
+    TextStyle get simpleHeadingStyle{
+    return const TextStyle(
+      fontWeight:FontWeight.bold,
+      fontSize:15,
+    );
+  }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'Custom-Files/colors.dart';
+import 'package:inventory_management/Custom-Files/colors.dart';
+import 'package:provider/provider.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -10,7 +12,11 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _emailController = TextEditingController();
+  final _otpController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isOtpSent = false;
+  bool _isOtpVerified = false;
+  bool _isSendingOtp = false;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +24,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       backgroundColor: AppColors.primaryBlue,
       body: Stack(
         children: [
+          Positioned(
+            top: 16,
+            left: 16,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: AppColors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
           LayoutBuilder(
             builder: (context, constraints) {
               final isSmallScreen = constraints.maxWidth < 600;
@@ -54,56 +70,146 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           const SizedBox(height: 20),
                           Form(
                             key: _formKey,
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: TextFormField(
-                                controller: _emailController,
-                                style: const TextStyle(color: AppColors.white),
-                                cursorColor: AppColors.white,
-                                decoration: const InputDecoration(
-                                  labelText: 'Email',
-                                  labelStyle: TextStyle(color: AppColors.white),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: AppColors.white),
-                                  ),
-                                  focusedBorder: UnderlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: AppColors.white),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: TextFormField(
+                                    controller: _emailController,
+                                    style:
+                                        const TextStyle(color: AppColors.white),
+                                    cursorColor: AppColors.white,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Email',
+                                      labelStyle:
+                                          TextStyle(color: AppColors.white),
+                                      enabledBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: AppColors.white),
+                                      ),
+                                      focusedBorder: UnderlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: AppColors.white),
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.emailAddress,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter your email';
+                                      }
+                                      if (!RegExp(r'\S+@\S+\.\S+')
+                                          .hasMatch(value)) {
+                                        return 'Please enter a valid email';
+                                      }
+                                      return null;
+                                    },
+                                    onChanged: (value) {
+                                      setState(() {});
+                                    },
                                   ),
                                 ),
-                                keyboardType: TextInputType.emailAddress,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your email';
-                                  }
-                                  if (!RegExp(r'\S+@\S+\.\S+')
-                                      .hasMatch(value)) {
-                                    return 'Please enter a valid email';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState?.validate() ?? false) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Reset link sent to ${_emailController.text}',
-                                    ),
+                                const SizedBox(height: 20),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: TextFormField(
+                                          controller: _otpController,
+                                          enabled: _isOtpSent,
+                                          style: const TextStyle(
+                                              color: AppColors.white),
+                                          cursorColor: AppColors.white,
+                                          decoration: const InputDecoration(
+                                            labelText: 'OTP',
+                                            labelStyle: TextStyle(
+                                                color: AppColors.white),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppColors.white),
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppColors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      ElevatedButton(
+                                        onPressed: _emailController
+                                                    .text.isNotEmpty &&
+                                                !_isOtpSent
+                                            ? () async {
+                                                setState(() {
+                                                  _isSendingOtp = true;
+                                                });
+
+                                                await Provider.of<AuthProvider>(
+                                                        context,
+                                                        listen: false)
+                                                    .forgotPassword(
+                                                        _emailController.text);
+
+                                                setState(() {
+                                                  _isOtpSent = true;
+                                                  _isSendingOtp = false;
+                                                });
+                                              }
+                                            : _isOtpSent && !_isOtpVerified
+                                                ? () async {
+                                                    await Provider.of<
+                                                                AuthProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .verifyOtp(
+                                                            _emailController
+                                                                .text,
+                                                            _otpController
+                                                                .text);
+
+                                                    setState(() {
+                                                      _isOtpVerified = true;
+                                                    });
+                                                  }
+                                                : null,
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor:
+                                              AppColors.primaryBlue,
+                                          backgroundColor: AppColors.white,
+                                        ),
+                                        child: Text(_isSendingOtp
+                                            ? 'Sending...'
+                                            : _isOtpSent
+                                                ? 'Verify'
+                                                : 'Send OTP'),
+                                      ),
+                                    ],
                                   ),
-                                );
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: AppColors.primaryBlue,
-                              backgroundColor: AppColors.white,
+                                ),
+                                const SizedBox(height: 20),
+                                ElevatedButton(
+                                  onPressed: _isOtpVerified
+                                      ? () {
+                                          if (_formKey.currentState
+                                                  ?.validate() ??
+                                              false) {
+                                            Navigator.pushNamed(
+                                                context, '/reset_password');
+                                          }
+                                        }
+                                      : null,
+                                  style: ElevatedButton.styleFrom(
+                                    foregroundColor: AppColors.primaryBlue,
+                                    backgroundColor: AppColors.white,
+                                  ),
+                                  child: const Text('Reset Password'),
+                                ),
+                              ],
                             ),
-                            child: const Text('Send Reset Link'),
                           ),
                         ],
                       )
@@ -135,75 +241,175 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                 const SizedBox(height: 20),
                                 Form(
                                   key: _formKey,
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.28,
-                                    child: TextFormField(
-                                      controller: _emailController,
-                                      style: const TextStyle(
-                                          color: AppColors.white),
-                                      cursorColor: AppColors.white,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Email',
-                                        labelStyle:
-                                            TextStyle(color: AppColors.white),
-                                        enabledBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.28,
+                                        child: TextFormField(
+                                          controller: _emailController,
+                                          style: const TextStyle(
                                               color: AppColors.white),
-                                        ),
-                                        focusedBorder: UnderlineInputBorder(
-                                          borderSide: BorderSide(
-                                              color: AppColors.white),
+                                          cursorColor: AppColors.white,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Email',
+                                            labelStyle: TextStyle(
+                                                color: AppColors.white),
+                                            enabledBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppColors.white),
+                                            ),
+                                            focusedBorder: UnderlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: AppColors.white),
+                                            ),
+                                          ),
+                                          keyboardType:
+                                              TextInputType.emailAddress,
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please enter your email';
+                                            }
+                                            if (!RegExp(r'\S+@\S+\.\S+')
+                                                .hasMatch(value)) {
+                                              return 'Please enter a valid email';
+                                            }
+                                            return null;
+                                          },
+                                          onChanged: (value) {
+                                            setState(() {});
+                                          },
                                         ),
                                       ),
-                                      keyboardType: TextInputType.emailAddress,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Please enter your email';
-                                        }
-                                        if (!RegExp(r'\S+@\S+\.\S+')
-                                            .hasMatch(value)) {
-                                          return 'Please enter a valid email';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 20),
-                                ElevatedButton(
-                                  onPressed: () {
-                                    if (_formKey.currentState?.validate() ??
-                                        false) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            'Reset link sent to ${_emailController.text}',
-                                          ),
+                                      const SizedBox(height: 20),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.28,
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller: _otpController,
+                                                enabled: _isOtpSent,
+                                                style: const TextStyle(
+                                                    color: AppColors.white),
+                                                cursorColor: AppColors.white,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  labelText: 'OTP',
+                                                  labelStyle: TextStyle(
+                                                      color: AppColors.white),
+                                                  enabledBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: AppColors.white),
+                                                  ),
+                                                  focusedBorder:
+                                                      UnderlineInputBorder(
+                                                    borderSide: BorderSide(
+                                                        color: AppColors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            ElevatedButton(
+                                              onPressed: _emailController
+                                                          .text.isNotEmpty &&
+                                                      !_isOtpSent
+                                                  ? () async {
+                                                      setState(() {
+                                                        _isSendingOtp = true;
+                                                      });
+
+                                                      await Provider.of<
+                                                                  AuthProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .forgotPassword(
+                                                              _emailController
+                                                                  .text);
+
+                                                      setState(() {
+                                                        _isOtpSent = true;
+                                                        _isSendingOtp = false;
+                                                      });
+                                                    }
+                                                  : _isOtpSent &&
+                                                          !_isOtpVerified
+                                                      ? () async {
+                                                          await Provider.of<
+                                                                      AuthProvider>(
+                                                                  context,
+                                                                  listen: false)
+                                                              .verifyOtp(
+                                                                  _emailController
+                                                                      .text,
+                                                                  _otpController
+                                                                      .text);
+
+                                                          setState(() {
+                                                            _isOtpVerified =
+                                                                true;
+                                                          });
+                                                        }
+                                                      : null,
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor:
+                                                    AppColors.primaryBlue,
+                                                backgroundColor:
+                                                    AppColors.white,
+                                              ),
+                                              child: Text(_isSendingOtp
+                                                  ? 'Sending...'
+                                                  : _isOtpSent
+                                                      ? 'Verify'
+                                                      : 'Send OTP'),
+                                            ),
+                                          ],
                                         ),
-                                      );
-                                    }
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: AppColors.primaryBlue,
-                                    backgroundColor: AppColors.white,
+                                      ),
+                                      const SizedBox(height: 20),
+                                      ElevatedButton(
+                                        onPressed: _isOtpVerified
+                                            ? () {
+                                                if (_formKey.currentState
+                                                        ?.validate() ??
+                                                    false) {
+                                                  Navigator.pushNamed(context,
+                                                      '/reset_password');
+                                                }
+                                              }
+                                            : null,
+                                        style: ElevatedButton.styleFrom(
+                                          foregroundColor:
+                                              AppColors.primaryBlue,
+                                          backgroundColor: AppColors.white,
+                                        ),
+                                        child: const Text('Reset Password'),
+                                      ),
+                                    ],
                                   ),
-                                  child: const Text('Send Reset Link'),
                                 ),
                               ],
                             ),
                           ),
-                          const SizedBox(width: 20),
                           Expanded(
-                            flex: 1,
-                            child: Align(
-                              alignment: Alignment.centerRight,
+                            flex: 3,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
                               child: SizedBox(
-                                width: constraints.maxWidth * 0.5,
-                                height: constraints.maxHeight * 0.6,
-                                child: Image.asset('assets/forgotPass.png',
-                                    fit: BoxFit.contain),
+                                width: 500,
+                                height: 500,
+                                child: Image.asset(
+                                  'assets/forgotPass.png',
+                                  fit: BoxFit.contain,
+                                ),
                               ),
                             ),
                           ),
@@ -211,16 +417,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
               );
             },
-          ),
-          Positioned(
-            top: 40,
-            left: 20,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: AppColors.white),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
           ),
         ],
       ),

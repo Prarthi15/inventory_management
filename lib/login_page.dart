@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:inventory_management/Api/loginApi.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -93,6 +94,7 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -173,8 +175,9 @@ class _LoginFormState extends State<LoginForm> {
               ],
             ),
             const SizedBox(height: 10),
-            const TextField(
-              decoration: InputDecoration(
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.mail),
                 labelText: "Email",
                 border: OutlineInputBorder(),
@@ -225,7 +228,10 @@ class _LoginFormState extends State<LoginForm> {
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(color: AppColors.primaryBlue),
+                      style: TextStyle(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -254,67 +260,73 @@ class _LoginFormState extends State<LoginForm> {
                     },
                     child: const Text(
                       "Forgot Password?",
-                      style: TextStyle(color: AppColors.primaryBlue),
+                      style: TextStyle(
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
               ),
             ],
             const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async{
-                  await AuthProvider().register('','','');
-                  Navigator.pushNamed(context, '/dashboard');
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: AppColors.white,
-                  backgroundColor: AppColors.primaryBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+            Consumer<AuthProvider>(
+              builder: (context, authProvider, child) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    String email = _emailController.text.trim();
+                    String password = _passwordController.text.trim();
+
+                    await authProvider.login(email, password);
+
+                    if (authProvider.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(authProvider.errorMessage!),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Login successful"),
+                          backgroundColor: AppColors.primaryGreen,
+                        ),
+                      );
+                      Navigator.pushNamed(context, '/dashboard');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBlue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 100.0, vertical: 20.0),
                   ),
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                ),
-                child: const Text("Log in"),
-              ),
+                  child: const Text("Log in"),
+                );
+              },
             ),
-            const SizedBox(height: 10),
-            if (isSmallScreen) ...[
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text("Don't have an account?"),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/createAccount');
-                      },
-                      child: const Text(
-                        "Create an account",
-                        style: TextStyle(color: AppColors.primaryBlue),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-            ] else ...[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Don't have an account?"),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/createAccount');
-                    },
-                    child: const Text(
-                      "Create an account",
-                      style: TextStyle(color: AppColors.primaryBlue),
+            const SizedBox(height: 15),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text("Don't have an account?"),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/createAccount');
+                  },
+                  child: const Text(
+                    "Create Account",
+                    style: TextStyle(
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
-            ]
+                ),
+              ],
+            ),
           ],
         ),
       ),
