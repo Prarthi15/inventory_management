@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:provider/provider.dart';
+import 'Api/auth_provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -94,6 +94,7 @@ class LoginForm extends StatefulWidget {
 class _LoginFormState extends State<LoginForm> {
   bool _rememberMe = false;
   bool _obscurePassword = true;
+  bool _isLoading = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -270,43 +271,65 @@ class _LoginFormState extends State<LoginForm> {
               ),
             ],
             const SizedBox(height: 20),
-            Consumer<AuthProvider>(
-              builder: (context, authProvider, child) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    String email = _emailController.text.trim();
-                    String password = _passwordController.text.trim();
+            ElevatedButton(
+              onPressed: _isLoading
+                  ? null
+                  : () async {
+                      setState(() {
+                        _isLoading = true;
+                      });
 
-                    await authProvider.login(email, password);
+                      String email = _emailController.text.trim();
+                      String password = _passwordController.text.trim();
 
-                    if (authProvider.errorMessage != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(authProvider.errorMessage!),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text("Login successful"),
-                          backgroundColor: AppColors.primaryGreen,
-                        ),
-                      );
-                      Navigator.pushNamed(context, '/dashboard');
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 100.0, vertical: 20.0),
-                  ),
-                  child: const Text("Log in"),
-                );
-              },
+                      final authProvider =
+                          Provider.of<AuthProvider>(context, listen: false);
+                      final result = await authProvider.login(email, password);
+
+                      setState(() {
+                        _isLoading = false;
+                      });
+
+                      if (result['success']) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Login successful"),
+                            backgroundColor: AppColors.primaryGreen,
+                          ),
+                        );
+                        Navigator.pushReplacementNamed(context, '/dashboard');
+                        _emailController.clear();
+                        _passwordController.clear();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result['message'] ?? "Login failed"),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        _emailController.clear();
+                        _passwordController.clear();
+                      }
+                    },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryBlue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 100.0, vertical: 20.0),
+                elevation: _isLoading ? 0 : 5,
+              ),
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(AppColors.white),
+                      ),
+                    )
+                  : const Text("Log in"),
             ),
             const SizedBox(height: 15),
             Row(

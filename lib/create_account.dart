@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:provider/provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
-import 'package:inventory_management/Api/auth_provider.dart';
+import 'package:provider/provider.dart';
+import 'Api/auth_provider.dart';
 
 class CreateAccountPage extends StatelessWidget {
   const CreateAccountPage({super.key});
@@ -185,20 +185,27 @@ class CreateAccountFormState extends State<CreateAccountForm> {
   final _formKey = GlobalKey<FormState>();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isOtpEnabled = false;
+  bool _isOtpSent = false;
+  bool _isOtpVerified = false;
+  bool _isLoading = false;
+  bool _isSendingOtp = false;
+  bool _isVerifyingOtp = false;
 
   String? _username;
   String? _email;
   String? _password;
   String? _confirmPassword;
-  bool _isOtpEnabled = false;
-  bool _isOtpSent = false;
-  bool _isOtpVerified = false;
 
   final TextEditingController _otpController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
 
   @override
   void dispose() {
     _otpController.dispose();
+    _emailController.dispose();
+    _usernameController.dispose();
     super.dispose();
   }
 
@@ -210,46 +217,17 @@ class CreateAccountFormState extends State<CreateAccountForm> {
           _email!.isNotEmpty &&
           _password != null &&
           _password!.isNotEmpty &&
-          _password == _confirmPassword;
+          _confirmPassword != null &&
+          _password == _confirmPassword &&
+          _isValidEmail(_email!);
     });
   }
 
-  Future<void> _sendOtp() async {
-    if (!_isOtpEnabled) return;
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    try {
-      await authProvider.register(_email!, _password!);
-      setState(() {
-        _isOtpSent = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP sent successfully!')),
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to send OTP: $error')),
-      );
-    }
-  }
-
-  Future<void> _verifyOtp() async {
-    if (_otpController.text.isEmpty) return;
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    try {
-      await authProvider.registerOtp(_email!, _otpController.text);
-      setState(() {
-        _isOtpVerified = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP verified successfully!')),
-      );
-    } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to verify OTP: $error')),
-      );
-    }
+  bool _isValidEmail(String email) {
+    final RegExp emailRegExp = RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    );
+    return emailRegExp.hasMatch(email);
   }
 
   @override
@@ -298,6 +276,7 @@ class CreateAccountFormState extends State<CreateAccountForm> {
               const Text("or use your email for registration:"),
               const SizedBox(height: 20),
               TextFormField(
+                controller: _usernameController,
                 decoration: const InputDecoration(
                   prefixIcon: Icon(Icons.person),
                   labelText: "Username",
@@ -316,14 +295,28 @@ class CreateAccountFormState extends State<CreateAccountForm> {
               ),
               const SizedBox(height: 10),
               TextFormField(
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.mail),
+                controller: _emailController,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.mail),
                   labelText: "Email",
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  suffixIcon: _email != null && _email!.isNotEmpty
+                      ? Icon(
+                          _isValidEmail(_email!)
+                              ? Icons.check_circle
+                              : Icons.cancel,
+                          color: _isValidEmail(_email!)
+                              ? Colors.green
+                              : Colors.red,
+                        )
+                      : null,
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter your email';
+                  }
+                  if (!_isValidEmail(value)) {
+                    return 'Please enter a valid email address';
                   }
                   return null;
                 },
@@ -421,7 +414,9 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                   ),
                   const SizedBox(width: 10),
                   ElevatedButton(
-                    onPressed: _isOtpSent ? _verifyOtp : _sendOtp,
+                    onPressed: _isOtpEnabled
+                        ? (_isOtpSent ? _verifyOtp : _sendOtp)
+                        : null,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           vertical: 20.0, horizontal: 20.0),
@@ -430,32 +425,25 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: Text(_isOtpSent ? "Verify" : "Send OTP"),
+                    child: _isSendingOtp
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.white),
+                            ),
+                          )
+                        : Text(_isOtpSent ? "Verify" : "Send OTP"),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: _isOtpVerified
-                    ? () async {
+                onPressed: _isOtpVerified && !_isVerifyingOtp
+                    ? () {
                         if (_formKey.currentState!.validate()) {
-                          final authProvider =
-                              Provider.of<AuthProvider>(context, listen: false);
-                          try {
-                            await authProvider.register(_email!, _password!);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content:
-                                      Text('Account created successfully!')),
-                            );
-                            Navigator.pop(context);
-                          } catch (error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content:
-                                      Text('Failed to create account: $error')),
-                            );
-                          }
+                          _register();
                         }
                       }
                     : null,
@@ -467,12 +455,111 @@ class CreateAccountFormState extends State<CreateAccountForm> {
                     borderRadius: BorderRadius.circular(8.0),
                   ),
                 ),
-                child: const Text("Sign Up"),
+                child: _isVerifyingOtp
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(AppColors.white),
+                        ),
+                      )
+                    : _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  AppColors.white),
+                            ),
+                          )
+                        : const Text("Sign Up"),
               ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  void _sendOtp() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (_email != null && _password != null) {
+      setState(() {
+        _isSendingOtp = true;
+      });
+      final response = await authProvider.register(_email!, _password!);
+      setState(() {
+        _isSendingOtp = false;
+      });
+
+      if (response['success']) {
+        setState(() {
+          _isOtpSent = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('OTP sent successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
+  }
+
+  void _verifyOtp() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final credentials = await authProvider.getCredentials();
+    final email = credentials['email'];
+    final password = credentials['password'];
+
+    if (email != null && _otpController.text.isNotEmpty && password != null) {
+      setState(() {
+        _isVerifyingOtp = true;
+      });
+      final response =
+          await authProvider.registerOtp(email, _otpController.text, password);
+      setState(() {
+        _isVerifyingOtp = false;
+      });
+
+      if (response['success']) {
+        setState(() {
+          _isOtpVerified = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('OTP verified successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
+  }
+
+  void _register() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    if (_email != null && _password != null && _username != null) {
+      setState(() {
+        _isLoading = true;
+      });
+      final response = await authProvider.register(_email!, _password!);
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (response['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created successfully!')),
+        );
+        Navigator.pushNamed(context, '/login');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response['message'])),
+        );
+      }
+    }
   }
 }
