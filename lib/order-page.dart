@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Api/order-page-checkbox-provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
+import 'package:provider/provider.dart';
 import 'package:textfields/textfields.dart';
 
 class OrdersPage extends StatefulWidget {
@@ -25,6 +27,7 @@ class _OrdersPageState extends State<OrdersPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    
   }
 
   @override
@@ -35,6 +38,7 @@ class _OrdersPageState extends State<OrdersPage>
 
   @override
   Widget build(BuildContext context) {
+    var checkBoxProvider =Provider.of<CheckBoxProvider>(context);
     return Scaffold(
       appBar: AppBar(
         bottom: TabBar(
@@ -97,11 +101,13 @@ class _OrdersPageState extends State<OrdersPage>
                     Row(
                       children: [
                         Checkbox.adaptive(
-                            value: mainCheckBox,
+                            value:checkBoxProvider.mainCheckBox,
                             onChanged: (val) {
-                              mainCheckBox = val!;
-                              _checkboxStates = List.generate(5, (index) => val);
-                              setState(() {});
+                              // mainCheckBox = val!;
+                              print("val is here $val");
+                              checkBoxProvider.upDateMainCheckBox(val!);
+                              // _checkboxStates = List.generate(5, (index) => val);
+                              // setState(() {});
                             }),
                         CustomButton(
                           width: 130,
@@ -147,10 +153,11 @@ class _OrdersPageState extends State<OrdersPage>
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Checkbox.adaptive(
-                                      value: _checkboxStates[index],
+                                      value: checkBoxProvider.checkboxStates[index],
                                       onChanged: (val) {
-                                        _checkboxStates[index] = val!;
-                                        setState(() {});
+                                        // _checkboxStates[index] = val!;
+                                        checkBoxProvider.updateListCheckBox(val!, index);
+                                        // setState(() {});
                                       }),
                                   customColumn("Easy Id", "222559741"),
                                   customColumn("Order Id", "ORD/mxmd2/6884"),
