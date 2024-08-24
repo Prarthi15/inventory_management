@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/retry.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
+import 'package:inventory_management/provider/manage-inventory-provider.dart';
 import 'package:pagination_flutter/pagination.dart';
+import 'package:provider/provider.dart';
 
 class ManageInventory extends StatefulWidget {
   const ManageInventory({super.key});
@@ -15,11 +18,13 @@ class ManageInventory extends StatefulWidget {
 }
 
 class _ManageInventoryState extends State<ManageInventory> {
-  int firstval=0,lastval=10;
-  int selectedPage=1;
-  int size=40,currentPage=0,jump=5;
+  int firstval = 0, lastval = 10;
+  int selectedPage = 1;
+  int size = 40, currentPage = 0, jump = 5;
+
   @override
   Widget build(BuildContext context) {
+    var manageInventoryProvider=Provider.of<ManagementProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       body: SingleChildScrollView(
@@ -117,20 +122,26 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 children: [
                                   CustomTextField(
                                     controller: TextEditingController(),
-                                    width:145,
+                                    width: 145,
                                   ),
                                   const SizedBox(width: 10),
                                   CustomTextField(
                                     controller: TextEditingController(),
-                                    width:145,
+                                    width: 145,
                                   ),
                                   const SizedBox(width: 10),
-                                 screenWidth>450?buttonForThisPage(
-                                      width: 70, height: 50, buttonTitle: 'GO'):const SizedBox(),
+                                  screenWidth > 450
+                                      ? buttonForThisPage(
+                                          width: 70,
+                                          height: 50,
+                                          buttonTitle: 'GO')
+                                      : const SizedBox(),
                                 ],
                               ),
-                              screenWidth<450?buttonForThisPage(
-                                      width: 70, height: 50, buttonTitle: 'GO'):const SizedBox(),
+                              screenWidth < 450
+                                  ? buttonForThisPage(
+                                      width: 70, height: 50, buttonTitle: 'GO')
+                                  : const SizedBox(),
                               Text('Search',
                                   style: AppColors().simpleHeadingStyle),
                               Row(
@@ -142,14 +153,16 @@ class _ManageInventoryState extends State<ManageInventory> {
                                   const SizedBox(width: 10),
                                   CustomTextField(
                                     controller: TextEditingController(),
-                                    width:screenWidth*0.15,
-                                    label:'Search Exact SKU',
+                                    width: screenWidth * 0.15,
+                                    label: 'Search Exact SKU',
                                   ),
                                   const SizedBox(
                                     width: 5,
                                   ),
-                                 screenWidth>450?Text('Search Exact SKU',
-                                      style: AppColors().simpleHeadingStyle):const SizedBox(),
+                                  screenWidth > 450
+                                      ? Text('Search Exact SKU',
+                                          style: AppColors().simpleHeadingStyle)
+                                      : const SizedBox(),
                                   const SizedBox(
                                     width: 5,
                                   ),
@@ -162,8 +175,8 @@ class _ManageInventoryState extends State<ManageInventory> {
                                   ),
                                 ],
                               ),
-                             const SizedBox(
-                                height:5,
+                              const SizedBox(
+                                height: 5,
                               ),
                               buttonForThisPage(
                                   buttonTitle: 'Download Inventory',
@@ -278,7 +291,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
                                   child: Text(
-                                    'Company ${firstval+index+1}',
+                                    'Company ${firstval + index + 1}',
                                     overflow: TextOverflow.visible,
                                     softWrap: true,
                                   ),
@@ -290,15 +303,15 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('Category ${firstval+index+1}'),
+                                  child:
+                                      Text('Category ${firstval + index + 1}'),
                                 ),
                               )),
                               DataCell(Image.network(
                                 'https://sharmellday.com/wp-content/uploads/2022/12/032_Canva-Text-to-Image-Generator-min-1.jpg',
                                 width: 100,
                                 height: 400,
-                              )
-                              ),
+                              )),
                               DataCell(IntrinsicHeight(
                                 child: Container(
                                   constraints: const BoxConstraints(
@@ -306,7 +319,8 @@ class _ManageInventoryState extends State<ManageInventory> {
                                   ),
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.vertical,
-                                    child: Text('Brand ${firstval+index+1}'),
+                                    child:
+                                        Text('Brand ${firstval + index + 1}'),
                                   ),
                                 ),
                               )),
@@ -316,7 +330,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('SKU${firstval+index+1}'),
+                                  child: Text('SKU${firstval + index + 1}'),
                                 ),
                               )),
                               DataCell(Container(
@@ -325,7 +339,8 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('Product Name ${firstval+index+1}'),
+                                  child: Text(
+                                      'Product Name ${firstval + index + 1}'),
                                 ),
                               )),
                               DataCell(Container(
@@ -334,7 +349,8 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('Model No ${firstval+index+1}'),
+                                  child:
+                                      Text('Model No ${firstval + index + 1}'),
                                 ),
                               )),
                               DataCell(Container(
@@ -343,7 +359,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('MRP ${firstval+index+1}'),
+                                  child: Text('MRP ${firstval + index + 1}'),
                                 ),
                               )),
                               DataCell(Container(
@@ -371,7 +387,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                                             AppColors.black)),
                                                 child: Center(
                                                     child: Text(
-                                                        "Quantity ${firstval+index+1}")),
+                                                        "Quantity ${firstval + index + 1}")),
                                               ),
                                               const SizedBox(height: 3),
                                               buttonForThisPage(),
@@ -404,7 +420,8 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('Flipkart ${firstval+index+1}'),
+                                  child:
+                                      Text('Flipkart ${firstval + index + 1}'),
                                 ),
                               )),
                               DataCell(Container(
@@ -413,7 +430,8 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('Snapdeal ${firstval+index+1}'),
+                                  child:
+                                      Text('Snapdeal ${firstval + index + 1}'),
                                 ),
                               )),
                               DataCell(Container(
@@ -422,73 +440,117 @@ class _ManageInventoryState extends State<ManageInventory> {
                                 ),
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.vertical,
-                                  child: Text('Amazon ${firstval+index+1}'),
+                                  child: Text('Amazon ${firstval + index + 1}'),
                                 ),
                               )),
                             ],
                           ),
-                        // ),
-                      ),
+                          // ),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
-               const SizedBox(height:10,),
-               Pagination(
-              numOfPages: 10,
-              selectedPage: selectedPage,
-              pagesVisible: 5,
-              spacing: 10,
-              onPageChanged: (page) {
-                setState(() {
-                  firstval=(page-1)*5;
-                  lastval=firstval+5;
-                  selectedPage = page;
-                });
-              },
-              nextIcon: const Icon(
-                Icons.chevron_right_rounded,
-                color:AppColors.primaryBlue,
-                size: 20,
+              const SizedBox(
+                height: 10,
               ),
-              previousIcon: const Icon(
-                Icons.chevron_left_rounded,
-                color: AppColors.primaryBlue,
-                size: 20,
-              ),
-              activeTextStyle: const TextStyle(
-                color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-              ),
-              activeBtnStyle: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(AppColors.primaryBlue),
-                shape: MaterialStateProperty.all(const CircleBorder(
-                  side: BorderSide(
-                    color: AppColors.primaryBlue,
-                    width: 1,
+              Row(
+                children: [
+                  InkWell(
+                    child: const FaIcon(
+                      FontAwesomeIcons.chevronLeft,
+                    ),
+                    onTap: () {
+                      // selectedPage = 1;
+                      manageInventoryProvider.upDateSelectedPage(1);
+                      // setState(() {});
+                    },
                   ),
-                )),
-              ),
-              inactiveBtnStyle: ButtonStyle(
-                elevation: MaterialStateProperty.all(0),
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                shape: MaterialStateProperty.all(const CircleBorder(
-                  side: BorderSide(
-                    color: AppColors.primaryBlue,
-                    width: 1,
+                  Pagination(
+                    numOfPages: manageInventoryProvider.numberofPages,
+                    selectedPage:manageInventoryProvider.selectedPage,
+                    pagesVisible: 5,
+                    spacing: 10,
+                    onPageChanged: (page) {
+                      print("page is here $page");
+                      // setState(() {
+                        // firstval = (page - 1) * 5;
+                        // lastval = firstval + 5;
+                        manageInventoryProvider.upDateSelectedPage(page);
+                        // selectedPage = page;
+                      // });
+                      // setState(() {
+                        
+                      // });
+                    },
+                    nextIcon: const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.primaryBlue,
+                      size: 20,
+                    ),
+                    previousIcon: const Icon(
+                      Icons.chevron_left_rounded,
+                      color: AppColors.primaryBlue,
+                      size: 20,
+                    ),
+                    activeTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    activeBtnStyle: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(AppColors.primaryBlue),
+                      shape: MaterialStateProperty.all(const CircleBorder(
+                        side: BorderSide(
+                          color: AppColors.primaryBlue,
+                          width: 1,
+                        ),
+                      )),
+                    ),
+                    inactiveBtnStyle: ButtonStyle(
+                      elevation: MaterialStateProperty.all(0),
+                      backgroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(const CircleBorder(
+                        side: BorderSide(
+                          color: AppColors.primaryBlue,
+                          width: 1,
+                        ),
+                      )),
+                    ),
+                    inactiveTextStyle: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                )),
+                  InkWell(
+                    child: const FaIcon(
+                      FontAwesomeIcons.chevronRight,
+                    ),
+                    onTap: () {
+                      // selectedPage = 10;
+                      manageInventoryProvider.upDateSelectedPage(manageInventoryProvider.numberofPages);
+                      // setState(() {});
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height:30,
+                      width:50,
+                      decoration:BoxDecoration(
+                        border:Border.all(
+                          color:AppColors.lightBlue
+                        ),
+                        
+                      ),
+                      child:Center(child: Text('${manageInventoryProvider.selectedPage}/${manageInventoryProvider.numberofPages}')),
+                    ),
+                  ),
+                ],
               ),
-              inactiveTextStyle: const TextStyle(
-                fontSize: 14,
-                color: AppColors.primaryBlue,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-              
-               
             ],
           ),
         ),
