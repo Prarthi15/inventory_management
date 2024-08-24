@@ -19,6 +19,9 @@ class AppColors {
   static const Color cardsred = Colors.redAccent;
   static const Color cardsgreen = Colors.greenAccent;
 // <<<<<<< HEAD
+// <<<<<<< HEAD
+// =======
+// >>>>>>> f739855e4312bceed673e57a85e5f13ee337e5ee
   //getWidth
   double getWidth(BuildContext context){
   return MediaQuery.of(context).size.width;
@@ -35,8 +38,11 @@ class AppColors {
       fontSize:15,
     );
   }
+// <<<<<<< HEAD
 // =======
   static const Color lightBlue = Color.fromRGBO(3, 169, 244, 1);
   static const Color tealcolor = Color.fromRGBO(38, 166, 154, 1);
 // >>>>>>> d730f9b8e18daf06e72f376d49e2a1dcb3bb96e2
+// =======
+// >>>>>>> f739855e4312bceed673e57a85e5f13ee337e5ee
 }
