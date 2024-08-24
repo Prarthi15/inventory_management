@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/order-page.dart';
+import 'package:inventory_management/products.dart';
 import 'package:inventory_management/dashboard_cards.dart';
 import 'Custom-Files/colors.dart';
 import 'package:inventory_management/product_manager.dart';
@@ -8,11 +11,12 @@ class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DashboardPageState createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String selectedDrawerItem = 'Dashboard';
+  String selectedDrawerItem = 'Orders';
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -233,6 +237,20 @@ class _DashboardPageState extends State<DashboardPage> {
               fontSize: 14,
             ),
           ),
+         const  SizedBox(height:4,),
+           Padding(
+            padding:
+                const EdgeInsets.only(left: 10.0), // Ensure consistent padding
+            child: _buildDrawerItem(
+              icon: Icons.production_quantity_limits,
+              text: 'Manage Inventory',
+              isSelected: selectedDrawerItem == 'Manage Inventory',
+              onTap: () => _onDrawerItemTapped('Manage Inventory', isSmallScreen),
+              isIndented: true, // Pass the indentation flag
+              iconSize: 20, // Adjust icon size
+              fontSize: 14, // Adjust font size
+            ),
+          ),
         ],
       ),
     );
@@ -300,8 +318,12 @@ class _DashboardPageState extends State<DashboardPage> {
         return const Center(child: Text("Sales Orders content goes here"));
       case 'Inventory':
         return const Center(child: Text("Inventory content goes here"));
-      case 'Product Master':
-        return const ProductDashboardPage();
+      case 'Products':
+        return const Products();
+      case 'Manage Inventory':
+        return const ManageInventory();
+      case 'Orders':
+        return const OrdersPage();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
 

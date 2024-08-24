@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
+import 'package:inventory_management/Api/order-page-checkbox-provider.dart';
 import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
 import 'package:inventory_management/login_page.dart';
@@ -38,7 +39,13 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginPage(),
+      home: MultiProvider(
+        providers: [
+ChangeNotifierProvider(create: (context) => AuthProvider()),
+ChangeNotifierProvider(create:(context)=>CheckBoxProvider())
+        ],
+        child: const DashboardPage()
+        ),
       routes: {
         '/login': (context) => const LoginPage(),
         '/createAccount': (context) => const CreateAccountPage(),

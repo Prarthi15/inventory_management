@@ -16,4 +16,20 @@ class AppColors {
   static const Color drawerBackground = Colors.grey;
   static const Color cardsred = Colors.redAccent;
   static const Color cardsgreen = Colors.greenAccent;
+  //getWidth
+  double getWidth(BuildContext context){
+  return MediaQuery.of(context).size.width;
+  }
+  // static const double MediaQuery.of(context).
+  TextStyle get headerStyle{
+    return const TextStyle(
+      fontWeight:FontWeight.w600,
+    );
+  }
+    TextStyle get simpleHeadingStyle{
+    return const TextStyle(
+      fontWeight:FontWeight.bold,
+      fontSize:15,
+    );
+  }
 }
