@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
-import 'package:provider/provider.dart';
-import 'package:inventory_management/Api/auth_provider.dart';
+import 'Api/auth_provider.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -17,6 +16,30 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   bool _isOtpSent = false;
   bool _isOtpVerified = false;
   bool _isSendingOtp = false;
+  bool _isEmailValid = false;
+  bool _isEmailEmpty = true;
+
+  final AuthProvider _authProvider = AuthProvider();
+
+  void _showSnackbar(String message, {bool isSuccess = true}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: isSuccess ? Colors.black : Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _validateEmail(String email) {
+    setState(() {
+      _isEmailEmpty = email.isEmpty;
+      _isEmailValid = RegExp(r'\S+@\S+\.\S+').hasMatch(email);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,18 +104,29 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                     style:
                                         const TextStyle(color: AppColors.white),
                                     cursorColor: AppColors.white,
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                       labelText: 'Email',
-                                      labelStyle:
-                                          TextStyle(color: AppColors.white),
-                                      enabledBorder: UnderlineInputBorder(
+                                      labelStyle: const TextStyle(
+                                          color: AppColors.white),
+                                      enabledBorder: const UnderlineInputBorder(
                                         borderSide:
                                             BorderSide(color: AppColors.white),
                                       ),
-                                      focusedBorder: UnderlineInputBorder(
+                                      focusedBorder: const UnderlineInputBorder(
                                         borderSide:
                                             BorderSide(color: AppColors.white),
                                       ),
+                                      suffixIcon:
+                                          _emailController.text.isNotEmpty
+                                              ? Icon(
+                                                  _isEmailValid
+                                                      ? Icons.check_circle
+                                                      : Icons.cancel,
+                                                  color: _isEmailValid
+                                                      ? Colors.green
+                                                      : Colors.red,
+                                                )
+                                              : null,
                                     ),
                                     keyboardType: TextInputType.emailAddress,
                                     validator: (value) {
@@ -106,8 +140,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       return null;
                                     },
                                     onChanged: (value) {
-                                      setState(() {});
+                                      _validateEmail(value);
                                     },
+                                    enabled: !_isOtpVerified,
                                   ),
                                 ),
                                 const SizedBox(height: 20),
@@ -119,7 +154,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       Expanded(
                                         child: TextFormField(
                                           controller: _otpController,
-                                          enabled: _isOtpSent,
+                                          enabled:
+                                              _isOtpSent && !_isOtpVerified,
                                           style: const TextStyle(
                                               color: AppColors.white),
                                           cursorColor: AppColors.white,
@@ -140,42 +176,61 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                       ),
                                       const SizedBox(width: 10),
                                       ElevatedButton(
-                                        onPressed: _emailController
-                                                    .text.isNotEmpty &&
-                                                !_isOtpSent
-                                            ? () async {
-                                                setState(() {
-                                                  _isSendingOtp = true;
-                                                });
-
-                                                await Provider.of<AuthProvider>(
-                                                        context,
-                                                        listen: false)
-                                                    .forgotPassword(
-                                                        _emailController.text);
-
-                                                setState(() {
-                                                  _isOtpSent = true;
-                                                  _isSendingOtp = false;
-                                                });
-                                              }
-                                            : _isOtpSent && !_isOtpVerified
+                                        onPressed: !_isEmailValid ||
+                                                _isEmailEmpty
+                                            ? null
+                                            : _emailController
+                                                        .text.isNotEmpty &&
+                                                    !_isOtpSent
                                                 ? () async {
-                                                    await Provider.of<
-                                                                AuthProvider>(
-                                                            context,
-                                                            listen: false)
-                                                        .verifyOtp(
-                                                            _emailController
-                                                                .text,
-                                                            _otpController
-                                                                .text);
-
                                                     setState(() {
-                                                      _isOtpVerified = true;
+                                                      _isSendingOtp = true;
                                                     });
+
+                                                    final result =
+                                                        await _authProvider
+                                                            .forgotPassword(
+                                                                _emailController
+                                                                    .text);
+
+                                                    _showSnackbar(
+                                                        result['message'],
+                                                        isSuccess:
+                                                            result['success']);
+
+                                                    if (result['success']) {
+                                                      setState(() {
+                                                        _isOtpSent = true;
+                                                        _isSendingOtp = false;
+                                                      });
+                                                    } else {
+                                                      setState(() {
+                                                        _isSendingOtp = false;
+                                                      });
+                                                    }
                                                   }
-                                                : null,
+                                                : _isOtpSent && !_isOtpVerified
+                                                    ? () async {
+                                                        final result =
+                                                            await _authProvider
+                                                                .verifyOtp(
+                                                          _emailController.text,
+                                                          _otpController.text,
+                                                        );
+
+                                                        _showSnackbar(
+                                                            result['message'],
+                                                            isSuccess: result[
+                                                                'success']);
+
+                                                        if (result['success']) {
+                                                          setState(() {
+                                                            _isOtpVerified =
+                                                                true;
+                                                          });
+                                                        }
+                                                      }
+                                                    : null,
                                         style: ElevatedButton.styleFrom(
                                           foregroundColor:
                                               AppColors.primaryBlue,
@@ -254,18 +309,31 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                           style: const TextStyle(
                                               color: AppColors.white),
                                           cursorColor: AppColors.white,
-                                          decoration: const InputDecoration(
+                                          decoration: InputDecoration(
                                             labelText: 'Email',
-                                            labelStyle: TextStyle(
+                                            labelStyle: const TextStyle(
                                                 color: AppColors.white),
-                                            enabledBorder: UnderlineInputBorder(
+                                            enabledBorder:
+                                                const UnderlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: AppColors.white),
                                             ),
-                                            focusedBorder: UnderlineInputBorder(
+                                            focusedBorder:
+                                                const UnderlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: AppColors.white),
                                             ),
+                                            suffixIcon:
+                                                _emailController.text.isNotEmpty
+                                                    ? Icon(
+                                                        _isEmailValid
+                                                            ? Icons.check_circle
+                                                            : Icons.cancel,
+                                                        color: _isEmailValid
+                                                            ? Colors.green
+                                                            : Colors.red,
+                                                      )
+                                                    : null,
                                           ),
                                           keyboardType:
                                               TextInputType.emailAddress,
@@ -281,8 +349,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                             return null;
                                           },
                                           onChanged: (value) {
-                                            setState(() {});
+                                            _validateEmail(value);
                                           },
+                                          enabled: !_isOtpVerified,
                                         ),
                                       ),
                                       const SizedBox(height: 20),
@@ -295,7 +364,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                             Expanded(
                                               child: TextFormField(
                                                 controller: _otpController,
-                                                enabled: _isOtpSent,
+                                                enabled: _isOtpSent &&
+                                                    !_isOtpVerified,
                                                 style: const TextStyle(
                                                     color: AppColors.white),
                                                 cursorColor: AppColors.white,
@@ -319,46 +389,70 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                             ),
                                             const SizedBox(width: 10),
                                             ElevatedButton(
-                                              onPressed: _emailController
-                                                          .text.isNotEmpty &&
-                                                      !_isOtpSent
-                                                  ? () async {
-                                                      setState(() {
-                                                        _isSendingOtp = true;
-                                                      });
-
-                                                      await Provider.of<
-                                                                  AuthProvider>(
-                                                              context,
-                                                              listen: false)
-                                                          .forgotPassword(
-                                                              _emailController
-                                                                  .text);
-
-                                                      setState(() {
-                                                        _isOtpSent = true;
-                                                        _isSendingOtp = false;
-                                                      });
-                                                    }
-                                                  : _isOtpSent &&
-                                                          !_isOtpVerified
+                                              onPressed: !_isEmailValid ||
+                                                      _isEmailEmpty
+                                                  ? null
+                                                  : _emailController.text
+                                                              .isNotEmpty &&
+                                                          !_isOtpSent
                                                       ? () async {
-                                                          await Provider.of<
-                                                                      AuthProvider>(
-                                                                  context,
-                                                                  listen: false)
-                                                              .verifyOtp(
-                                                                  _emailController
-                                                                      .text,
-                                                                  _otpController
-                                                                      .text);
-
                                                           setState(() {
-                                                            _isOtpVerified =
+                                                            _isSendingOtp =
                                                                 true;
                                                           });
+
+                                                          final result =
+                                                              await _authProvider
+                                                                  .forgotPassword(
+                                                                      _emailController
+                                                                          .text);
+
+                                                          _showSnackbar(
+                                                              result['message'],
+                                                              isSuccess: result[
+                                                                  'success']);
+
+                                                          if (result[
+                                                              'success']) {
+                                                            setState(() {
+                                                              _isOtpSent = true;
+                                                              _isSendingOtp =
+                                                                  false;
+                                                            });
+                                                          } else {
+                                                            setState(() {
+                                                              _isSendingOtp =
+                                                                  false;
+                                                            });
+                                                          }
                                                         }
-                                                      : null,
+                                                      : _isOtpSent &&
+                                                              !_isOtpVerified
+                                                          ? () async {
+                                                              final result =
+                                                                  await _authProvider
+                                                                      .verifyOtp(
+                                                                _emailController
+                                                                    .text,
+                                                                _otpController
+                                                                    .text,
+                                                              );
+
+                                                              _showSnackbar(
+                                                                  result[
+                                                                      'message'],
+                                                                  isSuccess: result[
+                                                                      'success']);
+
+                                                              if (result[
+                                                                  'success']) {
+                                                                setState(() {
+                                                                  _isOtpVerified =
+                                                                      true;
+                                                                });
+                                                              }
+                                                            }
+                                                          : null,
                                               style: ElevatedButton.styleFrom(
                                                 foregroundColor:
                                                     AppColors.primaryBlue,
@@ -400,17 +494,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             ),
                           ),
                           Expanded(
-                            flex: 3,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: SizedBox(
-                                width: 500,
-                                height: 500,
-                                child: Image.asset(
-                                  'assets/forgotPass.png',
-                                  fit: BoxFit.contain,
-                                ),
-                              ),
+                            flex: 1,
+                            child: SizedBox(
+                              width: 400,
+                              height: 400,
+                              child: Image.asset('assets/forgotPass.png',
+                                  fit: BoxFit.contain),
                             ),
                           ),
                         ],
@@ -421,5 +510,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _otpController.dispose();
+    super.dispose();
   }
 }

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:inventory_management/create_account.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
     ChangeNotifierProvider(
       create: (context) => AuthProvider(),
