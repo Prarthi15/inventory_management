@@ -87,9 +87,24 @@ class AuthProvider with ChangeNotifier {
         }),
       );
 
+      print('Login Response: ${response.statusCode}');
+      print('Login Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print('Parsed Response Data: $responseData');
+
+        final token = responseData['token']; // Adjust this if needed
+
+        if (token != null) {
+          await _saveToken(token);
+          print('Token retrieved and saved: $token');
+        } else {
+          print('Token not retrieved');
+        }
+
         await _saveCredentials(email, password);
-        return {'success': true, 'data': json.decode(response.body)};
+        return {'success': true, 'data': responseData};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);
         return {'success': false, 'message': errorResponse['error']};
@@ -105,6 +120,11 @@ class AuthProvider with ChangeNotifier {
       print('An error occurred during login: $error');
       return {'success': false, 'message': 'An error occurred'};
     }
+  }
+
+  Future<void> _saveToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('authToken', token);
   }
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {
@@ -198,6 +218,100 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> getAllCategories() async {
+    final url = Uri.parse('$_baseUrl/category/showAllCategory');
+
+    try {
+      final token = await _getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include the token here
+        },
+      );
+
+      print('Get All Categories Response: ${response.statusCode}');
+      print('Get All Categories Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': json.decode(response.body)};
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to fetch categories with status code: ${response.statusCode}'
+        };
+      }
+    } catch (error, stackTrace) {
+      print('An error occurred while fetching categories: $error');
+      print('Stack trace: $stackTrace');
+      return {'success': false, 'message': 'An error occurred: $error'};
+    }
+  }
+
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('authToken');
+  }
+
+  Future<Map<String, dynamic>> createCategory(String id, String name) async {
+    final url = Uri.parse('$_baseUrl/category/createCategory');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'id': id,
+          'name': name,
+        }),
+      );
+
+      print('Create Category Response: ${response.statusCode}');
+      print('Create Category Response Body: ${response.body}');
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {'success': true, 'data': json.decode(response.body)};
+      } else if (response.statusCode == 400) {
+        final errorResponse = json.decode(response.body);
+        return {
+          'success': false,
+          'message': errorResponse['error'] ?? 'Failed to create category'
+        };
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Create category failed with status code: ${response.statusCode}'
+        };
+      }
+    } catch (error, stackTrace) {
+      print('An error occurred while creating the category: $error');
+      print('Stack trace: $stackTrace');
+      return {'success': false, 'message': 'An error occurred: $error'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getCategoryById(String id) async {
+    final url = Uri.parse('$_baseUrl/category/showAllCategory/$id');
+    try {
+      final response =
+          await http.get(url, headers: {'Content-Type': 'application/json'});
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return {'success': true, 'data': data};
+      } else {
+        print('Failed to load category. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        return {'success': false, 'message': 'Failed to load category'};
+      }
+    } catch (error) {
+      print('Error fetching category by ID: $error');
+      return {'success': false, 'message': 'Error fetching category by ID'};
+    }
+  }
+
   Future<void> _saveCredentials(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('email', email);
@@ -218,5 +332,6 @@ class AuthProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('email');
     await prefs.remove('password');
+    await prefs.remove('authToken'); // Clear the token
   }
 }
