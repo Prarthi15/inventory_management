@@ -26,6 +26,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
           child: Container(
+            alignment:Alignment.topCenter,
             // padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
               // errorStyle:'',
@@ -47,7 +48,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
                 return DropdownMenuItem<String>(
                   value: item,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.only(left:8),
                     child: Text(item,style:TextStyle(fontSize:widget.fontSize),),
                   ),
                 );

@@ -80,72 +80,83 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       body: Row(
         children: [
           // Sidebar
-          if (isWideScreen || !isWideScreen)
-            Container(
-              width: isWideScreen ? 240 : 200,
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isWideScreen ? 240 : 200,
+              minHeight: MediaQuery.of(context).size.height,
+            ),
+            child: Container(
               color: Colors.grey[200],
               padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search...',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    FilterSection(
-                      title: 'Category',
-                      items: const [
-                        'NPK Fertilizer',
-                        'Hydroponic Nutrients',
-                        'Chemical product',
-                        'Organic Pest Control',
-                        'Lure & Traps',
-                      ],
-                      searchQuery: _searchQuery,
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          FilterSection(
+                            title: 'Category',
+                            items: const [
+                              'NPK Fertilizer',
+                              'Hydroponic Nutrients',
+                              'Chemical product',
+                              'Organic Pest Control',
+                              'Lure & Traps',
+                            ],
+                            searchQuery: _searchQuery,
+                          ),
+                          FilterSection(
+                            title: 'Brand',
+                            items: const [
+                              'Katyayani Organics',
+                              'Katyayani',
+                              'KATYAYNI',
+                              'Samarthaa (Bulk)',
+                              'quinalphos 25%ec',
+                            ],
+                            searchQuery: _searchQuery,
+                          ),
+                          FilterSection(
+                            title: 'Product Type',
+                            items: const [
+                              'Simple Products',
+                              'Products with Variants',
+                              'Virtual Combos',
+                              'Physical Combos(Kits)',
+                            ],
+                            searchQuery: _searchQuery,
+                          ),
+                          FilterSection(
+                            title: 'Colour',
+                            items: const [
+                              'NA',
+                              'shown an image',
+                              'Multicolour',
+                              '0',
+                            ],
+                            searchQuery: _searchQuery,
+                          ),
+                        ],
+                      ),
                     ),
-                    FilterSection(
-                      title: 'Brand',
-                      items: const [
-                        'Katyayani Organics',
-                        'Katyayani',
-                        'KATYAYNI',
-                        'Samarthaa (Bulk)',
-                        'quinalphos 25%ec',
-                      ],
-                      searchQuery: _searchQuery,
-                    ),
-                    FilterSection(
-                      title: 'Product Type',
-                      items: const [
-                        'Simple Products',
-                        'Products with Variants',
-                        'Virtual Combos',
-                        'Physical Combos(Kits)',
-                      ],
-                      searchQuery: _searchQuery,
-                    ),
-                    FilterSection(
-                      title: 'Colour',
-                      items: const [
-                        'NA',
-                        'shown an image',
-                        'Multicolour',
-                        '0',
-                      ],
-                      searchQuery: _searchQuery,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
+          ),
           // Main Content
           Expanded(
             child: Container(
