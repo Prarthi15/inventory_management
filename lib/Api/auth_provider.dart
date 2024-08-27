@@ -89,14 +89,31 @@ class AuthProvider with ChangeNotifier {
 
       print('Login Response: ${response.statusCode}');
       print('Login Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}');
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         print('Parsed Response Data: $responseData');
 
-        final token = responseData['token']; // Adjust this if needed
+        final setCookieHeader = response.headers['set-cookie'];
+        String? token;
 
-        if (token != null) {
+        if (setCookieHeader != null) {
+          print('Set-Cookie Header: $setCookieHeader');
+
+          // Extract the token from the Set-Cookie header
+          final cookies = setCookieHeader.split(';');
+          for (var cookie in cookies) {
+            if (cookie.trim().startsWith('token=')) {
+              token = cookie.trim().substring(6);
+              break;
+            }
+          }
+
+          print('Extracted Token: $token');
+        }
+
+        if (token != null && token.isNotEmpty) {
           await _saveToken(token);
           print('Token retrieved and saved: $token');
         } else {
