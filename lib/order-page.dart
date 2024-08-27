@@ -339,7 +339,9 @@ class _OrdersPageState extends State<OrdersPage>
                 Column(
                   children: List.generate(
                     index % 2 == 0 ? 1 : 2,
-                    (i) {
+                    (i) 
+                    {
+                      
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Row(
@@ -389,14 +391,14 @@ class _OrdersPageState extends State<OrdersPage>
                                 const SizedBox(height: 8.0),
                                 _buildRow('Selling Price', '\$90.00'),
                                 const SizedBox(height: 8.0),
-                                customRowWIthTextField(checkBoxProvider, index),
+                                customRowWIthTextField(checkBoxProvider, index,i,'Payment Mode',1),
                                 const SizedBox(height: 8.0),
                                 _buildRow(
                                     'Shipping Method', 'Standard Shipping'),
                                 const SizedBox(height: 8.0),
                                 _buildRow('Shipping Mode', 'Ground'),
                                 const SizedBox(height: 8.0),
-                                customRowWIthTextField(checkBoxProvider, index),
+                                customRowWIthTextField(checkBoxProvider,index,i,'Payment Status',2),
                               ]),
                             ),
                             SizedBox(
@@ -435,10 +437,10 @@ class _OrdersPageState extends State<OrdersPage>
     );
   }
 
-  Row customRowWIthTextField(CheckBoxProvider checkBoxProvider, int index) {
+  Row customRowWIthTextField(CheckBoxProvider checkBoxProvider, int rindex,int cindex,String title,int textFilednum) {
     return Row(
       children: [
-        Text('Payment Status :'),
+        Text('$title :'),
         SizedBox(
           height: 20,
           width: 50,
@@ -451,16 +453,17 @@ class _OrdersPageState extends State<OrdersPage>
               isDense: true,
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(0),
-              enabled: checkBoxProvider.textFieldEnabler1[index],
+              enabled:textFilednum==1?checkBoxProvider.getSubTextField1[rindex][cindex]:checkBoxProvider.getSubTextField2[rindex][cindex],
             ),
           ),
         ),
         InkWell(
-          child: Icon(Icons.edit),
+          child:const Icon(Icons.edit),
           onTap: () {
-            print("u[dated]  ${checkBoxProvider.textFieldEnabler1[index]}");
-            checkBoxProvider.updatetextFieldEnabler1(
-                !checkBoxProvider.textFieldEnabler1[index], index);
+            // print("u[dated]  ${checkBoxProvider.textFieldEnabler1[index]}");
+            // checkBoxProvider.updatetextFieldEnabler1(
+            //     !checkBoxProvider.textFieldEnabler1[index], index);
+                textFilednum==1?checkBoxProvider.updateSubTextFieldEnabler1(!checkBoxProvider.getSubTextField1[rindex][cindex],rindex, cindex):checkBoxProvider.updateSubTextFieldEnabler2(!checkBoxProvider.getSubTextField2[rindex][cindex],rindex, cindex);
           },
         )
       ],
