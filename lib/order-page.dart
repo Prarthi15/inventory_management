@@ -156,7 +156,24 @@ class _OrdersPageState extends State<OrdersPage>
                           // width:300,
                           child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return layoutOfOrderItem(checkBoxProvider, index);
+                              print("tabl controller index ${_tabController.index}");
+                              return Column(
+                                children: [
+                                  layoutOfOrderItem(checkBoxProvider:checkBoxProvider,index:index, totalOrderAmount: '', orderId: '', easyId: '', quantity:1, brand: '', totalMrp: '', sellingPrice: '', tat: '', importDate: '', paymentStatus: '', sku: '', paymentMode: '', orderDate: '', shippingMethod: '', orderItemId: '', shippingMode: '', productName: '',),
+                                  Row(
+                                    children: [
+                                      Text('No. of Boxes : '),
+                                      SizedBox(
+                                        height:35,
+                                        width:40,
+                                        child: CustomTextField(controller:TextEditingController())),
+                                      const  SizedBox(width:20,),
+                                      CustomButton(width:150, height:35, onTap:(){}, color: AppColors.cardsgreen, textColor:AppColors.white, fontSize:10, text:'Update MPS Count')
+                                    ],
+                                  )
+                                ]
+                                
+                              );
                             },
                             itemCount: 5,
                           ),
@@ -178,17 +195,17 @@ class _OrdersPageState extends State<OrdersPage>
                     width:AppColors().getWidth(context)>900?AppColors().getWidth(context)*0.68:900,
                     child: Column(
                       children: [
-                        Container(
-                          color:Colors.amber,
+                        SizedBox(
+                          // color:Colors.amber,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Row(
                                 children: [
                                   Checkbox.adaptive(
-                                      value: checkBoxProvider.mainCheckBox,
+                                      value: checkBoxProvider.failedOrderMainCheckBox,
                                       onChanged: (val) {
-                                        checkBoxProvider.upDateMainCheckBox(val!);
+                                        checkBoxProvider.upDateFailedMainCheckBox(val!);
                                       }),
                                   CustomButton(
                                     width: 130,
@@ -281,7 +298,22 @@ class _OrdersPageState extends State<OrdersPage>
                           // width:300,
                           child: ListView.builder(
                             itemBuilder: (context, index) {
-                              return layoutOfOrderItem(checkBoxProvider, index);
+                              return Column(
+                                children: [
+                                  layoutOfOrderItem(checkBoxProvider:checkBoxProvider,index:index,productName:'product name', easyId: '', sku: '', quantity:1 , totalOrderAmount: '', paymentMode: '', tat: '', importDate: '', shippingMethod: '', sellingPrice: '', totalMrp: '', orderItemId: '', shippingMode: '', paymentStatus: '', orderDate: '', orderId: '', brand: '',failedPage:true),
+                                   Row(
+                                    children: [
+                                      Text('No. of Boxes : '),
+                                      SizedBox(
+                                        height:35,
+                                        width:40,
+                                        child: CustomTextField(controller:TextEditingController())),
+                                      const  SizedBox(width:20,),
+                                      CustomButton(width:150, height:35, onTap:(){}, color: AppColors.cardsgreen, textColor:AppColors.white, fontSize:10, text:'Update MPS Count')
+                                    ],
+                                  )
+                                ],
+                              );
                             },
                             itemCount: 5,
                           ),
@@ -298,24 +330,68 @@ class _OrdersPageState extends State<OrdersPage>
     );
   }
 
-  Column layoutOfOrderItem(CheckBoxProvider checkBoxProvider, int index) {
+  Column layoutOfOrderItem( {
+  required CheckBoxProvider checkBoxProvider,
+  required int index,
+  required String productName,
+  required String easyId,
+  required String orderId,
+  required String totalOrderAmount,
+  required String sku,
+  required int quantity,
+  required String brand,
+  required String orderItemId,
+  required String totalMrp,
+  required String sellingPrice,
+  required String paymentMode,
+  required String shippingMethod,
+  required String shippingMode,
+  required String paymentStatus,
+  required String orderDate,
+  required String importDate,
+  required String tat,
+  bool failedPage=false
+   
+}
+) {
+ 
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Checkbox.adaptive(
-                value: checkBoxProvider.checkboxStates[index],
+                value:!failedPage?checkBoxProvider.checkboxStates[index]:checkBoxProvider.failedcheckboxStates[index],
                 onChanged: (val) {
-                  checkBoxProvider.updateListCheckBox(val!, index);
+                  !failedPage?checkBoxProvider.updateListCheckBox(val!, index):checkBoxProvider.updateFailedOrderListCheckBox(val!, index);
+                  // checkBoxProvider.updateListCheckBox(val!, index);
                 }),
-            customColumn("Easy Id", "222559741"),
-            customColumn("Order Id", "ORD/mxmd2/6884"),
+            customColumn("Easy Id", easyId),
+            customColumn("Order Id", orderId),
             customColumn("Time Remainig", "SLA Breached"),
-            customColumn("Total Order Amount(in rs)", "1,860.00"),
-            Container(
-              color: AppColors.cardsgreen,
-              child: const Text('Katy'),
+            customColumn("Total Order Amount(in rs)",totalOrderAmount),
+            SizedBox(
+              
+              child: Column(
+                children: [
+                  Container(
+                    color: AppColors.cardsgreen,
+                    child: const Text('Katy')),
+                  !failedPage?Padding(
+                     padding: const EdgeInsets.all(8.0),
+                     child: CustomButton(
+                                      width: 80,
+                                      height: 20,
+                                      onTap: () {},
+                                      color: AppColors.primaryBlue,
+                                      text: 'Qc Confirm',
+                                      textColor: AppColors.white,
+                                      fontSize: 10,
+                                    
+                                    ),
+                   ):const SizedBox(),
+                ],
+              ),
             ),
             const Icon(Icons.menu),
             const Column(
@@ -360,8 +436,8 @@ class _OrdersPageState extends State<OrdersPage>
                                   const SizedBox(
                                     height: 2,
                                   ),
-                                  const Text(
-                                    "Daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                                   Text(
+                                    productName,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 3,
                                   ),
@@ -374,42 +450,42 @@ class _OrdersPageState extends State<OrdersPage>
                             SizedBox(
                               child: Column(
                                 children: [
-                                  _buildRow('SKU', '123456'),
+                                  _buildRow('SKU', sku),
                                   const SizedBox(height: 8.0),
-                                  _buildRow('Quantity', '10'),
+                                  _buildRow('Quantity', quantity.toString()),
                                   const SizedBox(height: 8.0),
-                                  _buildRow('Brand', 'BrandName'),
+                                  _buildRow('Brand', brand),
                                   const SizedBox(height: 8.0),
-                                  _buildRow('Order Item Id', 'ABC123'),
+                                  _buildRow('Order Item Id',orderItemId),
                                   const SizedBox(height: 8.0),
                                 ],
                               ),
                             ),
                             SizedBox(
                               child: Column(children: [
-                                _buildRow('Total MRP', '\$100.00'),
+                                _buildRow('Total MRP', totalMrp),
                                 const SizedBox(height: 8.0),
-                                _buildRow('Selling Price', '\$90.00'),
+                                _buildRow('Selling Price', sellingPrice),
                                 const SizedBox(height: 8.0),
-                                customRowWIthTextField(checkBoxProvider, index,i,'Payment Mode',1),
+                                customRowWIthTextField(checkBoxProvider, index,i,'Payment Mode',1,failedPage),
                                 const SizedBox(height: 8.0),
                                 _buildRow(
-                                    'Shipping Method', 'Standard Shipping'),
+                                    'Shipping Method',shippingMethod),
                                 const SizedBox(height: 8.0),
-                                _buildRow('Shipping Mode', 'Ground'),
+                                _buildRow('Shipping Mode',shippingMode),
                                 const SizedBox(height: 8.0),
-                                customRowWIthTextField(checkBoxProvider,index,i,'Payment Status',2),
+                                customRowWIthTextField(checkBoxProvider,index,i,'Payment Status',2,failedPage),
                               ]),
                             ),
                             SizedBox(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  _buildRow('Order Date', '2024-08-22'),
+                                  _buildRow('Order Date',orderDate),
                                   const SizedBox(height: 8.0),
-                                  _buildRow('Import Date', '2024-08-20'),
+                                  _buildRow('Import Date',importDate),
                                   const SizedBox(height: 8.0),
-                                  _buildRow('TAT', '3 Days'),
+                                  _buildRow('TAT', tat),
                                   const SizedBox(height: 8.0),
                                   _buildRow(
                                       'QC Confirmation Date', '2024-08-21'),
@@ -437,7 +513,8 @@ class _OrdersPageState extends State<OrdersPage>
     );
   }
 
-  Row customRowWIthTextField(CheckBoxProvider checkBoxProvider, int rindex,int cindex,String title,int textFilednum) {
+  Row customRowWIthTextField(CheckBoxProvider checkBoxProvider, int rindex,int cindex,String title,int textFilednum,bool failedPage) {
+    // print("i am faild page $failedPage");
     return Row(
       children: [
         Text('$title :'),
@@ -453,17 +530,15 @@ class _OrdersPageState extends State<OrdersPage>
               isDense: true,
               border: InputBorder.none,
               contentPadding: const EdgeInsets.all(0),
-              enabled:textFilednum==1?checkBoxProvider.getSubTextField1[rindex][cindex]:checkBoxProvider.getSubTextField2[rindex][cindex],
+              enabled:!failedPage?(textFilednum==1?checkBoxProvider.getSubTextField1[rindex][cindex]:checkBoxProvider.getSubTextField2[rindex][cindex]):(textFilednum==2?checkBoxProvider.getFailedSubTextField1[rindex][cindex]:checkBoxProvider.getFailedSubTextField2[rindex][cindex]),
             ),
           ),
         ),
         InkWell(
           child:const Icon(Icons.edit),
           onTap: () {
-            // print("u[dated]  ${checkBoxProvider.textFieldEnabler1[index]}");
-            // checkBoxProvider.updatetextFieldEnabler1(
-            //     !checkBoxProvider.textFieldEnabler1[index], index);
-                textFilednum==1?checkBoxProvider.updateSubTextFieldEnabler1(!checkBoxProvider.getSubTextField1[rindex][cindex],rindex, cindex):checkBoxProvider.updateSubTextFieldEnabler2(!checkBoxProvider.getSubTextField2[rindex][cindex],rindex, cindex);
+                  !failedPage?(textFilednum==1?checkBoxProvider.updateSubTextFieldEnabler1(!checkBoxProvider.getSubTextField1[rindex][cindex],rindex,cindex):checkBoxProvider.updateSubTextFieldEnabler2(!checkBoxProvider.getSubTextField2[rindex][cindex],rindex,cindex)):(textFilednum==2?checkBoxProvider.updateFailedSubTextFieldEnabler1(!checkBoxProvider.getFailedSubTextField1[rindex][cindex],rindex,cindex):checkBoxProvider.updateFailedSubTextFieldEnabler2(!checkBoxProvider.getFailedSubTextField2[rindex][cindex],rindex,cindex));
+                
           },
         )
       ],
