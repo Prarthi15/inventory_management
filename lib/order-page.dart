@@ -246,7 +246,7 @@ class _OrdersPageState extends State<OrdersPage>
                                     height: 20,
                                     onTap: () {},
                                     color: AppColors.primaryBlue,
-                                    text: 'Print Packing Slip',
+                                    text: 'Reset Failed AWBs',
                                     textColor: AppColors.white,
                                     fontSize: 10,
                                     prefixIcon: const FaIcon(
@@ -263,7 +263,7 @@ class _OrdersPageState extends State<OrdersPage>
                                     height: 20,
                                     onTap: () {},
                                     color: AppColors.primaryBlue,
-                                    text: 'Print Packing Slip',
+                                    text: 'Mark QC Pass',
                                     textColor: AppColors.white,
                                     fontSize: 10,
                                     prefixIcon: const FaIcon(
@@ -377,7 +377,7 @@ class _OrdersPageState extends State<OrdersPage>
                   Container(
                     color: AppColors.cardsgreen,
                     child: const Text('Katy')),
-                  !failedPage?Padding(
+                  failedPage?Padding(
                      padding: const EdgeInsets.all(8.0),
                      child: CustomButton(
                                       width: 80,

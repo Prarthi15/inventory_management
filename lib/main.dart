@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Api/order-page-checkbox-provider.dart';
+import 'package:inventory_management/Custom-Files/multi-image-picker.dart';
 import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
 import 'package:inventory_management/login_page.dart';
