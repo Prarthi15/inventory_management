@@ -303,7 +303,7 @@ class _OrdersPageState extends State<OrdersPage>
                                   layoutOfOrderItem(checkBoxProvider:checkBoxProvider,index:index,productName:'product name', easyId: '', sku: '', quantity:1 , totalOrderAmount: '', paymentMode: '', tat: '', importDate: '', shippingMethod: '', sellingPrice: '', totalMrp: '', orderItemId: '', shippingMode: '', paymentStatus: '', orderDate: '', orderId: '', brand: '',failedPage:true),
                                    Row(
                                     children: [
-                                      Text('No. of Boxes : '),
+                                      const Text('No. of Boxes : '),
                                       SizedBox(
                                         height:35,
                                         width:40,
@@ -417,7 +417,8 @@ class _OrdersPageState extends State<OrdersPage>
                     index % 2 == 0 ? 1 : 2,
                     (i) 
                     {
-                      
+                      print("i am failed page $failedPage  $index");
+                     failedPage?checkBoxProvider.generateFailedSUbTextField(index,index % 2 == 0 ? 1 : 2,):checkBoxProvider.generateConfirmSUbTextField(index,index % 2 == 0 ? 1 : 2,);
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 15),
                         child: Row(
@@ -618,6 +619,10 @@ Widget _buildReadyToConfirmTab() {
                   const SizedBox(
                       width: 130,
                       height: 32,
+                      // color:Colors.amber,
+                     
+                      // padding:EdgeInsets.only(bottom:5),
+                      // alignment:Alignment.bottomRight,
                       child: CustomDropdown(
                         fontSize: 12.5,
                       )),

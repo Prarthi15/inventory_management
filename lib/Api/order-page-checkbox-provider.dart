@@ -6,13 +6,13 @@ class CheckBoxProvider with ChangeNotifier {
   List<bool> _listCheckBox = List.generate(5, (index) => false);
   List<bool> _listFailedCheckBox = List.generate(5, (index) => false);
   List<List<bool>> _subTextFieldEnabler1 =
-      List.generate(5, (_) => List.generate(10000, (_) => false));
+      List.generate(5, (_) =>[]);
   List<List<bool>> _subTextFieldEnabler2 =
-      List.generate(5, (_) => List.generate(10000, (_) => false));
+      List.generate(5, (_) =>[]);
   List<List<bool>> _failedOrderSubTextFieldEnabler1 =
-      List.generate(5, (_) => List.generate(10000, (_) => false));
+      List.generate(5, (_) =>[false]);
   List<List<bool>> _failedOrderSubTextFieldEnabler2 =
-      List.generate(5, (_) => List.generate(10000, (_) => false));
+      List.generate(5, (_) =>[false]);
 
   bool _mainCheckBox = false;
   bool failedOrderMainCheckBox = false;
@@ -26,7 +26,22 @@ class CheckBoxProvider with ChangeNotifier {
       _failedOrderSubTextFieldEnabler1;
   List<List<bool>> get getFailedSubTextField2 =>
       _failedOrderSubTextFieldEnabler2;
+ void generateConfirmSUbTextField(int rowNum,int colu) {
+    for(int i=0;i<colu;i++){
+      _subTextFieldEnabler1[rowNum].add(false);
+      _subTextFieldEnabler2[rowNum].add(false);
+    }
 
+  }
+  void generateFailedSUbTextField(int rowNum,int colu) {
+    print("yse o oooooooooooooo");
+    for(int i=0;i<colu;i++){
+      print("yse o oooooooooooooo $rowNum  $i");
+      _failedOrderSubTextFieldEnabler1[rowNum].add(false);
+      _failedOrderSubTextFieldEnabler2[rowNum].add(false);
+    }
+
+  }
   void upDateMainCheckBox(bool val) {
     _mainCheckBox = val;
     _listCheckBox = List.generate(5, (index) => val);

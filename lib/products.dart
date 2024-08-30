@@ -1,17 +1,12 @@
-import 'dart:js_interop';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Api/products-provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
 import 'package:inventory_management/Custom-Files/multi-image-picker.dart';
-// import 'package:inventory_management/Custom-Files/cutom-textfieild.dart';
-
+import 'package:provider/provider.dart';
 class Products extends StatefulWidget {
   const Products({super.key});
 
@@ -20,9 +15,10 @@ class Products extends StatefulWidget {
 }
 
 class _ProductsState extends State<Products> {
-  String _selectedProductCategory = "Create Simple Product";
+  // String productProvider!.selectedProductCategory = "Create Simple Product";
   List<String>? webImages;
-  int variationCount = 1;
+  // int variationCount = 1;
+  
   // Controllers for each text field
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _productIdentifierController =
@@ -104,15 +100,29 @@ class _ProductsState extends State<Products> {
     _colorController.clear();
     _skuController.clear();
   }
+  
+ProductProvider? productProvider;
 
+@override
+void initState() {
+  super.initState();
+  // WidgetsBinding.instance.addPostFrameCallback((_) {
+  //   // productProvider = Provider.of<ProductProvider>(context, listen:false);
+  //   // setState(() {
+      
+  //   // });
+  // });
+}
   @override
   Widget build(BuildContext context) {
+    productProvider = Provider.of<ProductProvider>(context, listen:true);
+    // final productProvider=[];
     final screenWidth = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
       body: MediaQuery.of(context).size.width > 1200
-          ? webLayout(context)
-          : mobileLayout(context),
+          ? webLayout(context,)
+          : mobileLayout(context,),
     );
   }
 
@@ -140,25 +150,17 @@ class _ProductsState extends State<Products> {
                           child: Column(
                             children: [
                               radioCheck('Create Simple Product', (val) {
-                                setState(() {
-                                  _selectedProductCategory = val!;
-                                });
+                                productProvider!.updateSelectedProductCategory(val!);
                               }),
                               radioCheck('Variant Product Creation', (val) {
-                                setState(() {
-                                  _selectedProductCategory = val!;
-                                });
+                                productProvider!.updateSelectedProductCategory(val!);
                               }),
                               radioCheck('Create Virtual Combo Products',
                                   (val) {
-                                setState(() {
-                                  _selectedProductCategory = val!;
-                                });
+                                productProvider!.updateSelectedProductCategory(val!);
                               }),
                               radioCheck('Create Kit Products', (val) {
-                                setState(() {
-                                  _selectedProductCategory = val!;
-                                });
+                                productProvider!.updateSelectedProductCategory(val!);
                               }),
                             ],
                           ),
@@ -263,7 +265,7 @@ class _ProductsState extends State<Products> {
                                       ),
                                     ),
                                     const SizedBox(
-                                      width: 20,
+                                      width: 30,
                                     ),
                                     Container(
                                       decoration: BoxDecoration(
@@ -320,8 +322,8 @@ class _ProductsState extends State<Products> {
                                   ],
                                 ),
                         ),
-                        fieldTitle('Variations', width: 80),
-                        variantProductCreation(context),
+                     productProvider!.selectedProductCategory=='Variant Product Creation'?fieldTitle('Variations', width: 80):const SizedBox(),
+                      productProvider!.selectedProductCategory=='Variant Product Creation'?   variantProductCreation(context):const SizedBox(),
 
                         fieldTitle('Model Name',
                             show: false, height: 50, width: 95.5),
@@ -542,8 +544,8 @@ class _ProductsState extends State<Products> {
                           ),
                         ),
                         const SizedBox(height: 8.0),
-                        _selectedProductCategory == 'Create Simple Product' ||
-                                _selectedProductCategory ==
+                        productProvider!.selectedProductCategory == 'Create Simple Product' ||
+                                productProvider!.selectedProductCategory ==
                                     'Variant Product Creation'
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -577,13 +579,13 @@ class _ProductsState extends State<Products> {
                               )
                             : const SizedBox(),
                         const SizedBox(height: 10.0),
-                        _selectedProductCategory == 'Create Simple Product'
+                        productProvider!.selectedProductCategory == 'Create Simple Product'
                             ? const Text(
                                 '* please select all mandantotry field',
                                 style: TextStyle(color: Colors.red),
                               )
                             : const Text(''),
-                        _selectedProductCategory == 'Create Simple Product'
+                        productProvider!.selectedProductCategory == 'Create Simple Product'
                             ? const SizedBox(height: 10.0)
                             : const SizedBox(
                                 height: 0,
@@ -595,12 +597,12 @@ class _ProductsState extends State<Products> {
                                 height: 50,
                                 width: 200,
                                 child: ElevatedButton(
-                                  onPressed: _selectedProductCategory !=
+                                  onPressed: productProvider!.selectedProductCategory !=
                                           'Create Simple Product'
                                       ? () {
                                           if (_formKey.currentState!
                                                   .validate() &&
-                                              _selectedProductCategory !=
+                                              productProvider!.selectedProductCategory !=
                                                   'Create Simple Product') {
                                             print("Product saved");
                                           }
@@ -785,11 +787,12 @@ class _ProductsState extends State<Products> {
                     ],
                   )),
                   const SizedBox(height: 12),
-                   formLayout(
+               
+                 productProvider!.selectedProductCategory=='Variant Product Creation'?formLayout(
                 fieldTitle('Variations'),
                 variantProductCreation(context),
-              ),
-              const SizedBox(height: 12),
+              ):const SizedBox(),
+            productProvider!.selectedProductCategory=='Variant Product Creation'?  const SizedBox(height: 12):const SizedBox(),
               formLayout(
                 fieldTitle('Model Name'),
                 CustomTextField(
@@ -1119,27 +1122,19 @@ class _ProductsState extends State<Products> {
           Row(
             children: [
               radioCheck('Create Simple Product', (val) {
-                setState(() {
-                  _selectedProductCategory = val!;
-                });
+                productProvider!.updateSelectedProductCategory(val!);
               }),
               radioCheck('Variant Product Creation', (val) {
-                setState(() {
-                  _selectedProductCategory = val!;
-                });
+                productProvider!.updateSelectedProductCategory(val!);
               }),
               MediaQuery.of(context).size.width > 1400
                   ? radioCheck('Create Virtual Combo Products', (val) {
-                      setState(() {
-                        _selectedProductCategory = val!;
-                      });
+                      productProvider!.updateSelectedProductCategory(val!);
                     })
                   : const SizedBox(),
               MediaQuery.of(context).size.width > 1400
                   ? radioCheck('Create Kit Products', (val) {
-                      setState(() {
-                        _selectedProductCategory = val!;
-                      });
+                      productProvider!.updateSelectedProductCategory(val!);
                     })
                   : const SizedBox(),
             ],
@@ -1151,14 +1146,10 @@ class _ProductsState extends State<Products> {
                   child: Row(
                     children: [
                       radioCheck('Create Virtual Combo Products', (val) {
-                        setState(() {
-                          _selectedProductCategory = val!;
-                        });
+                        productProvider!.updateSelectedProductCategory(val!);
                       }),
                       radioCheck('Create Kit Products', (val) {
-                        setState(() {
-                          _selectedProductCategory = val!;
-                        });
+                        productProvider!.updateSelectedProductCategory(val!);
                       }),
                     ],
                   ),
@@ -1177,9 +1168,10 @@ class _ProductsState extends State<Products> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height:50 + ((MediaQuery.of(context).size.width>940?51.0:102+40.0) * variationCount),
+            height:50 + ((MediaQuery.of(context).size.width>940?51.0:102+40.0) *productProvider!.countVariationFields),
             child: ListView.builder(
               itemBuilder: (context, index) {
+                
                 return MediaQuery.of(context).size.width > 940
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -1194,7 +1186,7 @@ class _ProductsState extends State<Products> {
                                 width: 130,
                                 // color:Colors.brown,
                                 child: CustomTextField(
-                                  controller: TextEditingController(),
+                                  controller:productProvider!.color[index],
                                 ),
                               ),
                             ],
@@ -1211,7 +1203,7 @@ class _ProductsState extends State<Products> {
                               SizedBox(
                                 width: 130,
                                 child: CustomTextField(
-                                    controller: TextEditingController(),
+                                    controller:productProvider!.size[index],
                                     height: 51,
                                     width: 130),
                               ),
@@ -1229,7 +1221,7 @@ class _ProductsState extends State<Products> {
                               SizedBox(
                                 width: 130,
                                 child: CustomTextField(
-                                    controller: TextEditingController(),
+                                    controller:productProvider!.eanUpc[index],
                                     height: 51,
                                     width: 130),
                               ),
@@ -1239,14 +1231,15 @@ class _ProductsState extends State<Products> {
                             width: 2,
                           ),
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               index == 0
-                                  ? const Text('EAN/UPC')
+                                  ? const Text('SKU')
                                   : const SizedBox(),
                               SizedBox(
                                 width: 130,
                                 child: CustomTextField(
-                                    controller: TextEditingController(),
+                                    controller: productProvider!.sku[index],
                                     height: 51,
                                     width: 130),
                               ),
@@ -1262,8 +1255,9 @@ class _ProductsState extends State<Products> {
                                 child: const FaIcon(FontAwesomeIcons.minus),
                               ),
                               onTap: () {
-                                variationCount = variationCount - 1;
-                                setState(() {});
+                                productProvider!.deleteTextEditingController();
+                                // variationCount = variationCount - 1;
+                                // setState(() {});
                               },
                             ),
                           ),
@@ -1281,7 +1275,7 @@ class _ProductsState extends State<Products> {
                                     children: [
                                       const Text('Colors'),
                                       CustomTextField(
-                                          controller: TextEditingController()),
+                                          controller: productProvider!.color[index]),
                                     ],
                                   )),
                               const SizedBox(
@@ -1293,7 +1287,7 @@ class _ProductsState extends State<Products> {
                                     children: [
                                       const Text('Size'),
                                       CustomTextField(
-                                          controller: TextEditingController()),
+                                          controller:productProvider!.size[index]),
                                     ],
                                   ))
                             ],
@@ -1306,7 +1300,7 @@ class _ProductsState extends State<Products> {
                                     children: [
                                      const Text('EAN/UPC'),
                                       CustomTextField(
-                                          controller: TextEditingController()),
+                                          controller:productProvider!.eanUpc[index]),
                                     ],
                                   )),
                               const SizedBox(
@@ -1316,21 +1310,22 @@ class _ProductsState extends State<Products> {
                                   width: 150,
                                   child: Column(
                                     children: [
-                                      const Text('EAN/UPC'),
+                                      const Text('SKU'),
                                       CustomTextField(
-                                          controller: TextEditingController()),
+                                          controller: productProvider!.sku[index]),
                                     ],
                                   ))
                             ],
                           ),
                            CustomButton(width:40, height:40, onTap: () {
-                                variationCount = variationCount - 1;
-                                setState(() {});
+                            productProvider!.deleteTextEditingController();
+                                // variationCount = variationCount - 1;
+                                // setState(() {});
                               }, color:AppColors.cardsgreen, textColor:AppColors.black, fontSize:25, text:'--')
                         ],
                       );
               },
-              itemCount: variationCount,
+              itemCount: productProvider!.countVariationFields,
             ),
           ),
           Padding(
@@ -1352,10 +1347,15 @@ class _ProductsState extends State<Products> {
               ),
               onTap: () {
                 // print("i am clii");
-                variationCount = variationCount + 1;
-                setState(() {
-                  print("variation count is here $variationCount");
-                });
+                // variationCount = variationCount + 1;
+                productProvider!.addNewTextEditingController();
+                // print("i product page ${productProvider!.countVariationFields}");
+                // setState(() {
+                  
+                // });
+                // setState(() {
+                //   print("variation count is here $variationCount");
+                // });
               },
             ),
           ),
@@ -1392,7 +1392,7 @@ class _ProductsState extends State<Products> {
       children: [
         Radio<String>(
           value: title,
-          groupValue: _selectedProductCategory,
+          groupValue: productProvider!.selectedProductCategory,
           onChanged: onTap,
         ),
         Text(title),
