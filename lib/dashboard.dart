@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/order-page.dart';
+import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
 import 'Custom-Files/colors.dart';
@@ -9,11 +12,12 @@ class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DashboardPageState createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String selectedDrawerItem = 'Dashboard';
+  String selectedDrawerItem = 'Manage Inventory';
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -166,6 +170,12 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
         ),
         _buildInventorySection(isSmallScreen),
+         _buildDrawerItem(
+          icon: Icons.production_quantity_limits,
+          text: 'Produts',
+          isSelected: selectedDrawerItem == 'Products',
+          onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
+        ),
         _buildDrawerItem(
           icon: Icons.analytics,
           text: 'Accounting',
@@ -183,6 +193,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 isSelected: selectedDrawerItem == 'Settings',
                 onTap: () => _onDrawerItemTapped('Settings', isSmallScreen),
               ),
+              
             ],
           ),
         ),
@@ -221,6 +232,7 @@ class _DashboardPageState extends State<DashboardPage> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
+// <<<<<<< HEAD
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
               text: 'Product Master',
@@ -231,18 +243,34 @@ class _DashboardPageState extends State<DashboardPage> {
               fontSize: 14,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
+         const  SizedBox(height:4,),
+           Padding(
+            padding:
+                const EdgeInsets.only(left: 10.0), // Ensure consistent padding
             child: _buildDrawerItem(
-              icon: Icons.category,
-              text: 'Category Master',
-              isSelected: selectedDrawerItem == 'Category Master',
-              onTap: () =>
-                  _onDrawerItemTapped('Category Master', isSmallScreen),
-              isIndented: true,
-              iconSize: 20,
-              fontSize: 14,
-            ),
+              icon: Icons.production_quantity_limits,
+              text: 'Manage Inventory',
+              isSelected: selectedDrawerItem == 'Manage Inventory',
+              onTap: () => _onDrawerItemTapped('Manage Inventory', isSmallScreen),
+              isIndented: true, // Pass the indentation flag
+              iconSize: 20, // Adjust icon size
+              fontSize: 14, // Adjust font size
+// =======
+           
+          ),
+//           Padding(
+//             padding: const EdgeInsets.only(left: 10.0),
+//             child: _buildDrawerItem(
+//               icon: Icons.category,
+//               text: 'Category Master',
+//               isSelected: selectedDrawerItem == 'Category Master',
+//               onTap: () =>
+//                   _onDrawerItemTapped('Category Master', isSmallScreen),
+//               isIndented: true,
+//               iconSize: 20,
+//               fontSize: 14,
+// >>>>>>> d730f9b8e18daf06e72f376d49e2a1dcb3bb96e2
+//             ),
           ),
         ],
       ),
@@ -311,6 +339,12 @@ class _DashboardPageState extends State<DashboardPage> {
         return const Center(child: Text("Sales Orders content goes here"));
       case 'Inventory':
         return const Center(child: Text("Inventory content goes here"));
+      case 'Products':
+        return const Products();
+      case 'Manage Inventory':
+        return const ManageInventory();
+      case 'Orders':
+        return const OrdersPage();
       case 'Product Master':
         return const ProductDashboardPage();
       case 'Category Master':

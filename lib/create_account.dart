@@ -230,6 +230,72 @@ class CreateAccountFormState extends State<CreateAccountForm> {
     return emailRegExp.hasMatch(email);
   }
 
+  // String? _username;
+  // String? _email;
+  // String? _password;
+  // String? _confirmPassword;
+  // bool _isOtpEnabled = false;
+  // bool _isOtpSent = false;
+  // bool _isOtpVerified = false;
+
+  // final TextEditingController _otpController = TextEditingController();
+
+  // @override
+  // void dispose() {
+  //   _otpController.dispose();
+  //   super.dispose();
+  // }
+
+  // void _checkIfOtpCanBeEnabled() {
+  //   setState(() {
+  //     _isOtpEnabled = _username != null &&
+  //         _username!.isNotEmpty &&
+  //         _email != null &&
+  //         _email!.isNotEmpty &&
+  //         _password != null &&
+  //         _password!.isNotEmpty &&
+  //         _password == _confirmPassword;
+  //   });
+  // }
+
+  Future<void> _sendOtp() async {
+    if (!_isOtpEnabled) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      await authProvider.register(_email!, _password!);
+      setState(() {
+        _isOtpSent = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP sent successfully!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send OTP: $error')),
+      );
+    }
+  }
+
+  Future<void> _verifyOtp() async {
+    if (_otpController.text.isEmpty) return;
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      await authProvider.registerOtp(_email!, _otpController.text,_password!);
+      setState(() {
+        _isOtpVerified = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('OTP verified successfully!')),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to verify OTP: $error')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -482,62 +548,9 @@ class CreateAccountFormState extends State<CreateAccountForm> {
     );
   }
 
-  void _sendOtp() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    if (_email != null && _password != null) {
-      setState(() {
-        _isSendingOtp = true;
-      });
-      final response = await authProvider.register(_email!, _password!);
-      setState(() {
-        _isSendingOtp = false;
-      });
+ 
 
-      if (response['success']) {
-        setState(() {
-          _isOtpSent = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP sent successfully!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
-      }
-    }
-  }
-
-  void _verifyOtp() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final credentials = await authProvider.getCredentials();
-    final email = credentials['email'];
-    final password = credentials['password'];
-
-    if (email != null && _otpController.text.isNotEmpty && password != null) {
-      setState(() {
-        _isVerifyingOtp = true;
-      });
-      final response =
-          await authProvider.registerOtp(email, _otpController.text, password);
-      setState(() {
-        _isVerifyingOtp = false;
-      });
-
-      if (response['success']) {
-        setState(() {
-          _isOtpVerified = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('OTP verified successfully!')),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'])),
-        );
-      }
-    }
-  }
+ 
 
   void _register() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);

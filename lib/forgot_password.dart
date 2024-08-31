@@ -342,7 +342,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                                                 value.isEmpty) {
                                               return 'Please enter your email';
                                             }
-
                                             if (!RegExp(r'\S+@\S+\.\S+')
                                                 .hasMatch(value)) {
                                               return 'Please enter a valid email';
