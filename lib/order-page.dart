@@ -1,11 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Api/order-page-checkbox-provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
+import 'package:provider/provider.dart';
+import 'package:textfields/textfields.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -17,8 +21,8 @@ class OrdersPage extends StatefulWidget {
 class _OrdersPageState extends State<OrdersPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool mainCheckBox = false;
-  List<bool> _checkboxStates = List.generate(5, (index) => false);
+  // bool mainCheckBox = false;
+  // List<bool> _checkboxStates = List.generate(5, (index) => false);
   @override
   void initState() {
     super.initState();
@@ -33,6 +37,7 @@ class _OrdersPageState extends State<OrdersPage>
 
   @override
   Widget build(BuildContext context) {
+    var checkBoxProvider = Provider.of<CheckBoxProvider>(context);
     return Scaffold(
       appBar: AppBar(
         bottom: TabBar(
@@ -70,227 +75,474 @@ class _OrdersPageState extends State<OrdersPage>
         automaticallyImplyLeading: false,
       ),
       body: TabBarView(
+        physics:const NeverScrollableScrollPhysics(),
         controller: _tabController,
+      
         children: [
           Row(
             children: [
-              _buildReadyToConfirmTab(),
+              if (AppColors().getWidth(context)>450) _buildReadyToConfirmTab(),
               Expanded(
-                child: Column(
-                  children: [
-                    Row(
+                child: SingleChildScrollView(
+                  scrollDirection:Axis.horizontal,
+                  child: SizedBox(
+                    // color:Colors.green,
+                    width:AppColors().getWidth(context)>900?AppColors().getWidth(context)*0.68:900,
+                    // height:500,
+                    child: Column(
                       children: [
-                        Checkbox.adaptive(
-                            value: mainCheckBox,
-                            onChanged: (val) {
-                              mainCheckBox = val!;
-                              _checkboxStates = List.generate(5, (index) => val);
-                              setState(() {});
-                            }),
-                        CustomButton(
-                          width: 130,
-                          height: 20,
-                          onTap: () {},
-                          color: AppColors.primaryBlue,
-                          text: 'Print Picklist',
-                          textColor: AppColors.white,
-                          fontSize: 10,
-                          prefixIcon: const Icon(
-                            Icons.print,
-                            size: 15,
-                            color: AppColors.white,
-                          ),
+                        Row(
+                          mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                Checkbox.adaptive(
+                                    value: checkBoxProvider.mainCheckBox,
+                                    onChanged: (val) {
+                                      checkBoxProvider.upDateMainCheckBox(val!);
+                                    }),
+                                CustomButton(
+                                  width: 130,
+                                  height: 20,
+                                  onTap: () {},
+                                  color: AppColors.primaryBlue,
+                                  text: 'Print Picklist',
+                                  textColor: AppColors.white,
+                                  fontSize: 10,
+                                  prefixIcon: const Icon(
+                                    Icons.print,
+                                    size: 15,
+                                    color: AppColors.white,
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 3,
+                                ),
+                                CustomButton(
+                                  width: 130,
+                                  height: 20,
+                                  onTap: () {},
+                                  color: AppColors.primaryBlue,
+                                  text: 'Print Packing Slip',
+                                  textColor: AppColors.white,
+                                  fontSize: 10,
+                                  prefixIcon: const Icon(
+                                    Icons.print,
+                                    size: 15,
+                                    color: AppColors.white,
+                                  ),
+                                )
+                              ],
+                            ),
+                              Row(
+                                children: [
+                                  const FaIcon(
+                                    FontAwesomeIcons.cloudArrowDown,
+                                    color:AppColors.grey,
+                                  ),
+                                const  SizedBox(
+                                    width: 2,
+                                  ),
+                                  Container(width:30, 
+                                  height:20,
+                                  color:Colors.black,
+                                  alignment:Alignment.centerLeft,
+                                  child: CustomDropdown(fontSize:12))
+                                ],
+                              ),
+                          ],
                         ),
-                        const SizedBox(
-                          width: 3,
-                        ),
-                        CustomButton(
-                          width: 130,
-                          height: 20,
-                          onTap: () {},
-                          color: AppColors.primaryBlue,
-                          text: 'Print Packing Slip',
-                          textColor: AppColors.white,
-                          fontSize: 10,
-                          prefixIcon: const Icon(
-                            Icons.print,
-                            size: 15,
-                            color: AppColors.white,
+                        Expanded(
+                          // width:300,
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              print("tabl controller index ${_tabController.index}");
+                              return Column(
+                                children: [
+                                  layoutOfOrderItem(checkBoxProvider:checkBoxProvider,index:index, totalOrderAmount: '', orderId: '', easyId: '', quantity:1, brand: '', totalMrp: '', sellingPrice: '', tat: '', importDate: '', paymentStatus: '', sku: '', paymentMode: '', orderDate: '', shippingMethod: '', orderItemId: '', shippingMode: '', productName: '',),
+                                  Row(
+                                    children: [
+                                      Text('No. of Boxes : '),
+                                      SizedBox(
+                                        height:35,
+                                        width:40,
+                                        child: CustomTextField(controller:TextEditingController())),
+                                      const  SizedBox(width:20,),
+                                      CustomButton(width:150, height:35, onTap:(){}, color: AppColors.cardsgreen, textColor:AppColors.white, fontSize:10, text:'Update MPS Count')
+                                    ],
+                                  )
+                                ]
+                                
+                              );
+                            },
+                            itemCount: 5,
                           ),
                         )
                       ],
                     ),
-                    Expanded(
-                      // width:300,
-                      child: ListView.builder(
-                        itemBuilder: (context, index) {
-                          return Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Checkbox.adaptive(
-                                      value: _checkboxStates[index],
-                                      onChanged: (val) {
-                                        _checkboxStates[index] = val!;
-                                        setState(() {});
-                                      }),
-                                  customColumn("Easy Id", "222559741"),
-                                  customColumn("Order Id", "ORD/mxmd2/6884"),
-                                  customColumn("Time Remainig", "SLA Breached"),
-                                  customColumn(
-                                      "Total Order Amount(in rs)", "1,860.00"),
-                                  Container(
-                                    color: AppColors.cardsgreen,
-                                    child: const Text('Katy'),
-                                  ),
-                                  const Icon(Icons.menu),
-                                  const Column(
-                                    children: [
-                                      FaIcon(
-                                        FontAwesomeIcons.triangleExclamation,
-                                        color: AppColors.cardsred,
-                                      ),
-                                      Text(
-                                        "* SLA Breached",
-                                        style: TextStyle(
-                                            color: AppColors.cardsred),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: List.generate(
-                                          3, 
-                                          (i) {
-                                            return Padding(
-                                              padding: const EdgeInsets.symmetric(vertical:15),
-                                              child: Row(
-                                                mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                                               children: [
-                                                  SizedBox(
-                                                    height: 150,
-                                                    width: 100,
-                                                    child: Column(
-                                                      children: [
-                                                        Container(
-                                                          height: 80,
-                                                          width: 100,
-                                                          color: Colors.amber,
-                                                          alignment:
-                                                              Alignment.center,
-                                                          child:
-                                                              const Text("Image"),
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 2,
-                                                        ),
-                                                        const Text(
-                                                          "Daaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                          maxLines: 3,
-                                                        ),
-                                                        const SizedBox(
-                                                          height: 2,
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    child: Column(
-                                                      children: [
-                                                        _buildRow(
-                                                            'SKU', '123456'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'Quantity', '10'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'Brand', 'BrandName'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow('Order Item Id',
-                                                            'ABC123'),
-                                                        SizedBox(height: 8.0),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                    child: Column(children: [
-                                                      _buildRow('Total MRP',
-                                                          '\$100.00'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Selling Price',
-                                                          '\$90.00'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Payment Mode',
-                                                          'Credit Card'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Shipping Method',
-                                                          'Standard Shipping'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Shipping Mode',
-                                                          'Ground'),
-                                                      SizedBox(height: 8.0),
-                                                      _buildRow('Payment Status',
-                                                          'Paid'),
-                                                    ]),
-                                                  ),
-                                                  SizedBox(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: <Widget>[
-                                                        _buildRow('Order Date',
-                                                            '2024-08-22'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow('Import Date',
-                                                            '2024-08-20'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'TAT', '3 Days'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'QC Confirmation Date',
-                                                            '2024-08-21'),
-                                                        SizedBox(height: 8.0),
-                                                        _buildRow(
-                                                            'Inventory Assigned',
-                                                            '✔️',
-                                                            isCheckmark: true),
-                                                      ],
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    )
-                                  ]),
-                            ],
-                          );
-                        },
-                        itemCount: 5,
-                      ),
-                    )
-                  ],
+                  ),
                 ),
               )
             ],
           ),
-          const Center(child: Text("Failed Orders")),
+          Row(
+            children: [
+             if (AppColors().getWidth(context)>450) _buildReadyToConfirmTab(),
+              Expanded(
+                child: SingleChildScrollView(
+                  scrollDirection:Axis.horizontal,
+                  child: SizedBox(
+                    width:AppColors().getWidth(context)>900?AppColors().getWidth(context)*0.68:900,
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          // color:Colors.amber,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox.adaptive(
+                                      value: checkBoxProvider.failedOrderMainCheckBox,
+                                      onChanged: (val) {
+                                        checkBoxProvider.upDateFailedMainCheckBox(val!);
+                                      }),
+                                  CustomButton(
+                                    width: 130,
+                                    height: 20,
+                                    onTap: () {},
+                                    color: AppColors.primaryBlue,
+                                    text: 'Print Picklist',
+                                    textColor: AppColors.white,
+                                    fontSize: 10,
+                                    prefixIcon: const Icon(
+                                      Icons.print,
+                                      size: 15,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 3,
+                                  ),
+                                  CustomButton(
+                                    width: 130,
+                                    height: 20,
+                                    onTap: () {},
+                                    color: AppColors.primaryBlue,
+                                    text: 'Print Packing Slip',
+                                    textColor: AppColors.white,
+                                    fontSize: 10,
+                                    prefixIcon: const Icon(
+                                      Icons.print,
+                                      size: 15,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 3,
+                                  ),
+                                  CustomButton(
+                                    width: 130,
+                                    height: 20,
+                                    onTap: () {},
+                                    color: AppColors.primaryBlue,
+                                    text: 'Reset Failed AWBs',
+                                    textColor: AppColors.white,
+                                    fontSize: 10,
+                                    prefixIcon: const FaIcon(
+                                      FontAwesomeIcons.circleCheck,
+                                      size: 14,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 3,
+                                  ),
+                                  CustomButton(
+                                    width: 130,
+                                    height: 20,
+                                    onTap: () {},
+                                    color: AppColors.primaryBlue,
+                                    text: 'Mark QC Pass',
+                                    textColor: AppColors.white,
+                                    fontSize: 10,
+                                    prefixIcon: const FaIcon(
+                                      FontAwesomeIcons.circleCheck,
+                                      size: 14,
+                                      color: AppColors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              
+                               Row(
+                                children: [
+                                  const FaIcon(
+                                    FontAwesomeIcons.cloudArrowDown,
+                                    color:AppColors.white,
+                                  ),
+                                const  SizedBox(
+                                    width: 2,
+                                  ),
+                                  Container(width:30, 
+                                  height:20,
+                                  color:Colors.black,
+                                  alignment:Alignment.centerLeft,
+                                  child: CustomDropdown(fontSize:12))
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          // width:300,
+                          child: ListView.builder(
+                            itemBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  layoutOfOrderItem(checkBoxProvider:checkBoxProvider,index:index,productName:'product name', easyId: '', sku: '', quantity:1 , totalOrderAmount: '', paymentMode: '', tat: '', importDate: '', shippingMethod: '', sellingPrice: '', totalMrp: '', orderItemId: '', shippingMode: '', paymentStatus: '', orderDate: '', orderId: '', brand: '',failedPage:true),
+                                   Row(
+                                    children: [
+                                      const Text('No. of Boxes : '),
+                                      SizedBox(
+                                        height:35,
+                                        width:40,
+                                        child: CustomTextField(controller:TextEditingController())),
+                                      const  SizedBox(width:20,),
+                                      CustomButton(width:150, height:35, onTap:(){}, color: AppColors.cardsgreen, textColor:AppColors.white, fontSize:10, text:'Update MPS Count')
+                                    ],
+                                  )
+                                ],
+                              );
+                            },
+                            itemCount: 5,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
         ],
       ),
+    );
+  }
+
+  Column layoutOfOrderItem( {
+  required CheckBoxProvider checkBoxProvider,
+  required int index,
+  required String productName,
+  required String easyId,
+  required String orderId,
+  required String totalOrderAmount,
+  required String sku,
+  required int quantity,
+  required String brand,
+  required String orderItemId,
+  required String totalMrp,
+  required String sellingPrice,
+  required String paymentMode,
+  required String shippingMethod,
+  required String shippingMode,
+  required String paymentStatus,
+  required String orderDate,
+  required String importDate,
+  required String tat,
+  bool failedPage=false
+   
+}
+) {
+ 
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Checkbox.adaptive(
+                value:!failedPage?checkBoxProvider.checkboxStates[index]:checkBoxProvider.failedcheckboxStates[index],
+                onChanged: (val) {
+                  !failedPage?checkBoxProvider.updateListCheckBox(val!, index):checkBoxProvider.updateFailedOrderListCheckBox(val!, index);
+                  // checkBoxProvider.updateListCheckBox(val!, index);
+                }),
+            customColumn("Easy Id", easyId),
+            customColumn("Order Id", orderId),
+            customColumn("Time Remainig", "SLA Breached"),
+            customColumn("Total Order Amount(in rs)",totalOrderAmount),
+            SizedBox(
+              
+              child: Column(
+                children: [
+                  Container(
+                    color: AppColors.cardsgreen,
+                    child: const Text('Katy')),
+                  failedPage?Padding(
+                     padding: const EdgeInsets.all(8.0),
+                     child: CustomButton(
+                                      width: 80,
+                                      height: 20,
+                                      onTap: () {},
+                                      color: AppColors.primaryBlue,
+                                      text: 'Qc Confirm',
+                                      textColor: AppColors.white,
+                                      fontSize: 10,
+                                    
+                                    ),
+                   ):const SizedBox(),
+                ],
+              ),
+            ),
+            const Icon(Icons.menu),
+            const Column(
+              children: [
+                FaIcon(
+                  FontAwesomeIcons.triangleExclamation,
+                  color: AppColors.cardsred,
+                ),
+                Text(
+                  "* SLA Breached",
+                  style: TextStyle(color: AppColors.cardsred),
+                )
+              ],
+            ),
+          ],
+        ),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Expanded(
+            child: Column(
+              children: [
+                Column(
+                  children: List.generate(
+                    index % 2 == 0 ? 1 : 2,
+                    (i) 
+                    {
+                      print("i am failed page $failedPage  $index");
+                     failedPage?checkBoxProvider.generateFailedSUbTextField(index,index % 2 == 0 ? 1 : 2,):checkBoxProvider.generateConfirmSUbTextField(index,index % 2 == 0 ? 1 : 2,);
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            SizedBox(
+                              height: 150,
+                              width: 100,
+                              child: Column(
+                                children: [
+                                  Image.network(
+                                    'https://sharmellday.com/wp-content/uploads/2022/12/032_Canva-Text-to-Image-Generator-min-1.jpg',
+                                    width: 100,
+                                    height: 80,
+                                  ),
+                                  const SizedBox(
+                                    height: 2,
+                                  ),
+                                   Text(
+                                    productName,
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 3,
+                                  ),
+                                  const SizedBox(
+                                    height: 2,
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              child: Column(
+                                children: [
+                                  _buildRow('SKU', sku),
+                                  const SizedBox(height: 8.0),
+                                  _buildRow('Quantity', quantity.toString()),
+                                  const SizedBox(height: 8.0),
+                                  _buildRow('Brand', brand),
+                                  const SizedBox(height: 8.0),
+                                  _buildRow('Order Item Id',orderItemId),
+                                  const SizedBox(height: 8.0),
+                                ],
+                              ),
+                            ),
+                            SizedBox(
+                              child: Column(children: [
+                                _buildRow('Total MRP', totalMrp),
+                                const SizedBox(height: 8.0),
+                                _buildRow('Selling Price', sellingPrice),
+                                const SizedBox(height: 8.0),
+                                customRowWIthTextField(checkBoxProvider, index,i,'Payment Mode',1,failedPage),
+                                const SizedBox(height: 8.0),
+                                _buildRow(
+                                    'Shipping Method',shippingMethod),
+                                const SizedBox(height: 8.0),
+                                _buildRow('Shipping Mode',shippingMode),
+                                const SizedBox(height: 8.0),
+                                customRowWIthTextField(checkBoxProvider,index,i,'Payment Status',2,failedPage),
+                              ]),
+                            ),
+                            SizedBox(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  _buildRow('Order Date',orderDate),
+                                  const SizedBox(height: 8.0),
+                                  _buildRow('Import Date',importDate),
+                                  const SizedBox(height: 8.0),
+                                  _buildRow('TAT', tat),
+                                  const SizedBox(height: 8.0),
+                                  _buildRow(
+                                      'QC Confirmation Date', '2024-08-21'),
+                                  const SizedBox(height: 8.0),
+                                  _buildRow('Inventory Assigned', '✔️',
+                                      isCheckmark: true),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const Divider(
+                  height: 12,
+                  color: Colors.amber,
+                ),
+              ],
+            ),
+          )
+        ]),
+      ],
+    );
+  }
+
+  Row customRowWIthTextField(CheckBoxProvider checkBoxProvider, int rindex,int cindex,String title,int textFilednum,bool failedPage) {
+    // print("i am faild page $failedPage");
+    return Row(
+      children: [
+        Text('$title :'),
+        SizedBox(
+          height: 20,
+          width: 50,
+          child: TextField(
+            controller: TextEditingController(
+              text: '12',
+            ),
+            style: const TextStyle(fontSize: 16, height: 1.6),
+            decoration: InputDecoration(
+              isDense: true,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.all(0),
+              enabled:!failedPage?(textFilednum==1?checkBoxProvider.getSubTextField1[rindex][cindex]:checkBoxProvider.getSubTextField2[rindex][cindex]):(textFilednum==2?checkBoxProvider.getFailedSubTextField1[rindex][cindex]:checkBoxProvider.getFailedSubTextField2[rindex][cindex]),
+            ),
+          ),
+        ),
+        InkWell(
+          child:const Icon(Icons.edit),
+          onTap: () {
+                  !failedPage?(textFilednum==1?checkBoxProvider.updateSubTextFieldEnabler1(!checkBoxProvider.getSubTextField1[rindex][cindex],rindex,cindex):checkBoxProvider.updateSubTextFieldEnabler2(!checkBoxProvider.getSubTextField2[rindex][cindex],rindex,cindex)):(textFilednum==2?checkBoxProvider.updateFailedSubTextFieldEnabler1(!checkBoxProvider.getFailedSubTextField1[rindex][cindex],rindex,cindex):checkBoxProvider.updateFailedSubTextFieldEnabler2(!checkBoxProvider.getFailedSubTextField2[rindex][cindex],rindex,cindex));
+                
+          },
+        )
+      ],
     );
   }
 
@@ -309,17 +561,16 @@ class _OrdersPageState extends State<OrdersPage>
       children: <Widget>[
         Text(
           '$label:',
-          style: TextStyle(fontSize: 16.0),
         ),
         if (isCheckmark)
           Text(
             value,
-            style: TextStyle(fontSize: 16.0, color: Colors.green),
+            style: TextStyle(color: AppColors.cardsgreen),
           )
         else
           Text(
             value,
-            style: TextStyle(fontSize: 16.0),
+            // style: TextStyle(fontSize: 16.0),
           ),
       ],
     );
@@ -368,6 +619,10 @@ Widget _buildReadyToConfirmTab() {
                   const SizedBox(
                       width: 130,
                       height: 32,
+                      // color:Colors.amber,
+                     
+                      // padding:EdgeInsets.only(bottom:5),
+                      // alignment:Alignment.bottomRight,
                       child: CustomDropdown(
                         fontSize: 12.5,
                       )),

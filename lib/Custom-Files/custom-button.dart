@@ -9,7 +9,7 @@ class CustomButton extends StatelessWidget {
   final double fontSize;
   final String text;
   final BorderRadiusGeometry borderRadius;
-  final Icon? prefixIcon; // Optional prefix icon
+  final Widget? prefixIcon; // Optional prefix icon
 
   const CustomButton({
     Key? key,

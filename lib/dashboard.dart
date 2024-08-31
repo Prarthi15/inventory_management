@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/order-page.dart';
 import 'package:inventory_management/products.dart';
+import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
 import 'Custom-Files/colors.dart';
 import 'package:inventory_management/product_manager.dart';
@@ -65,9 +66,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 20),
                       Row(
                         children: <Widget>[
                           if (isSmallScreen)
@@ -127,8 +126,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                       const SizedBox(height: 20),
                       Expanded(
-                          child: _buildMainContent(
-                              selectedDrawerItem, isSmallScreen)),
+                        child: _buildMainContent(
+                            selectedDrawerItem, isSmallScreen),
+                      ),
                     ],
                   ),
                 ),
@@ -144,9 +144,7 @@ class _DashboardPageState extends State<DashboardPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const SizedBox(
-          height: 20,
-        ),
+        const SizedBox(height: 20),
         const Padding(
           padding: EdgeInsets.all(20.0),
           child: Text(
@@ -172,6 +170,12 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
         ),
         _buildInventorySection(isSmallScreen),
+         _buildDrawerItem(
+          icon: Icons.production_quantity_limits,
+          text: 'Produts',
+          isSelected: selectedDrawerItem == 'Products',
+          onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
+        ),
         _buildDrawerItem(
           icon: Icons.analytics,
           text: 'Accounting',
@@ -189,6 +193,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 isSelected: selectedDrawerItem == 'Settings',
                 onTap: () => _onDrawerItemTapped('Settings', isSmallScreen),
               ),
+              
             ],
           ),
         ),
@@ -227,6 +232,7 @@ class _DashboardPageState extends State<DashboardPage> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
+// <<<<<<< HEAD
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
               text: 'Product Master',
@@ -249,7 +255,22 @@ class _DashboardPageState extends State<DashboardPage> {
               isIndented: true, // Pass the indentation flag
               iconSize: 20, // Adjust icon size
               fontSize: 14, // Adjust font size
-            ),
+// =======
+           
+          ),
+//           Padding(
+//             padding: const EdgeInsets.only(left: 10.0),
+//             child: _buildDrawerItem(
+//               icon: Icons.category,
+//               text: 'Category Master',
+//               isSelected: selectedDrawerItem == 'Category Master',
+//               onTap: () =>
+//                   _onDrawerItemTapped('Category Master', isSmallScreen),
+//               isIndented: true,
+//               iconSize: 20,
+//               fontSize: 14,
+// >>>>>>> d730f9b8e18daf06e72f376d49e2a1dcb3bb96e2
+//             ),
           ),
         ],
       ),
@@ -295,13 +316,13 @@ class _DashboardPageState extends State<DashboardPage> {
           leading: Icon(
             icon,
             color: isSelected ? AppColors.white : AppColors.primaryBlue,
-            size: iconSize, // Adjust icon size
+            size: iconSize,
           ),
           title: Text(
             text,
             style: TextStyle(
               color: isSelected ? AppColors.white : AppColors.primaryBlue,
-              fontSize: fontSize, // Adjust font size
+              fontSize: fontSize,
             ),
           ),
           onTap: onTap,
@@ -324,9 +345,12 @@ class _DashboardPageState extends State<DashboardPage> {
         return const ManageInventory();
       case 'Orders':
         return const OrdersPage();
+      case 'Product Master':
+        return const ProductDashboardPage();
+      case 'Category Master':
+        return CategoryMasterPage();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
-
       case 'Settings':
         return const Center(child: Text("Settings content goes here"));
       default:
