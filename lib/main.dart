@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Api/order-page-checkbox-provider.dart';
+import 'package:inventory_management/Api/products-provider.dart';
+import 'package:inventory_management/Custom-Files/multi-image-picker.dart';
 import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
 import 'package:inventory_management/login_page.dart';
@@ -18,6 +20,7 @@ void main() {
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => CheckBoxProvider()),
       ChangeNotifierProvider(create: (context) => ManagementProvider()),
+      ChangeNotifierProvider(create:(context)=>ProductProvider()),
       ChangeNotifierProvider(create: (context) => ComboProvider())
     ],
     child: ChangeNotifierProvider(
@@ -48,7 +51,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
+
       home: const LoginPage(),
+
       routes: {
         '/login': (context) => const LoginPage(),
         '/createAccount': (context) => const CreateAccountPage(),
