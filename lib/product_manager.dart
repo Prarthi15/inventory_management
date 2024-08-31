@@ -18,7 +18,8 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   final List<Product> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
-  bool _showCreateProduct=false;
+  bool _showCreateProduct = false;
+
   int _page = 0;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -166,6 +167,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                 !_showCreateProduct?ElevatedButton(
                     onPressed: () {
                      _showCreateProduct=!_showCreateProduct;
@@ -220,6 +222,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                         },
                       ),
                     ):Products(),
+
                   ),
                 ],
               ),
