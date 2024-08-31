@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management/Custom-Files/custom-button.dart';
 import 'Custom-Files/colors.dart';
 import 'products.dart';
 import 'Custom-Files/product-card.dart';
@@ -17,6 +18,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   final List<Product> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
+  bool _showCreateProduct = false;
   int _page = 0;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -164,54 +166,67 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const Products(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryBlue),
-                    child: const Text('Create Products'),
-                  ),
+                  !_showCreateProduct
+                      ? ElevatedButton(
+                          onPressed: () {
+                            _showCreateProduct = !_showCreateProduct;
+                            print("here is show product $_showCreateProduct");
+                            setState(() {});
+                          },
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryBlue),
+                          child: const Text('Create Products'),
+                        )
+                      : CustomButton(
+                          width: 40,
+                          height: 40,
+                          onTap: () {
+                            _showCreateProduct = !_showCreateProduct;
+                            //  print("here is show product $_showCreateProduct");
+                            setState(() {});
+                          },
+                          color: AppColors.lightBlue,
+                          textColor: AppColors.black,
+                          fontSize: 12,
+                          text: 'Back'),
                   const SizedBox(height: 16),
                   Expanded(
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (ScrollNotification scrollInfo) {
-                        if (!_isLoading &&
-                            scrollInfo.metrics.pixels ==
-                                scrollInfo.metrics.maxScrollExtent) {
-                          _loadMoreProducts();
-                        }
-                        return false;
-                      },
-                      child: ListView.builder(
-                        itemCount: _products.length + (_isLoading ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index >= _products.length) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-                          final product = _products[index];
-                          return ProductCard(
-                            sku: product.sku,
-                            category: product.category,
-                            brand: product.brand,
-                            mrp: product.mrp,
-                            createdDate: product.createdDate,
-                            lastUpdated: product.lastUpdated,
-                            listedOn: product.listedOn,
-                            accSku: product.accSku,
-                            colour: product.colour,
-                            accUnit: product.accUnit,
-                            upcEan: product.upcEan,
-                          );
-                        },
-                      ),
-                    ),
+                    child: !_showCreateProduct
+                        ? NotificationListener<ScrollNotification>(
+                            onNotification: (ScrollNotification scrollInfo) {
+                              if (!_isLoading &&
+                                  scrollInfo.metrics.pixels ==
+                                      scrollInfo.metrics.maxScrollExtent) {
+                                _loadMoreProducts();
+                              }
+                              return false;
+                            },
+                            child: ListView.builder(
+                              itemCount:
+                                  _products.length + (_isLoading ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index >= _products.length) {
+                                  return const Center(
+                                      child: CircularProgressIndicator());
+                                }
+                                final product = _products[index];
+                                return ProductCard(
+                                  sku: product.sku,
+                                  category: product.category,
+                                  brand: product.brand,
+                                  mrp: product.mrp,
+                                  createdDate: product.createdDate,
+                                  lastUpdated: product.lastUpdated,
+                                  listedOn: product.listedOn,
+                                  accSku: product.accSku,
+                                  colour: product.colour,
+                                  accUnit: product.accUnit,
+                                  upcEan: product.upcEan,
+                                );
+                              },
+                            ),
+                          )
+                        : Products(),
                   ),
                 ],
               ),

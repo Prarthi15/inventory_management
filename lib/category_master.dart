@@ -1,8 +1,8 @@
-//import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/categoryCard.dart';
+import 'package:inventory_management/Custom-Files/custom-button.dart';
 
 class CategoryMasterPage extends StatefulWidget {
   @override
@@ -13,17 +13,38 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
   late Future<List<String>> _categoriesFuture;
   final TextEditingController _categoryIdController = TextEditingController();
 
+  int _currentPage = 1;
+  bool _hasMore = true;
+  List<String> _categories = [];
+  bool _isFetching = false;
+
   @override
   void initState() {
     super.initState();
-    _categoriesFuture = _fetchCategories();
+    _categoriesFuture = _fetchCategories(page: _currentPage);
   }
 
-  Future<List<String>> _fetchCategories() async {
-    final result = await AuthProvider().getAllCategories();
+  Future<List<String>> _fetchCategories({int page = 1}) async {
+    if (_isFetching)
+      return _categories; // Avoid fetching if already in progress
+    _isFetching = true;
+
+    final result = await AuthProvider().getAllCategories(page: page);
+    _isFetching = false;
+
     if (result['success']) {
       final List<dynamic> data = result['data'];
-      return data.map((category) => category['name'] as String).toList();
+      if (data.isNotEmpty) {
+        _currentPage++;
+        setState(() {
+          _categories.addAll(
+              data.map((category) => category['name'] as String).toList());
+          _hasMore = data.length == 20; // Assuming 20 items per page
+        });
+      } else {
+        _hasMore = false;
+      }
+      return _categories;
     } else {
       print('Failed to fetch categories: ${result['message']}');
       return [];
@@ -61,29 +82,44 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
                 Navigator.of(context).pop();
               },
             ),
-            ElevatedButton(
-              child: Text('Create'),
-              onPressed: () async {
+            CustomButton(
+              width: 100,
+              height: 40,
+              onTap: () async {
                 final id = idController.text;
                 final name = nameController.text;
 
-                // Call createCategory API
                 final result = await AuthProvider().createCategory(id, name);
 
                 if (result['success']) {
                   // Refresh the category list
+                  _currentPage = 1; // Reset page number
+                  _categories.clear(); // Clear the existing list
                   setState(() {
-                    _categoriesFuture = _fetchCategories();
+                    _categoriesFuture = _fetchCategories(page: _currentPage);
                   });
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Category created successfully!'),
+                      backgroundColor: AppColors.green,
+                    ),
+                  );
                   Navigator.of(context).pop();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                        content:
-                            Text(result['message'] ?? 'An error occurred')),
+                      content: Text(
+                          'Failed to create category: ${result['message']}'),
+                      backgroundColor: AppColors.cardsred,
+                    ),
                   );
                 }
               },
+              color: AppColors.tealcolor,
+              textColor: AppColors.white,
+              fontSize: 16,
+              text: 'Create',
+              borderRadius: BorderRadius.circular(12),
             ),
           ],
         );
@@ -115,30 +151,58 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
                 Navigator.of(context).pop();
               },
             ),
-            ElevatedButton(
-              child: Text('Fetch'),
-              onPressed: () async {
+            CustomButton(
+              width: 100,
+              height: 40,
+              onTap: () async {
                 final id = _categoryIdController.text;
 
                 // Call getCategoryById API
                 final result = await AuthProvider().getCategoryById(id);
 
                 if (result['success']) {
-                  setState(() {});
+                  final category = result['data'];
+                  setState(() {
+                    if (category != null) {
+                      _categories = [category['name']];
+                      _currentPage = 1;
+                      _hasMore = false;
+                    } else {
+                      _categories = [];
+                    }
+                  });
+                  _categoryIdController.clear();
                   Navigator.of(context).pop();
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content:
-                            Text(result['message'] ?? 'An error occurred')),
-                  );
+                  print('Failed to fetch category: ${result['message']}');
+                  setState(() {
+                    _categories = [];
+                    _currentPage = 1; // Reset page number
+                    _hasMore = false; // No more pages
+                  });
+                  _categoryIdController.clear();
+                  Navigator.of(context).pop();
                 }
               },
+              color: AppColors.primaryBlue,
+              textColor: AppColors.white,
+              fontSize: 16,
+              text: 'Fetch',
+              borderRadius: BorderRadius.circular(12),
             ),
           ],
         );
       },
     );
+  }
+
+  Future<void> _showAllCategories() async {
+    setState(() {
+      _currentPage = 1; // Reset page number
+      _categories.clear(); // Clear the existing list
+      _hasMore = true;
+      _categoriesFuture = _fetchCategories(page: _currentPage);
+    });
   }
 
   @override
@@ -156,70 +220,126 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ElevatedButton.icon(
-                  onPressed: _createCategory,
-                  icon: const Icon(Icons.add),
-                  label: const Text("Create Category"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.tealcolor,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 5,
-                    shadowColor: AppColors.shadowblack,
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: _showCategoryByIdDialog,
-                  icon: const Icon(Icons.search),
-                  label: const Text("Fetch Category by ID"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    elevation: 5,
-                    shadowColor: AppColors.shadowblack,
-                  ),
-                ),
+                isSmallScreen
+                    ? Wrap(
+                        spacing: 16.0,
+                        runSpacing: 16.0,
+                        children: [
+                          _buildButton(
+                            text: 'Create Category',
+                            color: AppColors.tealcolor,
+                            icon: Icons.add,
+                            onTap: _createCategory,
+                          ),
+                          _buildButton(
+                            text: 'Fetch Category by ID',
+                            color: AppColors.primaryBlue,
+                            icon: Icons.search,
+                            onTap: _showCategoryByIdDialog,
+                          ),
+                          _buildButton(
+                            text: 'Show All Categories',
+                            color: AppColors.green,
+                            icon: Icons.list,
+                            onTap: _showAllCategories,
+                          ),
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          _buildButton(
+                            text: 'Create Category',
+                            color: AppColors.tealcolor,
+                            icon: Icons.add,
+                            onTap: _createCategory,
+                          ),
+                          const SizedBox(width: 16.0), // Space between buttons
+                          _buildButton(
+                            text: 'Fetch Category by ID',
+                            color: AppColors.primaryBlue,
+                            icon: Icons.search,
+                            onTap: _showCategoryByIdDialog,
+                          ),
+                          const SizedBox(width: 16.0), // Space between buttons
+                          _buildButton(
+                            text: 'Show All Categories',
+                            color: AppColors.green,
+                            icon: Icons.list,
+                            onTap: _showAllCategories,
+                          ),
+                        ],
+                      ),
                 const SizedBox(height: 24.0),
                 Expanded(
                   child: FutureBuilder<List<String>>(
                     future: _categoriesFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        // Show loading indicator while waiting for the data
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
                       } else if (snapshot.hasError) {
-                        print('Snapshot error: ${snapshot.error}');
-                        return Center(child: Text('Error: ${snapshot.error}'));
+                        // Handle error case
+                        return const Center(
+                          child: Text(
+                            'Failed to load categories',
+                            style:
+                                TextStyle(fontSize: 18, color: AppColors.grey),
+                          ),
+                        );
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Center(child: Text('No categories found'));
+                        // Handle the case when no data is returned
+                        return const Center(
+                          child: Text(
+                            'No item found',
+                            style:
+                                TextStyle(fontSize: 18, color: AppColors.grey),
+                          ),
+                        );
+                      } else {
+                        // Data is successfully loaded
+                        return NotificationListener<ScrollNotification>(
+                          onNotification: (scrollInfo) {
+                            if (!_isFetching &&
+                                _hasMore &&
+                                scrollInfo.metrics.pixels ==
+                                    scrollInfo.metrics.maxScrollExtent) {
+                              _fetchCategories(page: _currentPage);
+                            }
+                            return true;
+                          },
+                          child: GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: crossAxisCount,
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
+                              childAspectRatio: isSmallScreen ? 4 : 3,
+                            ),
+                            itemCount: _categories.length + (_hasMore ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index >= _categories.length) {
+                                return const Center(
+                                  child: SizedBox(
+                                    width: 30,
+                                    height: 30,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
+                              return CategoryCard(
+                                category: _categories[index],
+                                isSmallScreen: isSmallScreen,
+                                cardColor: AppColors.white,
+                                shadowColor: AppColors.shadowblack1,
+                                elevation: 3,
+                                borderRadius: 12,
+                              );
+                            },
+                          ),
+                        );
                       }
-
-                      final categories = snapshot.data!;
-                      return GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: crossAxisCount,
-                          crossAxisSpacing: 16.0,
-                          mainAxisSpacing: 16.0,
-                          childAspectRatio: isSmallScreen ? 4 : 3,
-                        ),
-                        itemCount: categories.length,
-                        itemBuilder: (context, index) {
-                          return CategoryCard(
-                            category: categories[index],
-                            isSmallScreen: isSmallScreen,
-                            cardColor: AppColors.white,
-                            shadowColor: AppColors.shadowblack1,
-                            elevation: 3,
-                            borderRadius: 12,
-                          );
-                        },
-                      );
                     },
                   ),
                 ),
@@ -227,6 +347,29 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildButton({
+    required String text,
+    required Color color,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      width: 200,
+      height: 50,
+      child: CustomButton(
+        onTap: onTap,
+        color: color,
+        textColor: AppColors.white,
+        fontSize: 16,
+        text: text,
+        borderRadius: BorderRadius.circular(12),
+        prefixIcon: Icon(icon, color: AppColors.white),
+        width: 20,
+        height: 20,
       ),
     );
   }
