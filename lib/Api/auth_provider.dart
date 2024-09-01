@@ -221,7 +221,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> getAllCategories(
-      {int page = 1, int limit = 20}) async {
+      {int page = 1, int limit = 20, String? name}) async {
     final url = Uri.parse('$_baseUrl/category/?page=$page&limit=$limit');
 
     try {
@@ -240,7 +240,25 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data.containsKey('categories') && data['categories'] is List) {
-          return {'success': true, 'data': data['categories']};
+          List categories = data['categories'];
+
+          // If a name is provided, filter the categories by the name
+          if (name != null && name.isNotEmpty) {
+            categories = categories
+                .where((category) =>
+                    category['name'].toString().toLowerCase() ==
+                    name.toLowerCase())
+                .toList();
+
+            if (categories.isEmpty) {
+              return {
+                'success': false,
+                'message': 'Category with name "$name" not found'
+              };
+            }
+          }
+
+          return {'success': true, 'data': categories};
         } else {
           print('Unexpected response format: $data');
           return {'success': false, 'message': 'Unexpected response format'};
