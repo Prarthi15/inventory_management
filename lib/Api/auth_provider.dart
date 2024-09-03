@@ -89,14 +89,16 @@ class AuthProvider with ChangeNotifier {
 
       print('Login Response: ${response.statusCode}');
       print('Login Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}');
 
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
         print('Parsed Response Data: $responseData');
 
-        final token = responseData['token']; // Adjust this if needed
+        // Directly extract the token from the response body
+        final token = responseData['token'];
 
-        if (token != null) {
+        if (token != null && token.isNotEmpty) {
           await _saveToken(token);
           print('Token retrieved and saved: $token');
         } else {
@@ -218,8 +220,9 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> getAllCategories() async {
-    final url = Uri.parse('$_baseUrl/category/showAllCategory');
+  Future<Map<String, dynamic>> getAllCategories(
+      {int page = 1, int limit = 20, String? name}) async {
+    final url = Uri.parse('$_baseUrl/category/?page=$page&limit=$limit');
 
     try {
       final token = await _getToken();
@@ -227,7 +230,7 @@ class AuthProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Include the token here
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -235,7 +238,31 @@ class AuthProvider with ChangeNotifier {
       print('Get All Categories Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        return {'success': true, 'data': json.decode(response.body)};
+        final data = json.decode(response.body);
+        if (data.containsKey('categories') && data['categories'] is List) {
+          List categories = data['categories'];
+
+          // If a name is provided, filter the categories by the name
+          if (name != null && name.isNotEmpty) {
+            categories = categories
+                .where((category) =>
+                    category['name'].toString().toLowerCase() ==
+                    name.toLowerCase())
+                .toList();
+
+            if (categories.isEmpty) {
+              return {
+                'success': false,
+                'message': 'Category with name "$name" not found'
+              };
+            }
+          }
+
+          return {'success': true, 'data': categories};
+        } else {
+          print('Unexpected response format: $data');
+          return {'success': false, 'message': 'Unexpected response format'};
+        }
       } else {
         return {
           'success': false,
@@ -256,22 +283,31 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> createCategory(String id, String name) async {
-    final url = Uri.parse('$_baseUrl/category/createCategory');
+    final url = Uri.parse('$_baseUrl/category/');
 
     try {
+      final token = await _getToken(); // Retrieve the token
+      if (token == null) {
+        return {'success': false, 'message': 'No token provided'};
+      }
+
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
         body: json.encode({
           'id': id,
           'name': name,
         }),
       );
 
-      print('Create Category Response: ${response.statusCode}');
-      print('Create Category Response Body: ${response.body}');
+      // print('Create Category Response: ${response.statusCode}');
+      // print('Create Category Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+            
         return {'success': true, 'data': json.decode(response.body)};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);
@@ -294,10 +330,25 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> getCategoryById(String id) async {
-    final url = Uri.parse('$_baseUrl/category/showAllCategory/$id');
+    final url = Uri.parse('$_baseUrl/category/$id');
+
     try {
-      final response =
-          await http.get(url, headers: {'Content-Type': 'application/json'});
+      final token = await _getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No token found'};
+      }
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('Get Category By ID Response: ${response.statusCode}');
+      print('Get Category By ID Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         return {'success': true, 'data': data};
@@ -334,4 +385,65 @@ class AuthProvider with ChangeNotifier {
     await prefs.remove('password');
     await prefs.remove('authToken'); // Clear the token
   }
+
+
+
+//get all brand name
+ Future<Map<String, dynamic>> getAllBrandName(
+      {int page = 1, int limit = 20, String? name}) async {
+    final url = Uri.parse('$_baseUrl/brand/');
+
+    try {
+      final token = await _getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('Get All brand Response: ${response.statusCode}');
+      print('Get All brand  Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data.containsKey('brands') && data['brands'] is List) {
+
+          print("i am dipu");
+          List brand;
+         
+            
+              brand=parseJsonToList(response.body.toString(),'brands');
+          // }
+          // print("i am dipu us here wiht success");
+          return {'success': true, 'data': brand};
+        } else {
+          print('Unexpected response format: $data');
+          return {'success': false, 'message': 'Unexpected response format'};
+        }
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to fetch categories with status code: ${response.statusCode}'
+        };
+      }
+    } catch (error, stackTrace) {
+      print('An error occurred while fetching categories: $error');
+      print('Stack trace: $stackTrace');
+      return {'success': false, 'message': 'An error occurred: $error'};
+    }
+  }
+
+List<Map<String, dynamic>> parseJsonToList(String jsonString,String key) {
+  // Decode the JSON string
+  final Map<String, dynamic> jsonData = json.decode(jsonString);
+
+  // Access the array of objects
+  final List<dynamic> categories = jsonData[key];
+
+  // Convert the List<dynamic> to List<Map<String, dynamic>>
+  return categories.map((item) => item as Map<String, dynamic>).toList();
+}
 }

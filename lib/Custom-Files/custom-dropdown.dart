@@ -1,10 +1,12 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 
 class CustomDropdown extends StatefulWidget {
   final double fontSize;
+   final List<Map<String,dynamic>>option;
   final String? Function(String?)? validator;
-  const CustomDropdown({super.key, this.validator, this.fontSize = 17});
+   CustomDropdown({super.key, this.validator, this.fontSize = 17,this.option=const []});
 
   @override
   State<CustomDropdown> createState() => _CustomDropdownState();
@@ -12,18 +14,34 @@ class CustomDropdown extends StatefulWidget {
 
 class _CustomDropdownState extends State<CustomDropdown> {
   String? _selectedItem = 'Option 1';
-  final List<String> _items = [
-    'Option 1',
-    'Option 2',
-    'Option 3',
-    'Option 4',
-    'Option 5',
+   List<String> _items = [
+   'Option 1'
+   
   ];
 
   // _CustomDropdownState({ this.fontSize=17});
+  void updateData(){
+    if(widget.option.isNotEmpty){
+     _selectedItem=widget.option[0]['name'];
+     _items.clear();
+     for(int i=0;i<widget.option.length;i++){
+        _items.add(widget.option[i]['name']);
+     }
+     setState(() {
+       
+     });
+    }
+  }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    updateData();
+  }
 
   @override
   Widget build(BuildContext context) {
+  
     return DropdownButtonHideUnderline(
       child: Container(
         alignment: Alignment.topCenter,

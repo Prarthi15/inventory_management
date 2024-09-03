@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Api/products-provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
@@ -7,6 +8,7 @@ import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
 import 'package:inventory_management/Custom-Files/multi-image-picker.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class Products extends StatefulWidget {
   const Products({super.key});
 
@@ -49,9 +51,11 @@ class _ProductsState extends State<Products> {
 
   final TextEditingController _skuController = TextEditingController();
   final TextEditingController _eanUpcController = TextEditingController();
-
+  String ?token;
   final GlobalKey<FormState> _formKey =
       GlobalKey<FormState>(); // Add a form key
+   List<Map<String, dynamic>>?cat;
+   List<Map<String, dynamic>>?brand;
 
   @override
   void dispose() {
@@ -106,13 +110,23 @@ ProductProvider? productProvider;
 @override
 void initState() {
   super.initState();
-  // WidgetsBinding.instance.addPostFrameCallback((_) {
-  //   // productProvider = Provider.of<ProductProvider>(context, listen:false);
-  //   // setState(() {
-      
-  //   // });
-  // });
+  getCategories();
+ 
 }
+
+  void getCategories()async{
+      // print("amazing with new concept ${await AuthProvider().getAllCategories()}");
+       cat = 
+    (await AuthProvider().getAllCategories())['data'].cast<Map<String, dynamic>>();
+      // print("dataa is sheree eeee  ${cat![0]["name"]}");
+      // AuthProvider().parseJsonToList(await AuthProvider().getAllCategories()['data']);
+
+       
+      brand=(await AuthProvider().getAllBrandName())['data'].cast<Map<String, dynamic>>();
+      setState(() {
+        print("heelo i am here ");
+      });
+  }
   @override
   Widget build(BuildContext context) {
     productProvider = Provider.of<ProductProvider>(context, listen:true);
@@ -120,9 +134,9 @@ void initState() {
     final screenWidth = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
-      body: MediaQuery.of(context).size.width > 1200
+      body:cat!=null?(MediaQuery.of(context).size.width > 1200
           ? webLayout(context,)
-          : mobileLayout(context,),
+          : mobileLayout(context,)):CircularProgressIndicator()
     );
   }
 
@@ -184,9 +198,12 @@ void initState() {
                         Container(
                           height: 250,
                           width: 550,
+                          
                           decoration: BoxDecoration(
+                            
                             border: Border.all(
-                              color: Colors.blue.shade200,
+                              color: Colors.black.withOpacity(0.2),
+                              
                             ),
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(10)),
@@ -240,16 +257,9 @@ void initState() {
 
                         fieldTitle('Product Brand', height: 50, width: 110),
                         SizedBox(
-                          child: CustomTextField(
-                              controller: _productBrandController,
-                              height: 51,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Product Brand is required';
-                                }
-                                return null;
-                              }),
-                        ),
+                          height: 51,
+                          width: 150,
+                          child: CustomDropdown(option:brand!,)),
 
                         fieldTitle('Category',
                             show: false, height: 50, width: 70),
@@ -257,11 +267,12 @@ void initState() {
                           child: MediaQuery.of(context).size.width > 450
                               ? Row(
                                   children: [
-                                    const SizedBox(
+                                     SizedBox(
                                       height: 51,
                                       width: 260,
                                       child: CustomDropdown(
                                         key: null,
+                                        option:cat!,
                                       ),
                                     ),
                                     const SizedBox(
@@ -289,11 +300,12 @@ void initState() {
                               : Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const SizedBox(
+                                     SizedBox(
                                       height: 51,
                                       width: 260,
                                       child: CustomDropdown(
                                         key: null,
+                                        option:cat!,
                                       ),
                                     ),
                                     const SizedBox(
@@ -325,7 +337,7 @@ void initState() {
                      productProvider!.selectedProductCategory=='Variant Product Creation'?fieldTitle('Variations', width: 80):const SizedBox(),
                       productProvider!.selectedProductCategory=='Variant Product Creation'?   variantProductCreation(context):const SizedBox(),
 
-                        fieldTitle('Model Name',
+                        fieldTitle('Technical Name',
                             show: false, height: 50, width: 95.5),
                         SizedBox(
                           child: CustomTextField(
@@ -374,21 +386,23 @@ void initState() {
                         ),
 
                         fieldTitle('Material Type', height: 50, width: 103.2),
-                        const SizedBox(
+                         SizedBox(
                           height: 51,
                           width: 550,
                           child: CustomDropdown(
                             key: null,
+                            option:cat!,
                           ),
                         ),
                         const SizedBox(height: 8.0),
                         fieldTitle('Predefined Tax Rule',
                             show: false, height: 50, width: 144.5),
-                        const SizedBox(
+                         SizedBox(
                           height: 51,
                           width: 550,
                           child: CustomDropdown(
                             key: null,
+                            option:cat!,
                           ),
                         ),
 
@@ -407,11 +421,11 @@ void initState() {
                           height: 250,
                           width: 550,
                           decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.blue.shade200,
-                            ),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(10)),
+                             border: Border.all(
+                      color:Colors.black.withOpacity(0.2)
+                    ),
+                    borderRadius:BorderRadius.circular(10),
+                    color: Colors.white30,
                           ),
                           child: Center(
                             child: Row(
@@ -536,7 +550,7 @@ void initState() {
                         ),
 
                         fieldTitle('Custom', show: false, height: 50, width: 1),
-                        const SizedBox(
+                         SizedBox(
                           height: 51,
                           width: 550,
                           child: CustomDropdown(
@@ -704,8 +718,11 @@ void initState() {
                   width: 550,
                   height: 250,
                   decoration: BoxDecoration(
-                    border: Border.all(),
-                    color: Colors.blue.shade200,
+                    border: Border.all(
+                      color:Colors.black.withOpacity(0.2)
+                    ),
+                    borderRadius:BorderRadius.circular(10),
+                    color: Colors.white30,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -755,21 +772,17 @@ void initState() {
               const SizedBox(height: 12),
               formLayout(
                   fieldTitle('Brand'),
-                  CustomTextField(
-                    controller: _productBrandController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Brand is required';
-                      }
-                      return null;
-                    },
-                  )),
+                  SizedBox(
+                    height: 51,
+                                    width: 150,
+                    child: CustomDropdown(option:brand!,)),
+                  ),
               const SizedBox(height: 12),
               formLayout(
                   fieldTitle('Category'),
                   Row(
                     children: [
-                      SizedBox(width: 150, height: 51, child: CustomDropdown()),
+                      SizedBox(width: 150, height: 51, child: CustomDropdown(option:cat!,)),
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.blue.shade50),
@@ -794,7 +807,7 @@ void initState() {
               ):const SizedBox(),
             productProvider!.selectedProductCategory=='Variant Product Creation'?  const SizedBox(height: 12):const SizedBox(),
               formLayout(
-                fieldTitle('Model Name'),
+                fieldTitle('Technical Name'),
                 CustomTextField(
                     controller: _modelNameController,
                     height: 51,
@@ -865,8 +878,11 @@ void initState() {
                   width: 550,
                   height: 250,
                   decoration: BoxDecoration(
-                    border: Border.all(),
-                    color: Colors.blue.shade200,
+                     border: Border.all(
+                      color:Colors.black.withOpacity(0.2)
+                    ),
+                    borderRadius:BorderRadius.circular(10),
+                    color: Colors.white30,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -1012,11 +1028,16 @@ void initState() {
                     height: 100,
                     width: 550,
                     decoration: BoxDecoration(
-                        border: Border.all(), color: Colors.blue.shade200),
-                    child: const Align(
+                         border: Border.all(
+                      color:Colors.black.withOpacity(0.2)
+                    ),
+                    borderRadius:BorderRadius.circular(10),
+                    color: Colors.white30,
+                        ),
+                    child:  Align(
                       alignment: Alignment.topLeft,
                       child: Padding(
-                        padding: EdgeInsets.all(8.0),
+                        padding:const EdgeInsets.all(8.0),
                         child: SizedBox(
                           height: 51,
                           width: 150,

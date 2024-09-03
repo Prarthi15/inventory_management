@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget{
+class CustomTextField extends StatelessWidget {
   final int maxLines;
   final double height;
   final double width;
@@ -8,64 +8,72 @@ class CustomTextField extends StatelessWidget{
   final String? unit;
   final String? prefix;
   final String? label;
-  // final IconData? icon;
   final TextInputType keyboardType;
   final TextEditingController controller;
   final String? Function(String?)? validator;
 
-  // Constructor with default values
   CustomTextField({
     this.maxLines = 1,
-    this.height = 51,
+    this.height = 52,
     this.width = 550,
     this.icon,
     this.unit,
     this.prefix,
-    
     this.keyboardType = TextInputType.text,
     required this.controller,
-    this.validator, this.label,
+    this.validator,
+    this.label,
   });
 
-  // Method to build the TextFormField
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      
       height: height,
       width: width,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 0.0, top: 0),
-        child: TextFormField(
-          cursorWidth: 2.0,
-          controller: controller,
-          maxLines: maxLines,
-          keyboardType: keyboardType,
-          
-          decoration: InputDecoration(
-            prefixIcon: icon != null && prefix == null
-                ? Padding(
+      child: TextFormField(
+        cursorWidth: 1.0,
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          isDense:true,
+          isCollapsed:true,
+          prefixIcon: icon != null && prefix == null
+              ? Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Icon(icon),
                 )
-                : prefix != null
-                    ? Padding(
-                        padding: const EdgeInsets.all(9.0),
-                        child: Text(prefix!),
-                      )
-                    : null,
-            suffix: unit != null ? Text(unit!) : const Text(''),
-            errorStyle:const TextStyle(height: 0.1),
-            fillColor:Colors.blue.shade100,
-            filled:true,
-            hintText: label??'',
-            border:InputBorder.none,
-            
-            
-            
+              : prefix != null
+                  ? Padding(
+                      padding: const EdgeInsets.all(9.0),
+                      child: Text(
+                        prefix!,
+                        style: TextStyle(color: Colors.blue.shade800),
+                      ),
+                    )
+                  : null,
+          suffix: unit != null ? Text(unit!, style: TextStyle(color: Colors.blue.shade800)) : null,
+          errorStyle: const TextStyle(height: 0.1, color: Colors.redAccent),
+          fillColor: Colors.blue.shade50,
+          filled: true,
+          hintText: label ?? '',
+          hintStyle: TextStyle(color: Colors.grey.shade500),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
           ),
-          validator: validator,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: Colors.blue.shade300, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide(color: Colors.blue.shade800, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 15.0,horizontal:8),
+          
         ),
+        validator: validator,
       ),
     );
   }
