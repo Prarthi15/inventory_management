@@ -81,9 +81,6 @@ class _CustomHorizontalImageScrollerState extends State<CustomHorizontalImageScr
 
   @override
   Widget build(BuildContext context) {
-    // Debugging information to verify what data is present
-  
-    
     return kIsWeb
         ? (widget.webImageUrls == null || widget.webImageUrls!.isEmpty
             ? const Center(child: Text('No images selected.'))

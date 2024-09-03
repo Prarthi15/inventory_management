@@ -66,3 +66,28 @@ class _CustomDropdownState extends State<CustomDropdown> {
     );
   }
 }
+
+
+class SimpleDropDown extends StatefulWidget {
+  const SimpleDropDown({super.key});
+
+  @override
+  State<SimpleDropDown> createState() => _SimpleDropDownState();
+}
+
+class _SimpleDropDownState extends State<SimpleDropDown> {
+  // DropdownMenuItem<String> vale='Hwlo';
+  List<String> ans=['option 0','option 1'];
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height:40,
+      width:double.infinity,
+      child:DropdownButton(
+        value:'option 0',
+        items:ans.map((e) =>DropdownMenuItem(child:Text(e))).toList(),
+        onChanged:(val){},
+        ),
+    );
+  }
+}
