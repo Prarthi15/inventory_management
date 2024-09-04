@@ -18,26 +18,30 @@ class AppColors {
   static const Color drawerBackground = Colors.grey;
   static const Color cardsred = Colors.redAccent;
   static const Color cardsgreen = Colors.greenAccent;
+  static const Color green = Colors.green;
 // <<<<<<< HEAD
 // <<<<<<< HEAD
 // =======
 // >>>>>>> f739855e4312bceed673e57a85e5f13ee337e5ee
   //getWidth
-  double getWidth(BuildContext context){
-  return MediaQuery.of(context).size.width;
+  double getWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width;
   }
+
   // static const double MediaQuery.of(context).
-  TextStyle get headerStyle{
+  TextStyle get headerStyle {
     return const TextStyle(
-      fontWeight:FontWeight.w600,
+      fontWeight: FontWeight.w600,
     );
   }
-    TextStyle get simpleHeadingStyle{
+
+  TextStyle get simpleHeadingStyle {
     return const TextStyle(
-      fontWeight:FontWeight.bold,
-      fontSize:15,
+      fontWeight: FontWeight.bold,
+      fontSize: 15,
     );
   }
+
 // <<<<<<< HEAD
 // =======
   static const Color lightBlue = Color.fromRGBO(3, 169, 244, 1);

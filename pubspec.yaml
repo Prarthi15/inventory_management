@@ -40,9 +40,13 @@ dependencies:
   intl: ^0.19.0
   http: ^1.2.2
   provider: ^6.1.2
-  shared_preferences:
+  shared_preferences: ^2.3.2
   pagination_flutter: ^0.0.8
   textfields: ^0.0.3
+  objectid: ^3.0.0
+  image_picker: ^1.1.2
+  dropdown_search: ^5.0.6
+
 
 dev_dependencies:
   flutter_test:
@@ -53,7 +57,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

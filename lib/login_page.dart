@@ -3,7 +3,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:provider/provider.dart';
-import 'Api/auth_provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
