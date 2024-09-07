@@ -7,20 +7,34 @@ class CustomDropdown extends StatefulWidget {
    int selectedIndex;
   final List<Map<String,dynamic>>option;
   final String? Function(String?)? validator;
+<<<<<<< HEAD
   final bool isboxSize;
   ValueChanged<int>? onSelectedChanged;
 
    CustomDropdown({super.key, this.validator, this.fontSize = 17,this.option=const [],this.isboxSize=false,this.selectedIndex=0,this.onSelectedChanged,});
+=======
+  const CustomDropdown({super.key, this.validator, this.fontSize = 17});
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
 
   @override
   State<CustomDropdown> createState() => _CustomDropdownState();
 }
 
 class _CustomDropdownState extends State<CustomDropdown> {
+<<<<<<< HEAD
   String? _selectedItem = 'Select option';
    List<String> _items = [
    'Select option'
    
+=======
+  String? _selectedItem = 'Option 1';
+  final List<String> _items = [
+    'Option 1',
+    'Option 2',
+    'Option 3',
+    'Option 4',
+    'Option 5',
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
   ];
 
   // _CustomDropdownState({ this.fontSize=17});
@@ -84,6 +98,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             // itemBuilder:
           ),
           onChanged: (String? newValue) {
+<<<<<<< HEAD
               // _items.fin;
              widget.selectedIndex= _items.indexWhere((element) => element == newValue);
              if(widget.onSelectedChanged!=null){
@@ -94,6 +109,10 @@ class _CustomDropdownState extends State<CustomDropdown> {
               _selectedItem = newValue;
               
               // widget.=0;
+=======
+            setState(() {
+              _selectedItem = newValue;
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
             });
           },
         ),
@@ -101,6 +120,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
     );
   }
 }
+<<<<<<< HEAD
 
 
 class SimpleDropDown extends StatefulWidget {
@@ -152,3 +172,5 @@ class _DropDownWithRowState extends State<DropDownWithRow> {
     );
   }
 }
+=======
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f

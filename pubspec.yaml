@@ -40,6 +40,7 @@ dependencies:
   intl: ^0.19.0
   http: ^1.2.2
   provider: ^6.1.2
+<<<<<<< HEAD
   shared_preferences: 
   pagination_flutter: ^0.0.8
   textfields: ^0.0.3
@@ -47,6 +48,13 @@ dependencies:
   image_picker: ^1.1.2
   dropdown_search: ^5.0.6
 
+=======
+  shared_preferences:
+  pagination_flutter: ^0.0.8
+  textfields: ^0.0.3
+  image_picker: ^1.1.2
+  dropdown_search: ^5.0.6
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
 
 dev_dependencies:
   flutter_test:

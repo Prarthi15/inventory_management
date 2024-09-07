@@ -173,7 +173,16 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
         ),
         _buildInventorySection(isSmallScreen),
+<<<<<<< HEAD
         _buildMasterSection(isSmallScreen),
+=======
+         _buildDrawerItem(
+          icon: Icons.production_quantity_limits,
+          text: 'Produts',
+          isSelected: selectedDrawerItem == 'Products',
+          onTap: () => _onDrawerItemTapped('Products', isSmallScreen),
+        ),
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
         _buildDrawerItem(
           icon: Icons.analytics,
           text: 'Accounting',
@@ -197,6 +206,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 isSelected: selectedDrawerItem == 'Settings',
                 onTap: () => _onDrawerItemTapped('Settings', isSmallScreen),
               ),
+              
             ],
           ),
         ),
@@ -300,6 +310,7 @@ class _DashboardPageState extends State<DashboardPage> {
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
+<<<<<<< HEAD
               icon: Icons.category,
               text: 'Category Master',
               isSelected: selectedDrawerItem == 'Category Master',
@@ -321,6 +332,31 @@ class _DashboardPageState extends State<DashboardPage> {
               iconSize: 20,
               fontSize: 14,
             ),
+=======
+              icon: Icons.production_quantity_limits,
+              text: 'Manage Inventory',
+              isSelected: selectedDrawerItem == 'Manage Inventory',
+              onTap: () => _onDrawerItemTapped('Manage Inventory', isSmallScreen),
+              isIndented: true, // Pass the indentation flag
+              iconSize: 20, // Adjust icon size
+              fontSize: 14, // Adjust font size
+// =======
+           
+          ),
+//           Padding(
+//             padding: const EdgeInsets.only(left: 10.0),
+//             child: _buildDrawerItem(
+//               icon: Icons.category,
+//               text: 'Category Master',
+//               isSelected: selectedDrawerItem == 'Category Master',
+//               onTap: () =>
+//                   _onDrawerItemTapped('Category Master', isSmallScreen),
+//               isIndented: true,
+//               iconSize: 20,
+//               fontSize: 14,
+// >>>>>>> d730f9b8e18daf06e72f376d49e2a1dcb3bb96e2
+//             ),
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
           ),
         ],
       ),
@@ -399,8 +435,11 @@ class _DashboardPageState extends State<DashboardPage> {
         return const ProductDashboardPage();
       case 'Category Master':
         return CategoryMasterPage();
+<<<<<<< HEAD
       case 'Combo Master':
         return const ComboPage();
+=======
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
       case 'Settings':

@@ -18,7 +18,6 @@ class AppColors {
   static const Color drawerBackground = Colors.grey;
   static const Color cardsred = Colors.redAccent;
   static const Color cardsgreen = Colors.greenAccent;
-  static const Color green = Colors.green;
 // <<<<<<< HEAD
 // <<<<<<< HEAD
 // =======
@@ -41,7 +40,6 @@ class AppColors {
       fontSize: 15,
     );
   }
-
 // <<<<<<< HEAD
 // =======
   static const Color lightBlue = Color.fromRGBO(3, 169, 244, 1);

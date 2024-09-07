@@ -18,8 +18,12 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   final List<Product> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
+<<<<<<< HEAD
   bool _showCreateProduct = false;
 
+=======
+  bool _showCreateProduct=false;
+>>>>>>> 1cc37af87897cc47c26db6d7b5d7ca24fe2cba5f
   int _page = 0;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
