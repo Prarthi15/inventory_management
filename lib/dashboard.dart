@@ -197,7 +197,6 @@ class _DashboardPageState extends State<DashboardPage> {
                 isSelected: selectedDrawerItem == 'Settings',
                 onTap: () => _onDrawerItemTapped('Settings', isSmallScreen),
               ),
-              
             ],
           ),
         ),

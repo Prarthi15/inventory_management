@@ -1,4 +1,3 @@
-//import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
@@ -135,7 +134,6 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final isSmallScreen = constraints.maxWidth < 600;
-          final crossAxisCount = isSmallScreen ? 1 : 2;
 
           return Padding(
             padding:
@@ -326,6 +324,6 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
       text: text,
       borderRadius: BorderRadius.circular(12),
       prefixIcon: Icon(icon, size: 18, color: AppColors.white),
-);
+    );
   }
 }
