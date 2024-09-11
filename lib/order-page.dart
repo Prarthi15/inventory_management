@@ -616,7 +616,7 @@ Widget _buildReadyToConfirmTab() {
 
               Row(
                 children: [
-                  const SizedBox(
+                   SizedBox(
                       width: 130,
                       height: 32,
                       // color:Colors.amber,
@@ -660,16 +660,16 @@ Widget _buildReadyToConfirmTab() {
 
               const SizedBox(height: 8),
 
-              const Row(
+               Row(
                 children: [
                   SizedBox(
                     height: 34,
                     width: 160,
                     child: CustomDropdown(fontSize: 12.5),
                   ),
-                  Spacer(),
-                  Icon(Icons.arrow_upward, size: 18),
-                  Icon(Icons.arrow_downward, size: 18),
+                 const Spacer(),
+                const  Icon(Icons.arrow_upward, size: 18),
+               const   Icon(Icons.arrow_downward, size: 18),
                 ],
               ),
 
@@ -704,7 +704,7 @@ Widget _buildReadyToConfirmTab() {
 
               const SizedBox(height: 8),
 
-              const SizedBox(
+               SizedBox(
                 height: 34,
                 width: 160,
                 child: CustomDropdown(fontSize: 12.5),

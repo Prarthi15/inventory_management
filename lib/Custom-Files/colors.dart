@@ -41,7 +41,6 @@ class AppColors {
       fontSize: 15,
     );
   }
-
 // <<<<<<< HEAD
 // =======
   static const Color lightBlue = Color.fromRGBO(3, 169, 244, 1);

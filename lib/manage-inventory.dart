@@ -76,7 +76,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                         style: AppColors().simpleHeadingStyle),
                                     Row(
                                       children: [
-                                        const SizedBox(
+                                         SizedBox(
                                           width: 100,
                                           child: CustomDropdown(),
                                         ),
@@ -146,7 +146,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                   style: AppColors().simpleHeadingStyle),
                               Row(
                                 children: [
-                                  const SizedBox(
+                                   SizedBox(
                                     width: 100,
                                     child: CustomDropdown(),
                                   ),
@@ -190,15 +190,18 @@ class _ManageInventoryState extends State<ManageInventory> {
                       height: 80,
                       // width: 300,
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.cardsgreen),
+                        border: Border.all(color: AppColors.black.withOpacity(0.2)),
+                        borderRadius:BorderRadius.circular(10)
+                        // color:Colors.amber
                         // color: Colors.amberAccent,
                       ),
-                      child: const Align(
+                      child:  Align(
                         alignment: Alignment.topLeft,
                         child: SizedBox(
                           width: 150,
+                          height:51,
                           child: Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: CustomDropdown(),
                           ),
                         ),

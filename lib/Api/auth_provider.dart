@@ -225,7 +225,7 @@ class AuthProvider with ChangeNotifier {
     final url = Uri.parse('$_baseUrl/category/?page=$page&limit=$limit');
 
     try {
-      final token = await _getToken();
+      final token = await getToken();
       final response = await http.get(
         url,
         headers: {
@@ -277,7 +277,7 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<String?> _getToken() async {
+  Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('authToken');
   }
@@ -286,7 +286,8 @@ class AuthProvider with ChangeNotifier {
     final url = Uri.parse('$_baseUrl/category/');
 
     try {
-      final token = await _getToken(); // Retrieve the token
+      final token = await getToken(); 
+     
       if (token == null) {
         return {'success': false, 'message': 'No token provided'};
       }
@@ -303,10 +304,11 @@ class AuthProvider with ChangeNotifier {
         }),
       );
 
-      print('Create Category Response: ${response.statusCode}');
-      print('Create Category Response Body: ${response.body}');
+      // print('Create Category Response: ${response.statusCode}');
+      // print('Create Category Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+            
         return {'success': true, 'data': json.decode(response.body)};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);
@@ -332,7 +334,7 @@ class AuthProvider with ChangeNotifier {
     final url = Uri.parse('$_baseUrl/category/$id');
 
     try {
-      final token = await _getToken();
+      final token = await getToken();
       if (token == null) {
         return {'success': false, 'message': 'No token found'};
       }
@@ -384,4 +386,65 @@ class AuthProvider with ChangeNotifier {
     await prefs.remove('password');
     await prefs.remove('authToken'); // Clear the token
   }
+
+
+
+//get all brand name
+//  Future<Map<String, dynamic>> getAllBrandName(
+//       {int page = 1, int limit = 20, String? name}) async {
+//     final url = Uri.parse('$_baseUrl/brand/');
+
+//     try {
+//       final token = await getToken();
+//       final response = await http.get(  
+//         url,
+//         headers: {
+//           'Content-Type': 'application/json',
+//           'Authorization': 'Bearer $token',
+//         },
+//       );
+
+//       print('Get All brand Response: ${response.statusCode}');
+//       print('Get All brand  Response Body: ${response.body}');
+
+//       if (response.statusCode == 200) {
+//         final data = json.decode(response.body);
+//         if (data.containsKey('brands') && data['brands'] is List) {
+
+//           print("i am dipu");
+//           List brand;
+         
+            
+//               brand=parseJsonToList(response.body.toString(),'brands');
+//           // }
+//           // print("i am dipu us here wiht success");
+//           return {'success': true, 'data': brand};
+//         } else {
+//           print('Unexpected response format: $data');
+//           return {'success': false, 'message': 'Unexpected response format'};
+//         }
+//       } else {
+//         return {
+//           'success': false,
+//           'message':
+//               'Failed to fetch categories with status code: ${response.statusCode}'
+//         };
+//       }
+//     } catch (error, stackTrace) {
+//       print('An error occurred while fetching categories: $error');
+//       print('Stack trace: $stackTrace');
+//       return {'success': false, 'message': 'An error occurred: $error'};
+//     }
+//   }
+
+// List<Map<String, dynamic>> parseJsonToList(String jsonString,String key) {
+//   // Decode the JSON string
+//   final Map<String, dynamic> jsonData = json.decode(jsonString);
+
+//   // Access the array of objects
+//   final List<dynamic> categories = jsonData[key];
+
+//   // Convert the List<dynamic> to List<Map<String, dynamic>>
+//   return categories.map((item) => item as Map<String, dynamic>).toList();
+// }
 }
