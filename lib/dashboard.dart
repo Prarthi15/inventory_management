@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/combo_page.dart';
 import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/marketplace_page.dart';
 import 'package:inventory_management/order-page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
@@ -322,6 +323,18 @@ class _DashboardPageState extends State<DashboardPage> {
               fontSize: 14,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: _buildDrawerItem(
+              icon: Icons.add_business,
+              text: 'Marketplace Master',
+              isSelected: selectedDrawerItem == 'Marketplace Master',
+              onTap: () => _onDrawerItemTapped('Marketplace Master', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );
@@ -401,6 +414,8 @@ class _DashboardPageState extends State<DashboardPage> {
         return CategoryMasterPage();
       case 'Combo Master':
         return const ComboPage();
+      case 'Marketplace Master':
+        return const MarketplacePage();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
       case 'Settings':
