@@ -46,6 +46,7 @@ dependencies:
   image_picker: ^1.1.2
   dropdown_search: ^5.0.6
   multi_dropdown: ^3.0.1
+  file_picker: ^8.0.5
 
 dev_dependencies:
   flutter_test:

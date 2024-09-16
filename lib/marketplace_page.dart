@@ -62,6 +62,14 @@ class _MarketplacePageState extends State<MarketplacePage> {
                   const SizedBox(height: 16),
                   Consumer<MarketplaceProvider>(
                     builder: (context, provider, child) {
+                      // Prepare the options for CustomDropdown
+                      List<Map<String, dynamic>> options = provider.products
+                          .map((product) => {
+                                'name': product.displayName ?? 'Unknown',
+                                'product': product,
+                              })
+                          .toList();
+
                       return Column(
                         children: provider.skuMaps.map((skuMap) {
                           int index = provider.skuMaps.indexOf(skuMap);
@@ -74,7 +82,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
                                   decoration: const InputDecoration(
                                     labelText: 'SKU',
                                     border: OutlineInputBorder(),
-                                    //hintText: 'Enter SKU',
                                   ),
                                   onChanged: (value) {
                                     provider.updateSkuMap(
@@ -85,23 +92,15 @@ class _MarketplacePageState extends State<MarketplacePage> {
                               const SizedBox(width: 8),
                               Expanded(
                                 child: CustomDropdown(
-                                  option: provider.products
-                                      .map((product) => {
-                                            'name': product.displayName ??
-                                                'Unknown',
-                                            'id': product.id,
-                                          })
-                                      .toList(),
+                                  option: options,
                                   selectedIndex: skuMap.product != null
-                                      ? provider.products.indexWhere(
-                                          (product) =>
-                                              product.id == skuMap.product?.id)
+                                      ? options.indexWhere((option) =>
+                                          option['product'] == skuMap.product)
                                       : 0,
                                   onSelectedChanged: (selectedIndex) {
-                                    final selectedProduct =
-                                        provider.products.isNotEmpty
-                                            ? provider.products[selectedIndex]
-                                            : null;
+                                    final selectedProduct = options.isNotEmpty
+                                        ? options[selectedIndex]['product']
+                                        : null;
                                     provider.updateSkuMap(
                                         index, skuMap.mktpSku, selectedProduct);
                                   },
@@ -146,7 +145,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 ],
               ),
             ),
-        ],
+          ],
           if (!provider.isFormVisible) ...[
             const SizedBox(height: 16),
             const Text(
@@ -161,7 +160,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
             Expanded(
               child: Consumer<MarketplaceProvider>(
                 builder: (context, provider, child) {
-                  if (provider.isLoading) {
+                  if (provider.loading) {
                     return const Center(child: CircularProgressIndicator());
                   }
 
@@ -263,22 +262,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
                                             color: Colors.black,
                                           ),
                                         ),
-                                        // const SizedBox(height: 4),
-                                        // Text(
-                                        //   'Weight: ${product?.weight ?? 'N/A'}',
-                                        //   style: const TextStyle(
-                                        //     fontSize: 16,
-                                        //     color: Colors.black,
-                                        //   ),
-                                        // ),
-                                        // const SizedBox(height: 4),
-                                        // Text(
-                                        //   'Type: ${product?.productType ?? 'N/A'}',
-                                        //   style: const TextStyle(
-                                        //     fontSize: 16,
-                                        //     color: Colors.black,
-                                        //   ),
-                                        // ),
                                       ],
                                     ),
                                   );

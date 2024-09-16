@@ -3,19 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:inventory_management/model/combo_model.dart';
 import 'package:inventory_management/Api/combo_api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+
 
 class ComboProvider with ChangeNotifier {
   Combo? _combo;
   bool _isFormVisible = false;
   List<Combo> _comboList = [];
-  List<Product> _products = []; //list
-  bool isLoading = false;
+
+  List<Product> _products = [];
+  List<Product> _selectedProducts = [];
+  bool _loading = false;
 
   Combo? get combo => _combo;
   bool get isFormVisible => _isFormVisible;
   List<Combo> get comboList => _comboList;
+
   List<Product> get products => _products;
-  //bool get isLoading => isLoading;
+  List<Product> get selectedProducts => _selectedProducts;
+  bool get loading => _loading;
+
+  List<Map<String, dynamic>> _combosList = [];
+  List<Map<String, dynamic>> get combosList => _combosList;
+
+  List<Uint8List>? selectedImages = [];
+  List<String> imageNames = [];
 
   ComboProvider() {
     _loadCombos();
@@ -42,28 +55,43 @@ class ComboProvider with ChangeNotifier {
 
   final comboApi = ComboApi();
 
-  Future<void> createCombo(Combo combo) async {
-    try {
-      final createdCombo = await comboApi.createCombo(combo);
-      _combo = createdCombo;
+Future<void> createCombo(Combo combo, List<Uint8List>? images, List<String> productIds) async {
+  try {
+    final createdCombo = await comboApi.createCombo(combo, images, productIds);
+    _combo = combo;
+    notifyListeners();
+  } catch (e) {
+    print('Failed to create combo: $e');
+  }
+}
+
+   // Select images using file picker
+  void selectImages() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      type: FileType.image, // Only allow image files
+    );
+
+    if (result != null) {
+      selectedImages = result.files.map((file) => file.bytes!).toList();
+      imageNames = result.files.map((file) => file.name).toList();
+      print('Selected images count: ${selectedImages!.length}');
+      print('Image names count: ${imageNames.length}');
       notifyListeners();
-    } catch (e) {
-      print('Failed to create combo: $e');
     }
   }
 
-  Future<void> fetchCombos() async {
-    isLoading = true;
+Future<void> fetchCombos() async {
+    _loading = true;
     notifyListeners();
-    try{
-      final comboApi = ComboApi();
-          final response =
-        await comboApi.getCombos(); // getCombos returns a List<Combo>
-    _comboList = response;
-    }finally {
-      isLoading = false;  // Set loading to false when fetching completes
-      notifyListeners();
+    try {
+      _combosList = await comboApi.getCombos();
+    } catch (e) {
+      print('Error fetching combos: $e');
     }
+
+    _loading = false;
+    notifyListeners();
   }
 
   Future<void> _loadCombos() async {
@@ -92,16 +120,23 @@ class ComboProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // fetch products
   Future<void> fetchProducts() async {
-    isLoading = true;
+    _loading = true;
     notifyListeners();
     try {
-      _products = await ComboApi().getAllProducts();
-    } catch (error) {
-      print("Error fetching products: $error");
+      final api = ComboApi();
+      final productList = await api.getAllProducts();
+      _products = productList.map<Product>((json) => Product.fromJson(json)).toList();
+    } catch (e) {
+      // Handle errors
     }
+    _loading = false;
+    notifyListeners();
+  }
 
-    isLoading = false;
+  void selectProducts(List<Product> products) {
+    _selectedProducts = products;
     notifyListeners();
   }
 }

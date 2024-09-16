@@ -1,136 +1,76 @@
 class Combo {
-  String? id;
-  String? name;
-  double? mrp;
-  double? cost;
-  String? sku;
-  List<Map<String, dynamic>>? products; // List of product maps
+  String? id; // Nullable ID
+  String name;
+  String mrp;
+  String cost;
+  String comboSku;
+  List<dynamic> products; // List of product IDs
+  List<String>? images; // Nullable list of image filenames
 
+  // Constructor
   Combo({
     this.id,
-    this.name,
-    this.mrp,
-    this.cost,
-    this.sku,
-    this.products,
+    required this.name,
+    required this.mrp,
+    required this.cost,
+    required this.comboSku,
+    required this.products,
+    this.images, // Nullable images
   });
 
+  // Factory method to create a Combo from JSON
   factory Combo.fromJson(Map<String, dynamic> json) {
     return Combo(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-      mrp: (json['mrp'] as num?)?.toDouble() ?? 0.0,
-      cost: (json['cost'] as num?)?.toDouble() ?? 0.0,
-      sku: json['comboSku'] ?? '',
-      products: (json['products'] as List<dynamic>?)
-          ?.map((item) => item as Map<String, dynamic>)
-          .toList(),
+      id: json['_id'] as String?, // Handle nullable ID
+      name: json['name'] as String? ?? '', // Default to empty string if null
+      mrp: (json['mrp'] as num?)?.toString() ?? '0', // Convert to string, default to '0' if null
+      cost: (json['cost'] as num?)?.toString() ?? '0', // Convert to string, default to '0' if null
+      comboSku: json['comboSku'] as String? ?? '', // Default to empty string if null
+      products: List<String>.from(json['products'] ?? []), // Default to empty list if null
+      images: (json['images'] as List<dynamic>?)?.map((image) => image as String).toList() ?? [], // Handle nullable list
     );
   }
 
+  // Method to convert a Combo to JSON
   Map<String, dynamic> toJson() {
     return {
-      '_id': id,
       'name': name,
       'mrp': mrp,
       'cost': cost,
-      'comboSku': sku,
+      'comboSku': comboSku,
       'products': products,
+      'images': images ?? [], // Default to empty list if null
     };
   }
 }
 
-class Dimensions {
-  double length;
-  double breadth;
-  double height;
-
-  Dimensions({
-    required this.length,
-    required this.breadth,
-    required this.height,
-  });
-
-  factory Dimensions.fromJson(Map<String, dynamic> json) {
-    return Dimensions(
-      length: json['length']?.toDouble() ?? 0.0,
-      breadth: json['breadth']?.toDouble() ?? 0.0,
-      height: json['height']?.toDouble() ?? 0.0,
-    );
-  }
-}
-
-class Brand {
-  String id;
-  String name;
-
-  Brand({
-    required this.id,
-    required this.name,
-  });
-
-  factory Brand.fromJson(Map<String, dynamic> json) {
-    return Brand(
-      id: json['id'] ?? '',
-      name: json['name'] ?? '',
-    );
-  }
-}
-
-class Category {
-  String id;
-  String name;
-
-  Category({
-    required this.id,
-    required this.name,
-  });
-
-  factory Category.fromJson(Map<String, dynamic> json) {
-    return Category(
-      id: json['_id'] ?? '',
-      name: json['name'] ?? '',
-    );
-  }
-}
 
 class Product {
-  String? id;
-  String? displayName;
-  String? sku;
-  String? description;
-  Brand? brand;
-  Category? category; // Optional field
-  Dimensions? dimensions;
-  double? weight;
-  String? productType;
+  final String? id;
+  final String? displayName;
+  final String? sku;
+  final bool? active;
+  final List<String>? images;
 
   Product({
     this.id,
     this.displayName,
     this.sku,
-    this.description,
-    this.brand,
-    this.dimensions,
-    this.category,
-    this.weight,
-    this.productType,
+    this.active,
+    this.images,
   });
 
+  // Factory constructor to create a Product from JSON, with null checks
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['_id'] ?? '',
-      displayName: json['displayName'] ?? '',
-      sku: json['sku'] ?? '',
-      description: json['description'] ?? '',
-      brand: json['brand'] != null ? Brand.fromJson(json['brand']) : null,
-      category:
-          json['category'] != null ? Category.fromJson(json['category']) : null,
-      dimensions: (json['dimensions']) != null
-          ? Dimensions.fromJson(json['dimensions'])
-          : null,
-      weight: json['weight']?.toDouble() ?? 0.0,
-      productType: json['productType'] ?? '',
+      id: json['_id'] ?? '', // Fallback to empty string if null
+      displayName:
+          json['displayName'] ?? 'Unknown', // Fallback to 'Unknown' if null
+      sku: json['sku'] ?? 'N/A', // Fallback to 'N/A' if null
+      active: json['active'] ?? false, // Fallback to 'false' if null
+      images: json['images'] != null
+          ? List<String>.from(json['images'])
+          : [], // Fallback to empty list if null
     );
   }
 }

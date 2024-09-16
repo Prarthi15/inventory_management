@@ -9,16 +9,20 @@ class MarketplaceProvider with ChangeNotifier {
   TextEditingController nameController = TextEditingController();
   final List<SkuMap> _skuMaps = [];
   List<Marketplace> _marketplaces = [];
-  bool _isLoading = false;
+
   List<Product> _products = [];
+  Product? _selectedProduct;
+  bool _loading = false;
 
   bool isSaving = false;
 
   bool get isFormVisible => _isFormVisible;
   List<Marketplace> get marketplaces => _marketplaces;
-  bool get isLoading => _isLoading;
   List<SkuMap> get skuMaps => _skuMaps;
+
   List<Product> get products => _products;
+  Product? get selectedProduct => _selectedProduct;
+  bool get loading => _loading;
 
 
   final marketplaceApi = MarketplaceApi();
@@ -26,7 +30,7 @@ class MarketplaceProvider with ChangeNotifier {
 
   // Fetch marketplaces
   Future<void> fetchMarketplaces() async {
-    _isLoading = true;
+    _loading = true;
     notifyListeners();
 
     try {
@@ -48,32 +52,34 @@ class MarketplaceProvider with ChangeNotifier {
         }
       }
 
-      _isLoading = false;
+      _loading = false;
     } catch (e) {
       // Handle general errors
       print('Error fetching marketplaces: $e');
       _marketplaces = []; // Clear the list on error
     } finally {
-      _isLoading = false;
+      _loading = false;
       notifyListeners();
     }
   }
 
-  Future<void> fetchProducts() async {
-    _isLoading = true;
+Future<void> fetchProducts() async {
+    _loading = true;
     notifyListeners();
-
     try {
-      // Fetch all products
-      _products = await comboApi.getAllProducts();
+      final api = ComboApi();
+      final productList = await api.getAllProducts();
+      _products = productList.map<Product>((json) => Product.fromJson(json)).toList();
     } catch (e) {
       // Handle errors
-      print('Error fetching products: $e');
-      _products = []; // Clear the list on error
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
+    _loading = false;
+    notifyListeners();
+  }
+
+  void selectProduct(Product product) {
+    _selectedProduct = product;
+    notifyListeners();
   }
 
   // Create a new marketplace
