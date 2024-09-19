@@ -7,6 +7,7 @@ import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
 import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/products.dart';
+import 'package:inventory_management/provider/book_provider.dart';
 import 'package:inventory_management/provider/combo_provider.dart';
 import 'package:inventory_management/provider/marketplace_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
@@ -24,6 +25,7 @@ void main() {
       ChangeNotifierProvider(create:(context)=>ProductProvider()),
       ChangeNotifierProvider(create: (context) => ComboProvider()),
       ChangeNotifierProvider(create: (context) => MarketplaceProvider()),
+      ChangeNotifierProvider(create: (context) => BookProvider()),
     ],
     child: ChangeNotifierProvider(
       create: (context) => AuthProvider(),
