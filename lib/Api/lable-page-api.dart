@@ -89,9 +89,9 @@ class LabelPageApi extends ChangeNotifier{
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data is List) {
+        if (data['products'] is List) {
           
-          _productDetails=List<Map<String,dynamic>>.from(data);
+          _productDetails=List<Map<String,dynamic>>.from(data['products']);
           _isloading=true;
           // print("i am succesfill");
           notifyListeners();
