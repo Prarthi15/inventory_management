@@ -5,9 +5,12 @@ import 'package:inventory_management/Api/products-provider.dart';
 import 'package:inventory_management/Custom-Files/multi-image-picker.dart';
 import 'package:inventory_management/dashboard.dart';
 import 'package:inventory_management/forgot_password.dart';
+import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/products.dart';
+import 'package:inventory_management/provider/category_provider.dart';
 import 'package:inventory_management/provider/combo_provider.dart';
+import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
 import 'package:inventory_management/reset_password.dart';
 import 'package:provider/provider.dart';
@@ -20,13 +23,15 @@ void main() {
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => CheckBoxProvider()),
       ChangeNotifierProvider(create: (context) => ManagementProvider()),
-      ChangeNotifierProvider(create:(context)=>ProductProvider()),
-      ChangeNotifierProvider(create: (context) => ComboProvider())
+      ChangeNotifierProvider(create: (context) => ProductProvider()),
+      ChangeNotifierProvider(create: (context) => ComboProvider()),
+      ChangeNotifierProvider(
+        create: (context) => LocationProvider(
+            authProvider: Provider.of<AuthProvider>(context, listen: false)),
+      ),
+      ChangeNotifierProvider(create: (context) => CategoryProvider()),
     ],
-    child: ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
-      child: const MyApp(),
-    ),
+    child: const MyApp(),
   ));
 }
 
@@ -51,9 +56,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-
       home: const LoginPage(),
-
       routes: {
         '/login': (context) => const LoginPage(),
         '/createAccount': (context) => const CreateAccountPage(),
@@ -61,6 +64,7 @@ class MyApp extends StatelessWidget {
         '/dashboard': (context) => const DashboardPage(),
         '/products': (context) => const Products(),
         '/reset_password': (context) => const ResetPasswordPage(),
+        //'/dashoard/location-master': (context) => const LocationMaster()
       },
     );
   }
