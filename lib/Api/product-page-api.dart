@@ -1,8 +1,19 @@
-import 'dart:convert';
+// import 'dart:html' as html;
 // import 'dart:js_interop';
+import 'dart:convert';
+import 'dart:io';
+// import 'dart:io';
+// import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 
+// import 'package:http_parser/http_parser.dart';
+// import 'package:flutter/services.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:inventory_management/Api/products-provider.dart';
+import 'package:provider/provider.dart';
+// import 'package:path/path.dart' as path;
 
 class ProductPageApi {
   final String _baseUrl =
@@ -21,19 +32,19 @@ class ProductPageApi {
         },
       );
 
-      // print('Get All brand Response: ${response.statusCode}');
+      print('token is here: ${token}');
       // print('Get All brand  Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         if (data.containsKey('brands') && data['brands'] is List) {
           print("i am dipu");
-          List brand;
+          // List brand;
 
-          brand = parseJsonToList(response.body.toString(), 'brands');
+          // brand = parseJsonToList(response.body.toString(), 'brands');
           // }
           // print("i am dipu us here wiht success");
-          return {'success': true, 'data': brand};
+          return {'success': true, 'data':List<Map<String,dynamic>>.from(data['brands'])};
         } else {
           print('Unexpected response format: $data');
           return {'success': false, 'message': 'Unexpected response format'};
@@ -59,52 +70,6 @@ class ProductPageApi {
 
     try {
       final token = await AuthProvider().getToken();
-      final response = await http.get(
-        url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-      );
-
-      // print('Get All brand Response: ${response.statusCode}');
-      // print('Get All brand  Response Body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data.containsKey('product_id') && data['product_id'] is List) {
-          // print("i am dipu");
-          List label;
-
-          label = parseJsonToList(response.body.toString(), 'product_id');
-          // }
-          // print("i am dipu us here wiht success");
-          return {'success': true, 'data': label};
-        } else {
-          print('Unexpected response format: $data');
-          return {'success': false, 'message': 'Unexpected response format'};
-        }
-      } else {
-        return {
-          'success': false,
-          'message':
-              'Failed to fetch categories with status code: ${response.statusCode}'
-        };
-      }
-    } catch (error, stackTrace) {
-      print('An error occurred while fetching categories: $error');
-      print('Stack trace: $stackTrace');
-      return {'success': false, 'message': 'An error occurred: $error'};
-    }
-  }
-
-//technical name
-  Future<Map<String, dynamic>> getTechnicalName(
-      {int page = 1, int limit = 20, String? name}) async {
-    final url = Uri.parse('$_baseUrl/technicalname/');
-
-    try {
-      final token = await AuthProvider().getToken();
       print("token is heree $token");
       final response = await http.get(
         url,
@@ -118,14 +83,15 @@ class ProductPageApi {
       // print('Get All brand  Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body).toList();
+        final data = json.decode(response.body);
         if (data.isNotEmpty) {
           // List<Map<String,dynamic>>dup=data.cast(List<Map<String,dynamic>>);
           print("techna e data is here ${data.runtimeType}  ");
-
+          final labels=data['data'];
+          print("lable of label is here ${labels.toString()}");
           return {
             'success': true,
-            'data': List<Map<String, dynamic>>.from(data)
+            'data': List<Map<String, dynamic>>.from(labels['labels'])
           };
         } else {
           print('Unexpected response format: $data');
@@ -144,6 +110,7 @@ class ProductPageApi {
       return {'success': false, 'message': 'An error occurred: $error'};
     }
   }
+
 
   //boxsize
   Future<Map<String, dynamic>> getBoxSize(
@@ -166,11 +133,9 @@ class ProductPageApi {
       if (response.statusCode == 200) {
         // print("jajajjhjhj");
         final data = json.decode(response.body);
-        if (data.containsKey('boxsizes') && data['boxsizes'] is List) {
-          List<Map<String, dynamic>> boxSize =
-              parseJsonToList(response.body.toString(), 'boxsizes');
-
-          return {'success': true, 'data': boxSize};
+        if (data.containsKey('data') ) {
+         
+          return {'success': true, 'data':List<Map<String,dynamic>>.from(data['data']['boxsizes'])};
         } else {
           print('Unexpected response format: $data');
           return {'success': false, 'message': 'Unexpected response format'};
@@ -189,74 +154,254 @@ class ProductPageApi {
     }
   }
 
+  //colors dropdown api
+    Future<Map<String, dynamic>> getColorDrop(
+      {int page = 1, int limit = 20, String? name}) async {
+    final url = Uri.parse('$_baseUrl/color/');
+
+    try {
+      final token = await AuthProvider().getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      
+
+      if (response.statusCode == 200) {
+       
+        final data = json.decode(response.body);
+       print("here is color data ${data.toString()}");
+          return {'success': true, 'data':List<Map<String,dynamic>>.from(data)};
+        // }
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to fetch categories with status code: ${response.statusCode}'
+        };
+      }
+    } catch (error, stackTrace) {
+      print('An error occurred while fetching categories: $error');
+      print('Stack trace: $stackTrace');
+      return {'success': false, 'message': 'An error occurred: $error'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getParentSku(
+      {int page = 1, int limit = 20, String? name}) async {
+    final url = Uri.parse('$_baseUrl/products/');
+
+    try {
+      final token = await AuthProvider().getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
 
 
-Future createProduct({
+      if (response.statusCode == 200) {
+        // print("jajajjhjhj");
+        final data = json.decode(response.body);
+
+        // print(${data})
+        if (data.containsKey('products') && data['products'] is List) {
+          List<Map<String, dynamic>> data =
+              parseJsonToList(response.body.toString(), 'products');
+
+          return {'success': true, 'data': data};
+        } else {
+          print('Unexpected response format: $data');
+          return {'success': false, 'message': 'Unexpected response format'};
+        }
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to fetch categories with status code: ${response.statusCode}'
+        };
+      }
+    } catch (error, stackTrace) {
+      print('An error occurred while fetching categories: $error');
+      print('Stack trace: $stackTrace');
+      return {'success': false, 'message': 'An error occurred: $error'};
+    }
+  } 
+
+//multi part request
+
+Future<Map<String, dynamic>> createProduct({
+  BuildContext? context,
   required String productName,
   required String parentSku,
   required String sku,
   required String ean,
   required String description,
-  required String brand,
+  required String brandId,
   required String category,
   required String technicalName,
-  required String label,
-  required String color,
+  required String labelSku,
+  required String colorId,
   required String taxRule,
   required Map<String, dynamic> dimensions,
-  required double weight,
-  required String boxSize,
-  required double mrp,
-  required double cost,
+  required String weight,
+  required String boxName,
+  required String mrp,
+  required String cost,
   required bool active,
 }) async {
   final url = Uri.parse('$_baseUrl/products/');
 
   try {
     final token = await AuthProvider().getToken();
-    final response = await http.post(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: json.encode({
-        "displayName": productName,
-        "parentSku": parentSku,
-        "sku":"SKU1234",
-        "ean": ean,
-        "description": description,
-        "brand": brand,
-        "category": category,
-        "technicalName": technicalName,
-        "label": label,
-        "color": color,
-        "tax_rule": taxRule,
-        "dimensions": dimensions,
-        "weight": weight,
-        "boxSize": boxSize,
-        "Mrp": mrp,
-        "Cost": cost,
-        "active": active,
-      }),
-    );
+    final request = http.MultipartRequest('POST', url);
+      request.headers.addAll({
+    "Content-Type": "multipart/form-data",
+    "Authorization": "Bearer $token",
+});   
 
-     
-    print("product is created succesfully ${response.body}");
+  var file =await Provider.of<ProductProvider>(context!,listen:false).images[0];
+  // List<int> bytes = await file.readAsBytes();
+  //     //  Uint8List.fromList(bytes);
+  // print("hjjh");
+  // var multipartFile = http.MultipartFile.fromBytes(
+  //       'images',
+  //      bytes,
+  //       filename: 'product_image.jpg',
+  //       contentType: MediaType('image', 'jpg'), 
+  //     );
+//   request.files.add(await http.MultipartFile.fromPath(
+//   "images",
+//   file.path,
+  
+// ));
+
+
+      // request.files.add(multipartFile);
+      request.fields['displayName'] =productName;
+      request.fields['sku'] =parentSku;
+      request.fields['parentSku'] =parentSku;
+      request.fields['labelSku'] = labelSku;
+      request.fields['ean'] = "123";
+      request.fields['description'] = "tet -1";
+      request.fields['brand_id'] = brandId;
+      request.fields['categoryName'] = category;
+      request.fields['technicalName'] = technicalName;
+      request.fields['color_id'] = colorId;
+      request.fields['tax_rule'] = taxRule;
+      request.fields['weight'] = weight.toString();
+      request.fields['mrp'] = mrp.toString();
+      request.fields['cost'] = cost.toString();
+      request.fields['active'] = active.toString();
+      request.fields['length'] = dimensions['length'].toString();
+      request.fields['breadth'] = dimensions['breadth'].toString();
+      request.fields['height'] = dimensions['height'].toString();
+      request.fields['box_name'] =boxName;
+
     
+print("divyansh patidadr4544656");
+    final response = await request.send();
+
+    final responseBody = await response.stream.bytesToString();
+    final Map<String, dynamic> jsonData = json.decode(responseBody);
+
+    jsonData['success'] = true;
+    print("Product is created successfully:${response} ${responseBody} ---> ${jsonData["success"]}");
+
+    return jsonData;
+
   } catch (error, stackTrace) {
-    print('An error occurred while fetching categories: $error');
+    print('An error occurred while creating the product: $error');
     print('Stack trace: $stackTrace');
     return {'success': false, 'message': 'An error occurred: $error'};
   }
 }
 
+Future tata(File f)async{
+  var l=await f.readAsBytes();
+  return l;
+}
+
+
+// Future createProduct({
+//   required String productName,
+//   required String parentSku,
+//   required String sku,
+//   required String ean,
+//   required String description,
+//   required String brand,
+//   required String category,
+//   required String technicalName,
+//   required String label,
+//   required String color,
+//   required String taxRule,
+//   required Map<String, dynamic> dimensions,
+//   required double weight,
+//   required String boxSize,
+//   required double mrp,
+//   required double cost,
+//   required bool active,
+// }) async {
+//   final url = Uri.parse('$_baseUrl/products/');
+
+//   try {
+//     final token = await AuthProvider().getToken();
+//      print('Some error is occuredddddddddd');
+//     final response = await http.post(
+//       url,
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': 'Bearer $token',
+//       },
+     
+//       body: json.encode({
+//         "displayName": productName,
+//         "parentSku":sku,
+//         "sku":sku,
+//         "ean": ean,
+//         "description": description,
+//         "brand": brand,
+//         "category": category,
+//         "technicalName": technicalName,
+//         "label": label,
+//         "color": color,
+//         "tax_rule": taxRule,
+//         "dimensions": dimensions,
+//         "weight": weight,
+//         "boxSize": boxSize,
+//         "Mrp": mrp,
+//         "Cost": cost,
+//         "active": active,
+//       }),
+//     );
+//     final Map<String, dynamic> jsonData = json.decode(response.body);
+//     jsonData['success']=true;
+//     // if(response.body=="1 product(s) created successfully"){
+//       print("product is created succesfully${response.body} ---> ${jsonData["success"]}");
+//     // }
+//  return jsonData;
+   
+//     // return 
+    
+//   } catch (error, stackTrace) {
+//     print('An error occurred while fetching categories: $error');
+//     print('Stack trace: $stackTrace');
+//     return {'success': false, 'message': 'An error occurred: $error'};
+//   }
+// }
+
 
   List<Map<String, dynamic>> parseJsonToList(String jsonString, String key) {
     // Decode the JSON string
-    // print("heee;loo i am dipu $")
+    print("heee;loo i am dipu $jsonString");
     final Map<String, dynamic> jsonData = json.decode(jsonString);
-
+    print("jason data is her $jsonData");
     // Access the array of objects
     final List<dynamic> categories = jsonData[key];
 

@@ -2,16 +2,17 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/model/combo_model.dart';
 import 'package:inventory_management/Api/combo_api.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
-
 
 class ComboProvider with ChangeNotifier {
   Combo? _combo;
   bool _isFormVisible = false;
   List<Combo> _comboList = [];
-
+  List<DropdownItem<String>> _items = [];
+  List<DropdownItem<String>> get item=>_items;
   List<Product> _products = [];
   List<Product> _selectedProducts = [];
   bool _loading = false;
@@ -40,9 +41,18 @@ class ComboProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Sets the current combo and notifies listeners
   void setCombo(Combo combo) {
     _combo = combo;
+    notifyListeners();
+  }
+
+
+  // Sets the current combo and notifies listeners
+  void addItem(String label,String value) {
+    // _combo = combo;
+    _items.add(DropdownItem<String>(label: label, value: value));
+
+    print("item len  ${_items.length}");
     notifyListeners();
   }
 
@@ -55,17 +65,19 @@ class ComboProvider with ChangeNotifier {
 
   final comboApi = ComboApi();
 
-Future<void> createCombo(Combo combo, List<Uint8List>? images, List<String> productIds) async {
-  try {
-    final createdCombo = await comboApi.createCombo(combo, images, productIds);
-    _combo = combo;
-    notifyListeners();
-  } catch (e) {
-    print('Failed to create combo: $e');
+  Future<void> createCombo(
+      Combo combo, List<Uint8List>? images, List<String> productIds) async {
+    try {
+      final createdCombo =
+          await comboApi.createCombo(combo, images, productIds);
+      _combo = combo;
+      notifyListeners();
+    } catch (e) {
+      print('Failed to create combo: $e');
+    }
   }
-}
 
-   // Select images using file picker
+  // Select images using file picker
   void selectImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
@@ -81,7 +93,7 @@ Future<void> createCombo(Combo combo, List<Uint8List>? images, List<String> prod
     }
   }
 
-Future<void> fetchCombos() async {
+  Future<void> fetchCombos() async {
     _loading = true;
     notifyListeners();
     try {
@@ -127,7 +139,17 @@ Future<void> fetchCombos() async {
     try {
       final api = ComboApi();
       final productList = await api.getAllProducts();
-      _products = productList.map<Product>((json) => Product.fromJson(json)).toList();
+      _products =
+          productList.map<Product>((json) => Product.fromJson(json)).toList();
+
+      /*
+    // Print the IDs of the fetched products
+    print('Fetched product IDs:');
+    for (var product in _products) {
+    print(product.id); // Ensure 'id' is a valid field in your Product class
+    }
+      */
+
     } catch (e) {
       // Handle errors
     }
@@ -135,8 +157,14 @@ Future<void> fetchCombos() async {
     notifyListeners();
   }
 
-  void selectProducts(List<Product> products) {
-    _selectedProducts = products;
+  // void selectProducts(List<Product> products) {
+  //   _selectedProducts = products;
+  //   notifyListeners();
+  // }
+
+    // Method to select products by IDs
+  void selectProductsByIds(List<String?> productIds) {
+    _selectedProducts = _products.where((product) => productIds.contains(product.id)).toList();
     notifyListeners();
   }
 }

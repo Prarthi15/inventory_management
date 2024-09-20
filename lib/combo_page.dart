@@ -18,6 +18,7 @@ class ComboPage extends StatefulWidget {
 
 class _ComboPageState extends State<ComboPage> {
   Product? product;
+  ComboProvider? comboProvider;
   final _idController = TextEditingController();
   final _nameController = TextEditingController();
   final _skuController = TextEditingController();
@@ -25,8 +26,8 @@ class _ComboPageState extends State<ComboPage> {
   final _costController = TextEditingController();
 
   //final productController = MultiSelectController<String>();
-
-  late final MultiSelectController<Product> productController;
+ 
+  late final MultiSelectController<String> productController;
 
   void _clearFormFields() {
     _idController.clear();
@@ -38,9 +39,10 @@ class _ComboPageState extends State<ComboPage> {
   }
 
   void saveCombo(BuildContext context) async {
+    ComboProvider comboProvider =
+        Provider.of<ComboProvider>(context, listen: false);
 
-    ComboProvider comboProvider = Provider.of<ComboProvider>(context, listen: false);
-
+    // Get the selected product IDs directly from the dropdown's selections
     List<String?> selectedProductIds =
         comboProvider.selectedProducts.map((product) => product.id).toList();
 
@@ -56,7 +58,8 @@ class _ComboPageState extends State<ComboPage> {
     final comboApi = ComboApi();
 
     try {
-      await comboApi.createCombo(combo, comboProvider.selectedImages, comboProvider.imageNames);
+      await comboApi.createCombo(
+          combo, comboProvider.selectedImages, comboProvider.imageNames);
       // comboProvider.setCombo(combo);
       // comboProvider.addCombo(combo);
       _clearFormFields();
@@ -70,12 +73,32 @@ class _ComboPageState extends State<ComboPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final comboProvider = Provider.of<ComboProvider>(context, listen: false);
-      comboProvider.fetchCombos();
-      comboProvider.fetchProducts();
-      productController = MultiSelectController<Product>();
+      comboProvider = Provider.of<ComboProvider>(context, listen: false);
+
+      productController = MultiSelectController<String>();
       // print(1);
+      // print(object)
+      getDropValue();
     });
+  }
+
+  void getDropValue() async {
+    await comboProvider!.fetchCombos();
+    await comboProvider!.fetchProducts();
+    print("new style");
+    for (int i = 0; i < comboProvider!.products.length; i++) {
+      print("heello i am divyansh");
+      comboProvider!.addItem('$i:${comboProvider!.products[i].displayName}', comboProvider!.products[i].id);
+      // items.add(DropdownItem<String>(
+      //   label: '$i:${comboProvider!.products[i].displayName}',
+      //   value: comboProvider!.products[i].id,
+      // ));
+    }
+
+    print("length of it is here ${comboProvider!.item.length}");
+    // setState(() {
+  
+    // });
   }
 
   @override
@@ -85,12 +108,7 @@ class _ComboPageState extends State<ComboPage> {
         padding: const EdgeInsets.all(16.0),
         child: Consumer<ComboProvider>(
           builder: (context, comboProvider, child) {
-            List<DropdownItem<Product>> items = comboProvider.products
-                .map((product) => DropdownItem(
-                      label: product.displayName ?? 'Unknown',
-                      value: product,
-                    ))
-                .toList();
+            // print("hete i am $items");
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,8 +131,8 @@ class _ComboPageState extends State<ComboPage> {
                     decoration: const InputDecoration(labelText: 'Name'),
                   ),
                   const SizedBox(height: 16),
-                  MultiDropdown<Product>(
-                    items: items,
+                  MultiDropdown<String>(
+                    items:comboProvider.item,
                     controller: productController,
                     searchEnabled: true,
                     chipDecoration: const ChipDecoration(
@@ -125,9 +143,6 @@ class _ComboPageState extends State<ComboPage> {
                     ),
                     fieldDecoration: FieldDecoration(
                       hintText: 'Select Products',
-                      hintStyle: const TextStyle(color: Colors.black87),
-                      prefixIcon: const Icon(Icons.shopping_cart),
-                      showClearIcon: false,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(color: Colors.grey),
@@ -138,31 +153,15 @@ class _ComboPageState extends State<ComboPage> {
                       ),
                     ),
                     dropdownDecoration: const DropdownDecoration(
-                      marginTop: 2,
                       maxHeight: 500,
-                      header: Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          'Select products from the list',
-                          textAlign: TextAlign.start,
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    dropdownItemDecoration: DropdownItemDecoration(
-                      selectedIcon:
-                          const Icon(Icons.check_box, color: Colors.green),
-                      disabledIcon:
-                          Icon(Icons.lock, color: Colors.grey.shade300),
                     ),
                     onSelectionChange: (selectedItems) {
-                      debugPrint('Selected items: $selectedItems');
-                      comboProvider.selectProducts(selectedItems);
+                      debugPrint(
+                          'Selected items (product IDs): $selectedItems');
+                      comboProvider.selectProductsByIds(selectedItems);
                     },
                   ),
+
                   const SizedBox(height: 16),
                   TextField(
                     controller: _mrpController,
@@ -182,56 +181,52 @@ class _ComboPageState extends State<ComboPage> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                  onPressed: comboProvider.selectImages, // Pick images
-                  child: const Text('Upload Images'),
-                ),
+                    onPressed: comboProvider.selectImages, // Pick images
+                    child: const Text('Upload Images'),
+                  ),
                   // Image Previews
-                comboProvider.selectedImages != null && comboProvider.selectedImages!.isNotEmpty
-                    ? SizedBox(
-                        height: 100,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: comboProvider.selectedImages!.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    child: Image.memory(
-                                      comboProvider.selectedImages![index],
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
+                  comboProvider.selectedImages != null &&
+                          comboProvider.selectedImages!.isNotEmpty
+                      ? SizedBox(
+                          height: 100,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: comboProvider.selectedImages!.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Image.memory(
+                                        comboProvider.selectedImages![index],
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    comboProvider.imageNames[index],
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      )
-                    : const Text('No images selected'),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      comboProvider.imageNames[index],
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : const Text('No images selected'),
 
-                const SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
                   Row(
                     children: [
-
                       ElevatedButton(
-                        onPressed: () => saveCombo(
-                          context),
-                          child: const Text('Save Combo'),
-                        ),
-                        
-                      
+                        onPressed: () => saveCombo(context),
+                        child: const Text('Save Combo'),
+                      ),
                       const SizedBox(width: 8),
-
                       TextButton(
                         onPressed: () {
                           _clearFormFields();
@@ -328,4 +323,28 @@ class _ComboPageState extends State<ComboPage> {
       ),
     );
   }
+}
+
+class CustomDropdownItem<T> extends DropdownItem<T> {
+  CustomDropdownItem({
+    required String label,
+    required T value,
+    bool disabled = false,
+    bool selected = false,
+  }) : super(
+          label: label,
+          value: value,
+          disabled: disabled,
+          selected: selected,
+        );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is CustomDropdownItem<T> && other.value == value;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
 }

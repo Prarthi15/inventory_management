@@ -46,14 +46,14 @@ class Combo {
 
 
 class Product {
-  final String? id;
+  final String id;
   final String? displayName;
   final String? sku;
   final bool? active;
   final List<String>? images;
 
   Product({
-    this.id,
+    required this.id,
     this.displayName,
     this.sku,
     this.active,

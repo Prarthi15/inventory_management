@@ -22,6 +22,7 @@ class CustomAlertBox{
               Row(
                 children: [
                   CustomTextField(controller:productPageProvider.alertBoxKeyEditingController[i],width:150,label:'Key',),
+                 const SizedBox(width:5,),
                    CustomTextField(controller:productPageProvider.alertBoxPairEditingController[i],width:150,label:'value',),
                    InkWell(
                     child:const Icon(Icons.add),
