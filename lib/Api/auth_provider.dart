@@ -308,6 +308,7 @@ class AuthProvider with ChangeNotifier {
       // print('Create Category Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+            
         return {'success': true, 'data': json.decode(response.body)};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);

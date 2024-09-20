@@ -244,6 +244,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                             ),
                           )
                         : const Products(),
+
                   ),
                 ],
               ),
