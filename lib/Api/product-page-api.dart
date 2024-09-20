@@ -174,8 +174,8 @@ class ProductPageApi {
       if (response.statusCode == 200) {
        
         final data = json.decode(response.body);
-       print("here is color data ${data.toString()}");
-          return {'success': true, 'data':List<Map<String,dynamic>>.from(data)};
+      //  print("here is color data ${data['data']['colors'].toString()}");
+          return {'success': true, 'data':List<Map<String,dynamic>>.from(data['data']['colors'])};
         // }
       } else {
         return {

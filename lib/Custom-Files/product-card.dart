@@ -7,10 +7,8 @@ class Product {
   final String mrp;
   final String createdDate;
   final String lastUpdated;
-  final List<String> listedOn;
   final String accSku;
   final String colour;
-  final String accUnit;
   final String upcEan;
 
   Product({
@@ -20,10 +18,8 @@ class Product {
     required this.mrp,
     required this.createdDate,
     required this.lastUpdated,
-    required this.listedOn,
     required this.accSku,
     required this.colour,
-    required this.accUnit,
     required this.upcEan,
   });
 }
@@ -35,10 +31,8 @@ class ProductCard extends StatelessWidget {
   final String mrp;
   final String createdDate;
   final String lastUpdated;
-  final List<String> listedOn;
   final String accSku;
   final String colour;
-  final String accUnit;
   final String upcEan;
 
   const ProductCard({
@@ -49,10 +43,8 @@ class ProductCard extends StatelessWidget {
     required this.mrp,
     required this.createdDate,
     required this.lastUpdated,
-    required this.listedOn,
     required this.accSku,
     required this.colour,
-    required this.accUnit,
     required this.upcEan,
   });
 
@@ -76,7 +68,6 @@ class ProductCard extends StatelessWidget {
                       Expanded(
                         child: _buildProductDetailsWideScreen(),
                       ),
-                      _buildListedOn(),
                     ],
                   )
                 : Column(
@@ -85,7 +76,6 @@ class ProductCard extends StatelessWidget {
                       _buildImage(),
                       const SizedBox(height: 16),
                       _buildProductDetails(),
-                      _buildListedOn(),
                     ],
                   ),
           ),
@@ -94,6 +84,7 @@ class ProductCard extends StatelessWidget {
     );
   }
 
+  // Displays a placeholder image
   Widget _buildImage() {
     return Image.asset(
       'assets/forgotPass.png',
@@ -102,6 +93,7 @@ class ProductCard extends StatelessWidget {
     );
   }
 
+  // Product details layout for wide screen
   Widget _buildProductDetailsWideScreen() {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,35 +102,10 @@ class ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'SKU: $sku',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text('CATEGORY: $category'),
-              Text('BRAND: $brand'),
-              Text('MRP: $mrp'),
-            ],
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('ACC SKU: $accSku'),
-              Text('COLOUR: $colour'),
-              Text('ACC UNIT: $accUnit'),
-              Text('UPC/EAN: $upcEan'),
-            ],
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('CREATED DATE: $createdDate'),
-              Text('LAST UPDATED: $lastUpdated'),
+              _buildText('SKU', sku),
+              _buildText('CATEGORY', category),
+              _buildText('BRAND', brand),
+              _buildText('MRP', mrp),
             ],
           ),
         ),
@@ -146,48 +113,24 @@ class ProductCard extends StatelessWidget {
     );
   }
 
+  // Product details layout for smaller screens
   Widget _buildProductDetails() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'SKU: $sku',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Text('CATEGORY: $category'),
-        Text('BRAND: $brand'),
-        Text('MRP: $mrp'),
-        Text('ACC SKU: $accSku'),
-        Text('COLOUR: $colour'),
-        Text('ACC UNIT: $accUnit'),
-        Text('UPC/EAN: $upcEan'),
-        Text('CREATED DATE: $createdDate'),
-        Text('LAST UPDATED: $lastUpdated'),
+        _buildText('SKU', sku),
+        _buildText('CATEGORY', category),
+        _buildText('BRAND', brand),
+        _buildText('MRP', mrp),
       ],
     );
   }
 
-  Widget _buildListedOn() {
-    return listedOn.isNotEmpty
-        ? Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              const Text('Listed On:'),
-              Wrap(
-                spacing: 4.0,
-                children: listedOn
-                    .map((platform) => Chip(
-                          label: Text(platform),
-                          backgroundColor: Colors.blueAccent.withOpacity(0.1),
-                          labelStyle: const TextStyle(
-                            color: Colors.blueAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ))
-                    .toList(),
-              ),
-            ],
-          )
-        : const SizedBox.shrink();
+  // Helper method to display text with dashes for missing fields
+  Widget _buildText(String label, String value) {
+    return Text(
+      '$label: ${value.isNotEmpty ? value : '-'}',
+      style: const TextStyle(fontWeight: FontWeight.bold),
+    );
   }
 }

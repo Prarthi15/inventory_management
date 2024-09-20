@@ -12,6 +12,13 @@ import 'package:inventory_management/products.dart';
 import 'package:inventory_management/provider/book_provider.dart';
 import 'package:inventory_management/provider/combo_provider.dart';
 import 'package:inventory_management/provider/marketplace_provider.dart';
+import 'package:inventory_management/forgot_password.dart';
+import 'package:inventory_management/location_master.dart';
+import 'package:inventory_management/login_page.dart';
+import 'package:inventory_management/products.dart';
+import 'package:inventory_management/provider/category_provider.dart';
+import 'package:inventory_management/provider/combo_provider.dart';
+import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
 import 'package:inventory_management/show-label-page.dart';
 // import 'package:inventory_management/reset_password.dart';
@@ -31,11 +38,15 @@ void main() {
       ChangeNotifierProvider(create: (context)=>LabelPageApi()),
       ChangeNotifierProvider(create: (context) => MarketplaceProvider()),
       ChangeNotifierProvider(create: (context) => BookProvider()),
+      ChangeNotifierProvider(create: (context) => ProductProvider()),
+      ChangeNotifierProvider(create: (context) => ComboProvider()),
+      ChangeNotifierProvider(
+        create: (context) => LocationProvider(
+            authProvider: Provider.of<AuthProvider>(context, listen: false)),
+      ),
+      ChangeNotifierProvider(create: (context) => CategoryProvider()),
     ],
-    child: ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
-      child: const MyApp(),
-    ),
+    child: const MyApp(),
   ));
 }
 
@@ -107,6 +118,16 @@ class _HomeState extends State<Home> {
           }
          } 
          ),
+      // home: const LoginPage(),
+      // routes: {
+      //   '/login': (context) => const LoginPage(),
+      //   '/createAccount': (context) => const CreateAccountPage(),
+      //   '/forgotPassword': (context) => const ForgotPasswordPage(),
+      //   '/dashboard': (context) => const DashboardPage(),
+      //   '/products': (context) => const Products(),
+      //   '/reset_password': (context) => const ResetPasswordPage(),
+      //   //'/dashoard/location-master': (context) => const LocationMaster()
+      // },
     );
   }
 }

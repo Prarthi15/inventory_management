@@ -7,6 +7,10 @@ import 'package:inventory_management/show-label-page.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/marketplace_page.dart';
 
+import 'package:inventory_management/location_master.dart';
+import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/order-page.dart';
+import 'package:inventory_management/product_display.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
@@ -22,8 +26,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-
-  String selectedDrawerItem = 'Create Label Page';
+  String selectedDrawerItem = 'Dashboard';
 
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -164,11 +167,41 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
         const SizedBox(height: 20),
-        _buildDrawerItem(
-          icon: Icons.dashboard,
-          text: 'Dashboard',
-          isSelected: selectedDrawerItem == 'Dashboard',
-          onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
+        // Wrap the drawer items in SingleChildScrollView to make them scrollable
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildDrawerItem(
+                  icon: Icons.dashboard,
+                  text: 'Dashboard',
+                  isSelected: selectedDrawerItem == 'Dashboard',
+                  onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
+                ),
+                _buildDrawerItem(
+                  icon: Icons.shopping_cart,
+                  text: 'Orders',
+                  isSelected: selectedDrawerItem == 'Orders',
+                  onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
+                ),
+                _buildInventorySection(isSmallScreen),
+                _buildMasterSection(isSmallScreen),
+                _buildDrawerItem(
+                  icon: Icons.analytics,
+                  text: 'Accounting',
+                  isSelected: selectedDrawerItem == 'Accounting',
+                  onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
+                ),
+                _buildDrawerItem(
+                  icon: Icons.production_quantity_limits,
+                  text: 'View Product',
+                  isSelected: selectedDrawerItem == 'View Product',
+                  onTap: () =>
+                      _onDrawerItemTapped('View Product', isSmallScreen),
+                ),
+              ],
+            ),
+          ),
         ),
         _buildOrdersSection(isSmallScreen),
         _buildInventorySection(isSmallScreen),
@@ -380,7 +413,6 @@ class _DashboardPageState extends State<DashboardPage> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
-// <<<<<<< HEAD
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
               text: 'Label Page',
@@ -455,6 +487,19 @@ class _DashboardPageState extends State<DashboardPage> {
               text: 'Marketplace Master',
               isSelected: selectedDrawerItem == 'Marketplace Master',
               onTap: () => _onDrawerItemTapped('Marketplace Master', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: _buildDrawerItem(
+              icon: Icons.warehouse,
+              text: 'Location Master',
+              isSelected: selectedDrawerItem == 'Location Master',
+              onTap: () =>
+                  _onDrawerItemTapped('Location Master', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -545,8 +590,12 @@ class _DashboardPageState extends State<DashboardPage> {
         return const ComboPage();
       case 'Marketplace Master':
         return const MarketplacePage();
+      case 'Location Master':
+        return const LocationMaster();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
+      case 'View Product':
+        return const ProductDataDisplay();
       case 'Settings':
         return const Center(child: Text("Settings content goes here"));
       default:
