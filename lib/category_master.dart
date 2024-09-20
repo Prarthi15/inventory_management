@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
-import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/categoryCard.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
+import 'package:inventory_management/provider/category_provider.dart';
 
 class CategoryMasterPage extends StatefulWidget {
   @override
@@ -10,300 +12,188 @@ class CategoryMasterPage extends StatefulWidget {
 }
 
 class _CategoryMasterPageState extends State<CategoryMasterPage> {
-  late Future<List<String>> _categoriesFuture;
-  final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _categoryNameController = TextEditingController();
-
-  List<String> _categories = [];
-  List<String> _filteredCategories = [];
-  bool _isFetching = false;
-  bool _isSearchMode = false;
-  bool _isCreatingCategory = false;
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _categoriesFuture = _fetchAllCategories();
-    _searchController.addListener(() {
-      if (_isSearchMode) {
-        _filterCategories(_searchController.text);
+    final categoryProvider =
+        Provider.of<CategoryProvider>(context, listen: false);
+    categoryProvider.fetchAllCategories();
+
+    categoryProvider.searchController.addListener(() {
+      if (categoryProvider.isSearchMode) {
+        _onSearchChanged(categoryProvider.searchController.text);
       }
     });
   }
 
-  Future<List<String>> _fetchAllCategories({String? name}) async {
-    List<String> allCategories = [];
-    bool hasMore = true;
-    int page = 1;
-
-    while (hasMore) {
-      if (_isFetching) return allCategories;
-      _isFetching = true;
-
-      final result =
-          await AuthProvider().getAllCategories(page: page, name: name);
-      _isFetching = false;
-
-      if (result['success']) {
-        final List<dynamic> data = result['data'];
-        if (data.isNotEmpty) {
-          allCategories.addAll(
-              data.map((category) => category['name'] as String).toList());
-          hasMore = data.length == 20; // Assuming 20 items per page
-          page++;
-        } else {
-          hasMore = false;
-        }
-      } else {
-        print('Failed to fetch categories: ${result['message']}');
-        hasMore = false;
-      }
-    }
-
-    setState(() {
-      _categories = allCategories;
-      _filteredCategories = _categories;
-    });
-
-    return allCategories;
-  }
-
-  void _filterCategories(String query) {
-    setState(() {
-      _filteredCategories = _categories.where((category) {
-        return category.toLowerCase().contains(query.toLowerCase());
-      }).toList();
-    });
-  }
-
-  Future<void> _createCategory() async {
-    final name = _categoryNameController.text;
-
-    if (name.isNotEmpty) {
-      final result = await AuthProvider().createCategory('', name);
-
-      if (result['success']) {
-        setState(() {
-          _categoriesFuture = _fetchAllCategories(); // Refresh the list
-          _searchController.clear();
-          _categoryNameController.clear();
-          _isCreatingCategory = false; // Hide the input field
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Category created successfully!'),
-            backgroundColor: AppColors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to create category: ${result['message']}'),
-            backgroundColor: AppColors.cardsred,
-          ),
-        );
-      }
-    }
-  }
-
-  void _toggleSearchMode() {
-    setState(() {
-      _isSearchMode = !_isSearchMode;
-      if (!_isSearchMode) {
-        _searchController.clear();
-        _filteredCategories = _categories;
-      }
-    });
-  }
-
-  void _toggleCreateCategoryMode() {
-    setState(() {
-      _isCreatingCategory = !_isCreatingCategory;
-      if (_isCreatingCategory) {
-        _searchController.clear();
-        _filteredCategories = _categories;
-        _isSearchMode = false; // Ensure search mode is off
-      }
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      Provider.of<CategoryProvider>(context, listen: false)
+          .filterCategories(query);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final categoryProvider = Provider.of<CategoryProvider>(context);
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
     return Scaffold(
       backgroundColor: AppColors.lightGrey,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isSmallScreen = constraints.maxWidth < 600;
-
-          return Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                isSmallScreen
-                    ? Wrap(
-                        spacing: 16.0,
-                        runSpacing: 16.0,
-                        children: [
-                          _buildButton(
-                            text: _isCreatingCategory ? 'Cancel' : 'Create',
-                            color: AppColors.tealcolor,
-                            icon:
-                                _isCreatingCategory ? Icons.cancel : Icons.add,
-                            onTap: _toggleCreateCategoryMode,
-                          ),
-                          if (!_isCreatingCategory) ...[
-                            _buildButton(
-                              text: _isSearchMode ? 'Cancel' : 'Search',
-                              color: AppColors.primaryBlue,
-                              icon: _isSearchMode ? Icons.cancel : Icons.search,
-                              onTap: _toggleSearchMode,
-                            ),
-                          ],
-                          if (_isCreatingCategory)
-                            Container(
-                              margin: const EdgeInsets.only(top: 16.0),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 150, // Adjust the width here
-                                    child: TextField(
-                                      controller: _categoryNameController,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Category Name',
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  ElevatedButton(
-                                    onPressed: _createCategory,
-                                    child: const Text('Add'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_isSearchMode && !_isCreatingCategory)
-                            Container(
-                              margin: const EdgeInsets.only(top: 16.0),
-                              child: SizedBox(
-                                width: 150, // Adjust the width here
-                                child: TextField(
-                                  controller: _searchController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Search Category by Name',
-                                    suffixIcon: Icon(Icons.search),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      )
-                    : Row(
-                        children: [
-                          _buildButton(
-                            text: _isCreatingCategory ? 'Cancel' : 'Create',
-                            color: AppColors.tealcolor,
-                            icon:
-                                _isCreatingCategory ? Icons.cancel : Icons.add,
-                            onTap: _toggleCreateCategoryMode,
-                          ),
-                          const SizedBox(width: 16.0),
-                          if (!_isCreatingCategory) ...[
-                            _buildButton(
-                              text: _isSearchMode ? 'Cancel' : 'Search',
-                              color: AppColors.primaryBlue,
-                              icon: _isSearchMode ? Icons.cancel : Icons.search,
-                              onTap: _toggleSearchMode,
-                            ),
-                          ],
-                          const SizedBox(width: 16.0),
-                          if (_isCreatingCategory)
-                            Expanded(
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: 200, // Adjust the width here
-                                    child: TextField(
-                                      controller: _categoryNameController,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Category Name',
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  ElevatedButton(
-                                    onPressed: _createCategory,
-                                    child: const Text('Add'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_isSearchMode && !_isCreatingCategory)
-                            Expanded(
-                              child: SizedBox(
-                                width: 200, // Adjust the width here
-                                child: TextField(
-                                  controller: _searchController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Search Category by Name',
-                                    suffixIcon: Icon(Icons.search),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            isSmallScreen
+                ? Wrap(
+                    spacing: 16.0,
+                    runSpacing: 16.0,
+                    children: [
+                      _buildButton(
+                        text: categoryProvider.isCreatingCategory
+                            ? 'Cancel'
+                            : 'Create',
+                        color: AppColors.tealcolor,
+                        icon: categoryProvider.isCreatingCategory
+                            ? Icons.cancel
+                            : Icons.add,
+                        onTap: categoryProvider.toggleCreateCategoryMode,
                       ),
-                const SizedBox(height: 24.0),
-                Expanded(
-                  child: FutureBuilder<List<String>>(
-                    future: _categoriesFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                          child: Text(
-                            'Failed to load categories',
-                            style:
-                                TextStyle(fontSize: 18, color: AppColors.grey),
+                      if (!categoryProvider.isCreatingCategory) ...[
+                        _buildButton(
+                          text: categoryProvider.isSearchMode
+                              ? 'Cancel'
+                              : 'Search',
+                          color: AppColors.primaryBlue,
+                          icon: categoryProvider.isSearchMode
+                              ? Icons.cancel
+                              : Icons.search,
+                          onTap: categoryProvider.toggleSearchMode,
+                        ),
+                      ],
+                      if (categoryProvider.isCreatingCategory)
+                        Container(
+                          margin: const EdgeInsets.only(top: 16.0),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 150,
+                                child: TextField(
+                                  controller:
+                                      categoryProvider.categoryNameController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Category Name'),
+                                ),
+                              ),
+                              const SizedBox(width: 8.0),
+                              ElevatedButton(
+                                onPressed: categoryProvider.createCategory,
+                                child: const Text('Add'),
+                              ),
+                            ],
                           ),
-                        );
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            'No categories found',
-                            style:
-                                TextStyle(fontSize: 18, color: AppColors.grey),
+                        ),
+                      if (categoryProvider.isSearchMode &&
+                          !categoryProvider.isCreatingCategory)
+                        Container(
+                          margin: const EdgeInsets.only(top: 16.0),
+                          child: SizedBox(
+                            width: 150,
+                            child: TextField(
+                              controller: categoryProvider.searchController,
+                              decoration: const InputDecoration(
+                                labelText: 'Search Category by Name',
+                                suffixIcon: Icon(Icons.search),
+                              ),
+                            ),
                           ),
-                        );
-                      } else {
-                        final categoriesToShow =
-                            _isSearchMode ? _filteredCategories : _categories;
-
-                        return ListView.builder(
-                          itemCount: categoriesToShow.length,
-                          itemBuilder: (context, index) {
-                            return CategoryCard(
-                              category: categoriesToShow[index],
-                              isSmallScreen: isSmallScreen,
-                              cardColor: AppColors.white,
-                              shadowColor: AppColors.shadowblack1,
-                              elevation: 3,
-                              borderRadius: 12,
-                            );
-                          },
-                        );
-                      }
-                    },
+                        ),
+                    ],
+                  )
+                : Row(
+                    children: [
+                      _buildButton(
+                        text: categoryProvider.isCreatingCategory
+                            ? 'Cancel'
+                            : 'Create',
+                        color: AppColors.tealcolor,
+                        icon: categoryProvider.isCreatingCategory
+                            ? Icons.cancel
+                            : Icons.add,
+                        onTap: categoryProvider.toggleCreateCategoryMode,
+                      ),
+                      const SizedBox(width: 16.0),
+                      if (!categoryProvider.isCreatingCategory) ...[
+                        _buildButton(
+                          text: categoryProvider.isSearchMode
+                              ? 'Cancel'
+                              : 'Search',
+                          color: AppColors.primaryBlue,
+                          icon: categoryProvider.isSearchMode
+                              ? Icons.cancel
+                              : Icons.search,
+                          onTap: categoryProvider.toggleSearchMode,
+                        ),
+                      ],
+                      const SizedBox(width: 16.0),
+                      if (categoryProvider.isCreatingCategory)
+                        Expanded(
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 200,
+                                child: TextField(
+                                  controller:
+                                      categoryProvider.categoryNameController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Category Name'),
+                                ),
+                              ),
+                              const SizedBox(width: 8.0),
+                              ElevatedButton(
+                                onPressed: categoryProvider.createCategory,
+                                child: const Text('Add'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (categoryProvider.isSearchMode &&
+                          !categoryProvider.isCreatingCategory)
+                        Expanded(
+                          child: SizedBox(
+                            width: 200,
+                            child: TextField(
+                              controller: categoryProvider.searchController,
+                              decoration: const InputDecoration(
+                                labelText: 'Search Category by Name',
+                                suffixIcon: Icon(Icons.search),
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
-                ),
-              ],
+            const SizedBox(height: 24.0),
+            Expanded(
+              child: ListView.builder(
+                itemCount: categoryProvider.categories.length,
+                itemBuilder: (context, index) {
+                  return CategoryCard(
+                    category: categoryProvider.categories[index],
+                    isSmallScreen: isSmallScreen,
+                    cardColor: AppColors.white,
+                    shadowColor: AppColors.shadowblack1,
+                    elevation: 3,
+                    borderRadius: 12,
+                  );
+                },
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

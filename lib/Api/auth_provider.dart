@@ -286,8 +286,8 @@ class AuthProvider with ChangeNotifier {
     final url = Uri.parse('$_baseUrl/category/');
 
     try {
-      final token = await getToken(); 
-     
+      final token = await getToken();
+
       if (token == null) {
         return {'success': false, 'message': 'No token provided'};
       }
@@ -308,7 +308,6 @@ class AuthProvider with ChangeNotifier {
       // print('Create Category Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-            
         return {'success': true, 'data': json.decode(response.body)};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);
@@ -364,6 +363,218 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> getAllProducts() async {
+    final url = Uri.parse('$_baseUrl/products');
+
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No token found'};
+      }
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+
+      print('Get All Products Response: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as List<dynamic>;
+
+        // Extract only required fields
+        final products = data.map((product) {
+          return {
+            'parentSku': product['parentSku'] ?? '-',
+            'sku': product['sku'] ?? '-',
+            'ean': product['ean'] ?? '-',
+            'brand': product['brand'] ?? '-',
+            'category': product['category'] ?? '-',
+            'mrp': product['mrp']?.toString() ?? '-',
+            'createdAt': product['createdAt'] ?? '-',
+            'updatedAt': product['updatedAt'] ?? '-',
+          };
+        }).toList();
+
+        // Print each product's required fields
+        for (var product in products) {
+          print('Parent SKU: ${product['parentSku']}');
+          print('SKU: ${product['sku']}');
+          print('EAN: ${product['ean']}');
+          print('Brand: ${product['brand']}');
+          print('Category: ${product['category']}');
+          print('MRP: ${product['mrp']}');
+          print('Created At: ${product['createdAt']}');
+          print('Updated At: ${product['updatedAt']}');
+          print('-----------------------------------');
+        }
+
+        return {'success': true, 'data': products};
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to load products. Status code: ${response.statusCode}'
+        };
+      }
+    } catch (error) {
+      print('Error fetching products: $error');
+      return {'success': false, 'message': 'Error fetching products'};
+    }
+  }
+
+  Future<Map<String, dynamic>> getAllWarehouses() async {
+    final url = Uri.parse('$_baseUrl/warehouse');
+
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No token found'};
+      }
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include token in headers
+        },
+      );
+
+      print('Get All Warehouses Response: ${response.statusCode}');
+      print('Get All Warehouses Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as List<dynamic>;
+
+        // Extract the required fields for each warehouse
+        final warehouses = data.map((warehouse) {
+          final location =
+              warehouse['location'] ?? {}; // Access the 'location' object
+          final billingAddress =
+              location['billingAddress'] ?? {}; // Access 'billingAddress'
+
+          return {
+            'locationName': warehouse['name'] ?? '-', // Warehouse name
+            'locationKey': warehouse['_id'] ?? '-', // Warehouse ID
+            'city': billingAddress['city'] ?? '-', // City from billingAddress
+            'state':
+                billingAddress['state'] ?? '-', // State from billingAddress
+            'country':
+                billingAddress['country'] ?? '-', // Country from billingAddress
+            'zip': billingAddress['zipCode'] ?? '-', // Zip from billingAddress
+            'holdsStock': location['holdStocks'] ?? false, // Holds stock flag
+            'copyMasterFromPrimary': location['copyMasterSkuFromPrimary'] ??
+                false, // Copy Master flag
+          };
+        }).toList();
+
+        // Print the data in the terminal
+        for (var warehouse in warehouses) {
+          print('--- Warehouse ---');
+          print('Location Name: ${warehouse['locationName']}');
+          print('Location Key: ${warehouse['locationKey']}');
+          print('City: ${warehouse['city']}');
+          print('State: ${warehouse['state']}');
+          print('Country: ${warehouse['country']}');
+          print('Zip: ${warehouse['zip']}');
+          print('Holds Stock: ${warehouse['holdsStock'] ? "Yes" : "No"}');
+          print(
+              'Copy Master from Primary: ${warehouse['copyMasterFromPrimary'] ? "Yes" : "No"}');
+          print('------------------');
+        }
+
+        return {'success': true, 'data': warehouses};
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to load warehouses. Status code: ${response.statusCode}'
+        };
+      }
+    } catch (error) {
+      print('Error fetching warehouses: $error');
+      return {'success': false, 'message': 'Error fetching warehouses'};
+    }
+  }
+
+  Future<Map<String, dynamic>> createWarehouse({
+    required String name,
+    required String email,
+    required int taxIdentificationNumber,
+    required String billingAddressLine1,
+    required String billingAddressLine2,
+    required String billingCountry,
+    required String billingState,
+    required String billingCity,
+    required int billingZipCode,
+    required int billingPhoneNumber,
+    required String shippingAddressLine1,
+    required String shippingAddressLine2,
+    required String shippingCountry,
+    required String shippingState,
+    required String shippingCity,
+    required int shippingZipCode,
+    required int shippingPhoneNumber,
+    required String locationType,
+    required bool holdStocks,
+    required bool copyMasterSkuFromPrimary,
+  }) async {
+    final url = Uri.parse('$_baseUrl/warehouse');
+    final body = {
+      "name": name,
+      "email": email,
+      "location": {
+        "otherDetails": {
+          "taxIdentificationNumber": taxIdentificationNumber,
+        },
+        "billingAddress": {
+          "addressLine1": billingAddressLine1,
+          "addressLine2": billingAddressLine2,
+          "country": billingCountry,
+          "state": billingState,
+          "city": billingCity,
+          "zipCode": billingZipCode,
+          "phoneNumber": billingPhoneNumber,
+        },
+        "shippingAddress": {
+          "addressLine1": shippingAddressLine1,
+          "addressLine2": shippingAddressLine2,
+          "country": shippingCountry,
+          "state": shippingState,
+          "city": shippingCity,
+          "zipCode": shippingZipCode,
+          "phoneNumber": shippingPhoneNumber,
+        },
+        "locationType": locationType,
+        "holdStocks": holdStocks,
+        "copyMasterSkuFromPrimary": copyMasterSkuFromPrimary,
+      }
+    };
+
+    try {
+      final token = await getToken();
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token', // Include the token here
+        },
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode == 201) {
+        return jsonDecode(response.body);
+      } else {
+        throw Exception('Failed to create warehouse: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error creating warehouse: $e');
+    }
+  }
+
   Future<void> _saveCredentials(String email, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('email', email);
@@ -387,7 +598,44 @@ class AuthProvider with ChangeNotifier {
     await prefs.remove('authToken'); // Clear the token
   }
 
+  Future<Map<String, dynamic>> searchCategoryByName(String name) async {
+    final url =
+        Uri.parse('$_baseUrl/category/query?name=${Uri.encodeComponent(name)}');
 
+    try {
+      final token = await getToken();
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('Response status: ${response.statusCode}'); // Debugging line
+      print('Response body: ${response.body}'); // Debugging line
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        // Since the response is an array, we check if data is a List
+        if (data is List) {
+          return {'success': true, 'data': data}; // Return the whole list
+        } else {
+          print('Unexpected response format: ${data}'); // Debugging line
+          return {'success': false, 'message': 'Unexpected response format'};
+        }
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to search categories with status code: ${response.statusCode}'
+        };
+      }
+    } catch (error) {
+      print('Error: $error'); // Debugging line
+      return {'success': false, 'message': 'An error occurred'};
+    }
+  }
 
 //get all brand name
 //  Future<Map<String, dynamic>> getAllBrandName(
@@ -396,7 +644,7 @@ class AuthProvider with ChangeNotifier {
 
 //     try {
 //       final token = await getToken();
-//       final response = await http.get(  
+//       final response = await http.get(
 //         url,
 //         headers: {
 //           'Content-Type': 'application/json',
@@ -413,8 +661,7 @@ class AuthProvider with ChangeNotifier {
 
 //           print("i am dipu");
 //           List brand;
-         
-            
+
 //               brand=parseJsonToList(response.body.toString(),'brands');
 //           // }
 //           // print("i am dipu us here wiht success");

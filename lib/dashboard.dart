@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/combo_page.dart';
+import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/order-page.dart';
+import 'package:inventory_management/product_display.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
@@ -18,7 +20,6 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-
   String selectedDrawerItem = 'Dashboard';
 
   DateTime? lastUpdatedTime;
@@ -160,27 +161,42 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
         ),
         const SizedBox(height: 20),
-        _buildDrawerItem(
-          icon: Icons.dashboard,
-          text: 'Dashboard',
-          isSelected: selectedDrawerItem == 'Dashboard',
-          onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
+        // Wrap the drawer items in SingleChildScrollView to make them scrollable
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                _buildDrawerItem(
+                  icon: Icons.dashboard,
+                  text: 'Dashboard',
+                  isSelected: selectedDrawerItem == 'Dashboard',
+                  onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
+                ),
+                _buildDrawerItem(
+                  icon: Icons.shopping_cart,
+                  text: 'Orders',
+                  isSelected: selectedDrawerItem == 'Orders',
+                  onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
+                ),
+                _buildInventorySection(isSmallScreen),
+                _buildMasterSection(isSmallScreen),
+                _buildDrawerItem(
+                  icon: Icons.analytics,
+                  text: 'Accounting',
+                  isSelected: selectedDrawerItem == 'Accounting',
+                  onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
+                ),
+                _buildDrawerItem(
+                  icon: Icons.production_quantity_limits,
+                  text: 'View Product',
+                  isSelected: selectedDrawerItem == 'View Product',
+                  onTap: () =>
+                      _onDrawerItemTapped('View Product', isSmallScreen),
+                ),
+              ],
+            ),
+          ),
         ),
-        _buildDrawerItem(
-          icon: Icons.shopping_cart,
-          text: 'Orders',
-          isSelected: selectedDrawerItem == 'Orders',
-          onTap: () => _onDrawerItemTapped('Orders', isSmallScreen),
-        ),
-        _buildInventorySection(isSmallScreen),
-        _buildMasterSection(isSmallScreen),
-        _buildDrawerItem(
-          icon: Icons.analytics,
-          text: 'Accounting',
-          isSelected: selectedDrawerItem == 'Accounting',
-          onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
-        ),
-        const Spacer(),
         Padding(
           padding: const EdgeInsets.only(bottom: 20.0),
           child: Column(
@@ -283,7 +299,6 @@ class _DashboardPageState extends State<DashboardPage> {
         children: <Widget>[
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
-// <<<<<<< HEAD
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
               text: 'Product Master',
@@ -317,6 +332,19 @@ class _DashboardPageState extends State<DashboardPage> {
               text: 'Combo Master',
               isSelected: selectedDrawerItem == 'Combo Master',
               onTap: () => _onDrawerItemTapped('Combo Master', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: _buildDrawerItem(
+              icon: Icons.warehouse,
+              text: 'Location Master',
+              isSelected: selectedDrawerItem == 'Location Master',
+              onTap: () =>
+                  _onDrawerItemTapped('Location Master', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -401,8 +429,12 @@ class _DashboardPageState extends State<DashboardPage> {
         return CategoryMasterPage();
       case 'Combo Master':
         return const ComboPage();
+      case 'Location Master':
+        return const LocationMaster();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
+      case 'View Product':
+        return const ProductDataDisplay();
       case 'Settings':
         return const Center(child: Text("Settings content goes here"));
       default:
