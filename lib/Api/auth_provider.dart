@@ -101,12 +101,12 @@ class AuthProvider with ChangeNotifier {
         if (token != null && token.isNotEmpty) {
           await _saveToken(token);
           print('Token retrieved and saved: $token');
+          await _saveCredentials(email, password);
+          return {'success': true, 'data': responseData};
         } else {
           print('Token not retrieved');
+          return {'success': false, 'data': responseData};
         }
-
-        await _saveCredentials(email, password);
-        return {'success': true, 'data': responseData};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);
         return {'success': false, 'message': errorResponse['error']};

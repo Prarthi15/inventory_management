@@ -351,17 +351,7 @@ packages:
       sha256: bdb68674043280c3428e9ec998512fb681678676b3c54e773629ffe74419f8c7
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
-<<<<<<< HEAD
     version: "1.15.0"
-<<<<<<< HEAD
-=======
-=======
-    version: "1.11.0"
->>>>>>> 4be333d (Perfect code (#25))
-=======
-    version: "1.15.0"
->>>>>>> b509d58 (random commit)
   mime:
     dependency: transitive
     description:
@@ -370,9 +360,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
-<<<<<<< HEAD
->>>>>>> c885c099c3027c7eec0dcf8b6e11e30837f9665f
-=======
   multi_dropdown:
     dependency: "direct main"
     description:
@@ -381,7 +368,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
->>>>>>> 41d4ff2 (Added 4 files for Combo Master)
   nested:
     dependency: transitive
     description:
