@@ -8,13 +8,10 @@ class AuthProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String? _token;
-  
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get token => _token;
-  // String? get selectedIndex => _selectedIndex;
-  
 
   Future<void> register(String userName, String email, String password) async {
     _isLoading = true;

@@ -1,20 +1,16 @@
-import 'dart:js';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 
 class CustomDropdown extends StatefulWidget {
   final double fontSize;
-  int selectedIndex;
+   int selectedIndex;
   final List<Map<String,dynamic>>option;
   final String? Function(String?)? validator;
   final bool isboxSize;
-  final bool label;
   ValueChanged<int>? onSelectedChanged;
 
-   CustomDropdown({super.key, this.validator, this.fontSize = 17,this.option=const [],this.isboxSize=false,this.label=false,this.selectedIndex=0,this.onSelectedChanged,});
+   CustomDropdown({super.key, this.validator, this.fontSize = 17,this.option=const [],this.isboxSize=false,this.selectedIndex=0,this.onSelectedChanged,});
 
   @override
   State<CustomDropdown> createState() => _CustomDropdownState();
@@ -27,19 +23,18 @@ class _CustomDropdownState extends State<CustomDropdown> {
    
   ];
 
+  // _CustomDropdownState({ this.fontSize=17});
   void updateData(){
-    if(widget.label){
+    if(widget.option.isNotEmpty && widget.isboxSize==false){
+    //  _selectedItem=widget.option[0]['name'];
+    //  _items.clear();
      for(int i=0;i<widget.option.length;i++){
-        _items.add(widget.option[i]['labelSku']);
+        _items.add(widget.option[i]['name']);
      }
      
-    }else if(widget.isboxSize){
-       for(int i=0;i<widget.option.length;i++){
-        _items.add('${widget.option[i]['box_name']}');
-     }
     }else{
         for(int i=0;i<widget.option.length;i++){
-        _items.add('${widget.option[i]['name']}');
+        _items.add('length: ${widget.option[i]['length']}  width: ${widget.option[i]['width']} height: ${widget.option[i]['height']}');
      }
     }
     setState(() {
@@ -69,7 +64,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
         child: DropdownSearch<String>(
           items: _items,
           selectedItem: _selectedItem,
-          popupProps:const  PopupProps.menu(
+          popupProps: const PopupProps.menu(
             fit: FlexFit.tight,
             showSelectedItems: true,
             showSearchBox: true,
@@ -83,22 +78,10 @@ class _CustomDropdownState extends State<CustomDropdown> {
                 isDense:true,
                 filled:true,
                 label:Text('Search'),
-                contentPadding:EdgeInsets.all(0),
-                
+                contentPadding:EdgeInsets.all(0)
               ),
-              
             ),
-        //  itemBuilder: (context, item, isSelected)=>ListTile(
-        //       title: Text(item),
-        //       selected: isSelected,
-        //     ),
-            scrollbarProps:ScrollbarProps(
-              // scrollbarOrientation:ScrollEndNotification
-              // notificationPredicate:(b){
-              //   print("b is ssssss $b");
-              //   return true;
-              // }
-            ),
+            // itemBuilder:
           ),
           onChanged: (String? newValue) {
               // _items.fin;
@@ -110,6 +93,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
             setState(() {
               _selectedItem = newValue;
               
+              // widget.=0;
             });
           },
         ),

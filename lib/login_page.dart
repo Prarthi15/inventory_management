@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
-import 'package:inventory_management/dashboard.dart';
 import 'package:provider/provider.dart';
 // import 'Api/auth_provider.dart';
 
@@ -299,10 +298,9 @@ class _LoginFormState extends State<LoginForm> {
                             backgroundColor: AppColors.primaryGreen,
                           ),
                         );
+                        Navigator.pushReplacementNamed(context, '/dashboard');
                         _emailController.clear();
                         _passwordController.clear();
-                        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const DashboardPage(),));
-                        
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
