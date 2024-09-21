@@ -33,8 +33,7 @@ void main() {
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => CheckBoxProvider()),
       ChangeNotifierProvider(create: (context) => ManagementProvider()),
-      ChangeNotifierProvider(create:(context)=>ProductProvider()),
-      ChangeNotifierProvider(create: (context) => ComboProvider()),
+      
       ChangeNotifierProvider(create: (context)=>LabelPageApi()),
       ChangeNotifierProvider(create: (context) => MarketplaceProvider()),
       ChangeNotifierProvider(create: (context) => BookProvider()),
