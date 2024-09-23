@@ -21,7 +21,7 @@ import 'package:inventory_management/provider/combo_provider.dart';
 import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
 import 'package:inventory_management/show-label-page.dart';
-// import 'package:inventory_management/reset_password.dart';
+
 import 'package:provider/provider.dart';
 // import 'package:inventory_management/create_account.dart';
 // prarthi2474@gmail.com
@@ -39,6 +39,7 @@ void main() {
       ChangeNotifierProvider(create: (context) => BookProvider()),
       ChangeNotifierProvider(create: (context) => ProductProvider()),
       ChangeNotifierProvider(create: (context) => ComboProvider()),
+      // ChangeNotifierProvider(create: (context) => CheckBoxProvider()),
       ChangeNotifierProvider(
         create: (context) => LocationProvider(
             authProvider: Provider.of<AuthProvider>(context, listen: false)),

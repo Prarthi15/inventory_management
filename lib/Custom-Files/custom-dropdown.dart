@@ -4,20 +4,26 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
+import 'package:inventory_management/Api/products-provider.dart';
+import 'package:provider/provider.dart';
 
 class CustomDropdown extends StatefulWidget {
   final double fontSize;
   int selectedIndex;
+  
   final List<Map<String,dynamic>>option;
   final String? Function(String?)? validator;
   final bool isboxSize;
   final bool label;
+  final bool grade;
   ValueChanged<int>? onSelectedChanged;
 
-   CustomDropdown({super.key, this.validator, this.fontSize = 17,this.option=const [],this.isboxSize=false,this.label=false,this.selectedIndex=0,this.onSelectedChanged,});
+
+   CustomDropdown({super.key, this.validator, this.fontSize = 17,this.option=const [],this.isboxSize=false,this.label=false,this.selectedIndex=0,this.onSelectedChanged,this.grade=false});
 
   @override
   State<CustomDropdown> createState() => _CustomDropdownState();
+
 }
 
 class _CustomDropdownState extends State<CustomDropdown> {
@@ -28,6 +34,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
   ];
 
   void updateData(){
+    // _items.clear();
     if(widget.label){
      for(int i=0;i<widget.option.length;i++){
         _items.add(widget.option[i]['labelSku']);
@@ -37,19 +44,25 @@ class _CustomDropdownState extends State<CustomDropdown> {
        for(int i=0;i<widget.option.length;i++){
         _items.add('${widget.option[i]['box_name']}');
      }
+    }else if(widget.grade){
+        _items.addAll(['A','B','C','D']);
     }else{
         for(int i=0;i<widget.option.length;i++){
         _items.add('${widget.option[i]['name']}');
      }
     }
+    _selectedItem=_items[widget.selectedIndex];
     setState(() {
        
      });
   }
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     updateData();
   }
 
@@ -106,7 +119,9 @@ class _CustomDropdownState extends State<CustomDropdown> {
              if(widget.onSelectedChanged!=null){
               widget.onSelectedChanged!( widget.selectedIndex );
              }
-             
+             if(widget.grade){
+              Provider.of<ProductProvider>(context,listen:false).grade(newValue!);
+             }
             setState(() {
               _selectedItem = newValue;
               

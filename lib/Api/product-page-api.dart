@@ -251,12 +251,37 @@ Future<Map<String, dynamic>> createProduct({
   required String taxRule,
   required Map<String, dynamic> dimensions,
   required String weight,
+  required String netWeight,
+  required String grossWeight,
+  required String shopifyImage,
   required String boxName,
   required String mrp,
   required String cost,
   required bool active,
 }) async {
   final url = Uri.parse('$_baseUrl/products/');
+  print('''
+Product Name: $productName
+Parent SKU: $parentSku
+SKU: $sku
+EAN: $ean
+Description: $description
+Brand ID: $brandId
+Category: $category
+Technical Name: $technicalName
+Label SKU: $labelSku
+Color ID: $colorId
+Tax Rule: $taxRule
+Dimensions: $dimensions
+Weight: $weight
+Net Weight: $netWeight
+Gross Weight: $grossWeight
+Shopify Image: $shopifyImage
+Box Name: $boxName
+MRP: $mrp
+Cost: $cost
+Active: $active
+''');
 
   try {
     final token = await AuthProvider().getToken();
@@ -266,7 +291,7 @@ Future<Map<String, dynamic>> createProduct({
     "Authorization": "Bearer $token",
 });   
 
-  var file =await Provider.of<ProductProvider>(context!,listen:false).images[0];
+  // var file =await Provider.of<ProductProvider>(context!,listen:false).images[0];
   // List<int> bytes = await file.readAsBytes();
   //     //  Uint8List.fromList(bytes);
   // print("hjjh");
@@ -303,9 +328,12 @@ Future<Map<String, dynamic>> createProduct({
       request.fields['breadth'] = dimensions['breadth'].toString();
       request.fields['height'] = dimensions['height'].toString();
       request.fields['box_name'] =boxName;
-
+      request.fields['garde'] ='A';
+      request.fields['netWeight'] =netWeight;
+      request.fields['grossWeight'] =grossWeight;
+      request.fields['shopifyImage'] =shopifyImage;
     
-print("divyansh patidadr4544656");
+// print("divyansh patidadr4544656");
     final response = await request.send();
 
     final responseBody = await response.stream.bytesToString();

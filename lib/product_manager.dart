@@ -196,18 +196,17 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                               backgroundColor: AppColors.primaryBlue),
                           child: const Text('Create Products'),
                         )
-                      : CustomButton(
-                          width: 40,
-                          height: 40,
-                          onTap: () {
+                      : ElevatedButton(
+                          
+                          onPressed: () {
                             _showCreateProduct = !_showCreateProduct;
                             //  print("here is show product $_showCreateProduct");
                             setState(() {});
                           },
-                          color: AppColors.lightBlue,
-                          textColor: AppColors.black,
-                          fontSize: 12,
-                          text: 'Back'),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryBlue),
+                          child:const Text('Back'),
+                         ),
                   const SizedBox(height: 16),
                   Expanded(
                     child: !_showCreateProduct

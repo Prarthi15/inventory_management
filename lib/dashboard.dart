@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/book_page.dart';
 import 'package:inventory_management/combo_page.dart';
 import 'package:inventory_management/create-label-page.dart';
+import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/marketplace_page.dart';
+import 'package:inventory_management/order-page.dart';
 
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
@@ -151,35 +154,44 @@ class _DashboardPageState extends State<DashboardPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        const SizedBox(height: 20),
-        const Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text(
-            'Katyayani',
-            style: TextStyle(
-              fontSize: 27,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primaryBlue,
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection:Axis.vertical,
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                      const Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Text(
+              'Katyayani',
+              style: TextStyle(
+                fontSize: 27,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryBlue,
+              ),
+            ),
+                      ),
+                      const SizedBox(height: 20),
+                      _buildDrawerItem(
+            icon: Icons.dashboard,
+            text: 'Dashboard',
+            isSelected: selectedDrawerItem == 'Dashboard',
+            onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
+                      ),
+                      _buildOrdersSection(isSmallScreen),
+                      _buildInventorySection(isSmallScreen),
+                      _buildMasterSection(isSmallScreen),
+                      _buildDrawerItem(
+            icon: Icons.analytics,
+            text: 'Accounting',
+            isSelected: selectedDrawerItem == 'Accounting',
+            onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
+                      ),
+              ],
             ),
           ),
         ),
-        const SizedBox(height: 20),
-        _buildDrawerItem(
-          icon: Icons.dashboard,
-          text: 'Dashboard',
-          isSelected: selectedDrawerItem == 'Dashboard',
-          onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
-        ),
-        _buildOrdersSection(isSmallScreen),
-        _buildInventorySection(isSmallScreen),
-        _buildMasterSection(isSmallScreen),
-        _buildDrawerItem(
-          icon: Icons.analytics,
-          text: 'Accounting',
-          isSelected: selectedDrawerItem == 'Accounting',
-          onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
-        ),
-        const Spacer(),
+        // const Spacer(),
         Padding(
           padding: const EdgeInsets.only(bottom: 20.0),
           child: Column(
@@ -232,6 +244,18 @@ class _DashboardPageState extends State<DashboardPage> {
             ? const Color.fromRGBO(6, 90, 216, 0.1)
             : null,
         children: <Widget>[
+           Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: _buildDrawerItem(
+              icon: Icons.menu_book,
+              text: 'Order Page',
+              isSelected: selectedDrawerItem == 'Order Page',
+              onTap: () => _onDrawerItemTapped('Order Page', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
@@ -456,6 +480,19 @@ class _DashboardPageState extends State<DashboardPage> {
               fontSize: 14,
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: _buildDrawerItem(
+              icon: Icons.warehouse,
+              text: 'Location Master',
+              isSelected: selectedDrawerItem == 'Location Master',
+              onTap: () =>
+                  _onDrawerItemTapped('Location Master', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
+            ),
+          ),
         ],
       ),
     );
@@ -518,6 +555,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildMainContent(String selectedDrawerItem, bool isSmallScreen) {
     switch (selectedDrawerItem) {
       case 'Dashboard':
+      // return Products();
         return _buildDashboardContent(isSmallScreen);
       case 'Sales Orders':
         return const Center(child: Text("Sales Orders content goes here"));
@@ -527,6 +565,8 @@ class _DashboardPageState extends State<DashboardPage> {
         return const Products();
       case 'Manage Inventory':
         return const ManageInventory();
+      case 'Order Page':
+        return const OrdersPage();
       case 'Book Page':
         return const BookPage();
       case 'Product Master':
@@ -539,6 +579,8 @@ class _DashboardPageState extends State<DashboardPage> {
         return CategoryMasterPage();
       case 'Combo Master':
         return const ComboPage();
+      case 'Location Master':
+        return const LocationMaster();
       case 'Marketplace Master':
         return const MarketplacePage();
       case 'Accounting':

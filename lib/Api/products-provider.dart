@@ -15,9 +15,12 @@ import 'package:inventory_management/Api/product-page-api.dart';
 class ProductProvider extends ChangeNotifier {
   int _countVariationField = 1;
   int _alertBoxFieldCount = 1;
+  int _dropFailIndex = 0;
   bool _isloading=false;
   bool _activeStatus=false;
   bool _noData=false;
+  String _grade='';
+  bool _saveButtonClick=false;
   String _selectedProductCategory='Create Simple Product';
   List<TextEditingController> _colors = [TextEditingController()];
   List<TextEditingController> _sizes = [TextEditingController()];
@@ -26,12 +29,12 @@ class ProductProvider extends ChangeNotifier {
   List<TextEditingController> _alertBoxKeyEditingController = [TextEditingController()];
   List<TextEditingController> _alertBoxPairEditingController = [TextEditingController()];
   //list of values for all custom field
-  List<Map<String, dynamic>> _cat=[];
-  List<Map<String, dynamic>> _brand=[];
-  List<Map<String, dynamic>> _label=[];
-  List<Map<String, dynamic>> _boxSize=[];
-  List<Map<String, dynamic>> _parentSku=[];
-  List<Map<String, dynamic>> _colorDrop=[];
+  List<Map<String, dynamic>> _cat=[{"name":"Select option"}];
+  List<Map<String, dynamic>> _brand=[{"name":"Select option"}];
+  List<Map<String, dynamic>> _label=[{"labelSku":"Select option"}];
+  List<Map<String, dynamic>> _boxSize=[{"box_name":"Select option"}];
+  List<Map<String, dynamic>> _parentSku=[{"name":"Select option"}];
+  List<Map<String, dynamic>> _colorDrop=[{"name":"Select option"}];
   List<File> _file=[];
 
   // Getters
@@ -41,14 +44,17 @@ class ProductProvider extends ChangeNotifier {
   List<TextEditingController> get sku => _skus;
   List<TextEditingController> get alertBoxKeyEditingController => _alertBoxKeyEditingController;
   List<TextEditingController> get alertBoxPairEditingController =>_alertBoxPairEditingController;
+  int get dropFailIndex =>_dropFailIndex;
 
   bool get isloading=>_isloading;
   bool get activeStatus=>_activeStatus;
   bool get noData=>_noData;
+  bool get saveButtonClick=>_saveButtonClick;
 
   String get selectedProductCategory =>_selectedProductCategory;
   int get countVariationFields => _countVariationField;
   int get alertBoxFieldCount => _alertBoxFieldCount;
+  String get gradee => _grade;
 
   //get values for all cutom field
   List<Map<String, dynamic>> get cat=>_cat;
@@ -65,6 +71,21 @@ class ProductProvider extends ChangeNotifier {
     Future.delayed(const Duration(seconds:15)).whenComplete((){
       _noData=!_noData;
     });
+    // _noData=!noData;
+  }
+   void grade(String val){
+    print("i am updating grade  $val");
+    _grade=val;
+    // _noData=!noData;
+  }
+   void saveButtonClickStatus(){
+    _saveButtonClick=!_saveButtonClick;
+    notifyListeners();
+   
+  }
+  //
+  void failedIndex(){
+    notifyListeners();
     // _noData=!noData;
   }
 
@@ -101,15 +122,15 @@ class ProductProvider extends ChangeNotifier {
     //get all custom dropvalue
    Future getCategories() async {
   
-    _cat = (await AuthProvider().getAllCategories())['data']
-        .cast<Map<String, dynamic>>();
+    _cat.addAll((await AuthProvider().getAllCategories())['data']
+        .cast<Map<String, dynamic>>());
  
 
-    _brand = (await ProductPageApi().getAllBrandName())['data']
-        .cast<Map<String, dynamic>>();
-    _boxSize = (await ProductPageApi().getBoxSize())['data'];
-    _label = (await ProductPageApi().getLabel())['data'];
-   _colorDrop = (await ProductPageApi().getColorDrop())['data'];
+    _brand.addAll((await ProductPageApi().getAllBrandName())['data']
+        .cast<Map<String, dynamic>>());
+    _boxSize.addAll((await ProductPageApi().getBoxSize())['data']);
+    _label.addAll((await ProductPageApi().getLabel())['data']);
+   _colorDrop.addAll((await ProductPageApi().getColorDrop())['data']);
     _isloading=true;
     notifyListeners();
     // _isloading=false;
