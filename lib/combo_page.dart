@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:inventory_management/Api/combo_api.dart';
@@ -17,13 +18,16 @@ class ComboPage extends StatefulWidget {
 
 class _ComboPageState extends State<ComboPage> {
   Product? product;
+  ComboProvider? comboProvider;
   final _idController = TextEditingController();
   final _nameController = TextEditingController();
   final _skuController = TextEditingController();
   final _mrpController = TextEditingController();
   final _costController = TextEditingController();
 
-  final productController = MultiSelectController<String>();
+  //final productController = MultiSelectController<String>();
+ 
+  late final MultiSelectController<String> productController;
 
   void _clearFormFields() {
     _idController.clear();
@@ -34,24 +38,30 @@ class _ComboPageState extends State<ComboPage> {
     productController.selectedItems.clear();
   }
 
-  void saveCombo(ComboProvider comboProvider) async {
+  void saveCombo(BuildContext context) async {
+    ComboProvider comboProvider =
+        Provider.of<ComboProvider>(context, listen: false);
+
+    // Get the selected product IDs directly from the dropdown's selections
+    List<String?> selectedProductIds =
+        comboProvider.selectedProducts.map((product) => product.id).toList();
+
     final combo = Combo(
       id: _idController.text,
-      products: productController.selectedItems
-          .map((product) => {'product_id': product.value})
-          .toList(),
+      products: selectedProductIds,
       name: _nameController.text,
-      mrp: double.tryParse(_mrpController.text) ?? 0.0,
-      cost: double.tryParse(_costController.text) ?? 0.0,
-      sku: _skuController.text,
+      mrp: _mrpController.text,
+      cost: _costController.text,
+      comboSku: _skuController.text,
     );
 
     final comboApi = ComboApi();
 
     try {
-      await comboApi.createCombo(combo);
-      comboProvider.setCombo(combo);
-      comboProvider.addCombo(combo);
+      await comboApi.createCombo(
+          combo, comboProvider.selectedImages, comboProvider.imageNames);
+      // comboProvider.setCombo(combo);
+      // comboProvider.addCombo(combo);
       _clearFormFields();
       comboProvider.toggleFormVisibility();
     } catch (e) {
@@ -63,10 +73,32 @@ class _ComboPageState extends State<ComboPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final comboProvider = Provider.of<ComboProvider>(context, listen: false);
-      comboProvider.fetchCombos();
-      comboProvider.fetchProducts();
+      comboProvider = Provider.of<ComboProvider>(context, listen: false);
+
+      productController = MultiSelectController<String>();
+      // print(1);
+      // print(object)
+      getDropValue();
     });
+  }
+
+  void getDropValue() async {
+    await comboProvider!.fetchCombos();
+    await comboProvider!.fetchProducts();
+    print("new style");
+    for (int i = 0; i < comboProvider!.products.length; i++) {
+      print("heello i am divyansh");
+      comboProvider!.addItem('$i:${comboProvider!.products[i].displayName}', comboProvider!.products[i].id);
+      // items.add(DropdownItem<String>(
+      //   label: '$i:${comboProvider!.products[i].displayName}',
+      //   value: comboProvider!.products[i].id,
+      // ));
+    }
+
+    print("length of it is here ${comboProvider!.item.length}");
+    // setState(() {
+  
+    // });
   }
 
   @override
@@ -76,15 +108,7 @@ class _ComboPageState extends State<ComboPage> {
         padding: const EdgeInsets.all(16.0),
         child: Consumer<ComboProvider>(
           builder: (context, comboProvider, child) {
-            final comboProvider = Provider.of<ComboProvider>(context);
-
-            List<DropdownItem<String>> productItems = comboProvider.products
-                .map((product) => DropdownItem<String>(
-                      label:
-                          product.displayName!, // Use 'displayName' of product
-                      value: product.id!, // Use the 'id' of product
-                    ))
-                .toList();
+            // print("hete i am $items");
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,12 +132,14 @@ class _ComboPageState extends State<ComboPage> {
                   ),
                   const SizedBox(height: 16),
                   MultiDropdown<String>(
-                    items: productItems,
+                    items:comboProvider.item,
                     controller: productController,
-                    enabled: true,
                     searchEnabled: true,
                     chipDecoration: const ChipDecoration(
                       backgroundColor: Colors.yellow,
+                      wrap: true,
+                      runSpacing: 2,
+                      spacing: 10,
                     ),
                     fieldDecoration: FieldDecoration(
                       hintText: 'Select Products',
@@ -121,14 +147,21 @@ class _ComboPageState extends State<ComboPage> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(color: Colors.grey),
                       ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Colors.black87),
+                      ),
                     ),
                     dropdownDecoration: const DropdownDecoration(
-                      maxHeight: 300,
+                      maxHeight: 500,
                     ),
-                    dropdownItemDecoration: const DropdownItemDecoration(
-                      selectedIcon: Icon(Icons.check_box, color: Colors.green),
-                    ),
+                    onSelectionChange: (selectedItems) {
+                      debugPrint(
+                          'Selected items (product IDs): $selectedItems');
+                      comboProvider.selectProductsByIds(selectedItems);
+                    },
                   ),
+
                   const SizedBox(height: 16),
                   TextField(
                     controller: _mrpController,
@@ -147,12 +180,50 @@ class _ComboPageState extends State<ComboPage> {
                     decoration: const InputDecoration(labelText: 'SKU'),
                   ),
                   const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: comboProvider.selectImages, // Pick images
+                    child: const Text('Upload Images'),
+                  ),
+                  // Image Previews
+                  comboProvider.selectedImages != null &&
+                          comboProvider.selectedImages!.isNotEmpty
+                      ? SizedBox(
+                          height: 100,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: comboProvider.selectedImages!.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    Expanded(
+                                      child: Image.memory(
+                                        comboProvider.selectedImages![index],
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      comboProvider.imageNames[index],
+                                      style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                        )
+                      : const Text('No images selected'),
+
+                  const SizedBox(height: 30),
+
                   Row(
                     children: [
                       ElevatedButton(
-                        onPressed: () => saveCombo(
-                          Provider.of<ComboProvider>(context, listen: false),
-                        ),
+                        onPressed: () => saveCombo(context),
                         child: const Text('Save Combo'),
                       ),
                       const SizedBox(width: 8),
@@ -179,19 +250,17 @@ class _ComboPageState extends State<ComboPage> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
-                  if (comboProvider.isLoading)
-                  const Center(child: CircularProgressIndicator()),
-
-                  if (!comboProvider.isLoading && comboProvider.comboList.isNotEmpty)
+                  if (comboProvider.loading)
+                    const Center(child: CircularProgressIndicator()),
+                  if (!comboProvider.loading &&
+                      comboProvider.combosList.isNotEmpty)
                     Expanded(
                       child: ListView.builder(
-                        itemCount: comboProvider.comboList.length,
+                        itemCount: comboProvider.combosList.length,
                         itemBuilder: (context, index) {
-                          final combo = comboProvider.comboList[index];
-                          final products = combo.products!;
-                          //print(combo.products);
-
+                          final combo = comboProvider.combosList[index];
+                          final products =
+                              (combo['products'] as List<dynamic>?) ?? [];
                           return Card(
                             margin: const EdgeInsets.symmetric(vertical: 8),
                             child: Padding(
@@ -199,206 +268,44 @@ class _ComboPageState extends State<ComboPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  // Row(
-                                  //   children: [
-                                  //     const Text(
-                                  //       'ID:',
-                                  //       style: TextStyle(
-                                  //         fontSize: 16,
-                                  //         fontWeight: FontWeight.bold,
-                                  //       ),
-                                  //     ),
-                                  //     const SizedBox(width: 8),
-                                  //     Text(
-                                  //       combo.id ?? 'N/A',
-                                  //       style: const TextStyle(fontSize: 16),
-                                  //     ),
-                                  //   ],
-                                  // ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        'Name:',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        combo.name!,
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        'Products:',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Card(
-                                          color: Colors.grey[200],
-                                          child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: products.map((e) {
-                                                  final product = e[
-                                                          'product_id'] ??
-                                                      {}; // Fetch product details safely
-                                                  return Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        vertical:
-                                                            8.0), // Add some space between products
-                                                    child: Row(
-                                                      children: [
-                                                        Expanded(
-                                                          flex: 3,
-                                                          child: Column(
-                                                            crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Text(
-                                                                product['displayName'] ??
-                                                                    'Product Name: N/A', // Display product name
-                                                                style: const TextStyle(
-                                                                    fontSize:
-                                                                        18,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .bold),
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 4),
-                                                              Text(
-                                                                'Description: ${product['description'] ?? 'N/A'}', // Display description
-                                                                style:
-                                                                    const TextStyle(
-                                                                        fontSize:
-                                                                            16),
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 4),
-                                                              Text(
-                                                                'Weight: ${product['weight'] ?? 'N/A'}', // Display weight
-                                                                style:
-                                                                    const TextStyle(
-                                                                        fontSize:
-                                                                            16),
-                                                              ),
-                                                              const SizedBox(
-                                                                  height: 4),
-                                                              Text(
-                                                                'Type: ${product['productType'] ?? 'N/A'}', // Display product type
-                                                                style:
-                                                                    const TextStyle(
-                                                                        fontSize:
-                                                                            16),
-                                                              ),
-                                                              const Divider(
-                                                                  thickness: 1,
-                                                                  color: Colors
-                                                                      .grey), // Divider for separation
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        const Expanded(
-                                                          flex:
-                                                              1, // Adjust the space ratio for the image/icon
-                                                          child: Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .start,
-                                                            children: [
-                                                              Icon(
-                                                                Icons
-                                                                    .image, // Placeholder for product image
-                                                                size:
-                                                                    50, // Size of the icon
-                                                                color: Colors
-                                                                    .grey, // Icon color
-                                                              ),
-                                                              SizedBox(
-                                                                  height: 8),
-                                                              // Optional: Add a placeholder for future image if needed
-                                                              // Image.network(productImageUrl), // If you have product image URLs
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                }).toList(),
-                                              )),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        'MRP:',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '₹${combo.mrp!.toStringAsFixed(2)}',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        'Cost:',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '₹${combo.cost!.toStringAsFixed(2)}',
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      const Text(
-                                        'SKU:',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        combo.sku!,
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
+                                  Text('Name: ${combo['name'] ?? 'N/A'}'),
+                                  Text('MRP: ${combo['mrp'] ?? 'N/A'}'),
+                                  Text('Cost: ${combo['cost'] ?? 'N/A'}'),
+                                  Text('SKU: ${combo['sku'] ?? 'N/A'}'),
+                                  if (products.isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    const Text('Products:'),
+                                    Column(
+                                      children: products.map((product) {
+                                        // Ensure that 'image' field exists and is a list of URLs.
+                                        final imageUrl = (product['images']
+                                                        as List<dynamic>?)
+                                                    ?.isNotEmpty ==
+                                                true
+                                            ? product['images'][0]
+                                            : null;
+
+                                        return ListTile(
+                                          leading: imageUrl != null
+                                              ? Image.network(
+                                                  imageUrl,
+                                                  width: 50,
+                                                  height: 50,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : const Icon(
+                                                  Icons.image,
+                                                  size: 50,
+                                                  color: Colors.grey,
+                                                ),
+                                          title: Text(
+                                              product['displayName'] ?? 'N/A'),
+                                          subtitle: Text(
+                                              'SKU: ${product['sku'] ?? 'N/A'}'),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
@@ -407,6 +314,7 @@ class _ComboPageState extends State<ComboPage> {
                       ),
                     ),
                 ],
+
                 // Do not touch this code - End
               ],
             );
@@ -415,4 +323,28 @@ class _ComboPageState extends State<ComboPage> {
       ),
     );
   }
+}
+
+class CustomDropdownItem<T> extends DropdownItem<T> {
+  CustomDropdownItem({
+    required String label,
+    required T value,
+    bool disabled = false,
+    bool selected = false,
+  }) : super(
+          label: label,
+          value: value,
+          disabled: disabled,
+          selected: selected,
+        );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is CustomDropdownItem<T> && other.value == value;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
 }

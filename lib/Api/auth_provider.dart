@@ -4,10 +4,14 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
+  bool _isAuthenticated=false;
   final String _baseUrl =
       'https://inventory-management-backend-s37u.onrender.com';
+
+   bool get isAuthenticated => _isAuthenticated;
   Future<Map<String, dynamic>> register(String email, String password) async {
     final url = Uri.parse('$_baseUrl/register');
+   
 
     try {
       final response = await http.post(
@@ -126,7 +130,9 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
+    
     await prefs.setString('authToken', token);
+
   }
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {
@@ -221,7 +227,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> getAllCategories(
-      {int page = 1, int limit = 20, String? name}) async {
+      {int page = 1, int limit =70, String? name}) async {
     final url = Uri.parse('$_baseUrl/category/?page=$page&limit=$limit');
 
     try {
@@ -279,6 +285,8 @@ class AuthProvider with ChangeNotifier {
 
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
+    _isAuthenticated = prefs.getString('authToken') != null;
+    // notifyListeners();
     return prefs.getString('authToken');
   }
 
