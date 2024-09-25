@@ -11,21 +11,24 @@ import 'package:pagination_flutter/pagination.dart';
 import 'package:provider/provider.dart';
 
 class ManageInventory extends StatefulWidget {
-  const ManageInventory({super.key});
+  const ManageInventory({Key? key}) : super(key: key);
 
   @override
   State<ManageInventory> createState() => _ManageInventoryState();
 }
 
 class _ManageInventoryState extends State<ManageInventory> {
-  int firstval = 0, lastval = 10;
-  int selectedPage = 1;
-  int size = 40, currentPage = 0, jump = 5;
+  String handleNullValue(String? value) {
+    return value ?? 'NA';
+  }
+
+  int _nextQuantity = 1;
 
   @override
   Widget build(BuildContext context) {
-    var manageInventoryProvider=Provider.of<ManagementProvider>(context);
+    var manageInventoryProvider = Provider.of<ManagementProvider>(context);
     final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -76,7 +79,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                         style: AppColors().simpleHeadingStyle),
                                     Row(
                                       children: [
-                                        const SizedBox(
+                                        SizedBox(
                                           width: 100,
                                           child: CustomDropdown(),
                                         ),
@@ -146,7 +149,7 @@ class _ManageInventoryState extends State<ManageInventory> {
                                   style: AppColors().simpleHeadingStyle),
                               Row(
                                 children: [
-                                  const SizedBox(
+                                  SizedBox(
                                     width: 100,
                                     child: CustomDropdown(),
                                   ),
@@ -190,15 +193,19 @@ class _ManageInventoryState extends State<ManageInventory> {
                       height: 80,
                       // width: 300,
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.cardsgreen),
-                        // color: Colors.amberAccent,
-                      ),
-                      child: const Align(
+                          border: Border.all(
+                              color: AppColors.black.withOpacity(0.2)),
+                          borderRadius: BorderRadius.circular(10)
+                          // color:Colors.amber
+                          // color: Colors.amberAccent,
+                          ),
+                      child: Align(
                         alignment: Alignment.topLeft,
                         child: SizedBox(
                           width: 150,
+                          height: 51,
                           child: Padding(
-                            padding: EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(8.0),
                             child: CustomDropdown(),
                           ),
                         ),
@@ -226,263 +233,157 @@ class _ManageInventoryState extends State<ManageInventory> {
                 ],
               ),
               SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Column(
-                    children: [
-                      DataTable(
-                        showBottomBorder: true,
-                        dataRowMaxHeight: 100,
-                        columns: [
-                          DataColumn(
-                              label: Text('COMPANY NAME',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('CATEGORY',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('IMAGE',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('BRAND',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label:
-                                  Text('SKU', style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('PRODUCT NAME',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('MODEL NO',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label:
-                                  Text('MRP', style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('QUANTITY',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                            label: ElevatedButton(
-                              onPressed: () {
-                                // Save action
-                              },
-                              child: const Text('Save All'),
-                            ),
-                          ),
-                          DataColumn(
-                              label: Text('FLIPKART',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('SNAPDEAL',
-                                  style: AppColors().headerStyle)),
-                          DataColumn(
-                              label: Text('AMAZON.IN',
-                                  style: AppColors().headerStyle)),
-                        ],
-                        rows: List<DataRow>.generate(
-                          5, // Example number of rows
-                          (index) => DataRow(
-                            cells: [
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 200,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Text(
-                                    'Company ${firstval + index + 1}',
-                                    overflow: TextOverflow.visible,
-                                    softWrap: true,
-                                  ),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 150,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child:
-                                      Text('Category ${firstval + index + 1}'),
-                                ),
-                              )),
-                              DataCell(Image.network(
-                                'https://sharmellday.com/wp-content/uploads/2022/12/032_Canva-Text-to-Image-Generator-min-1.jpg',
-                                width: 100,
-                                height: 400,
-                              )),
-                              DataCell(IntrinsicHeight(
-                                child: Container(
-                                  constraints: const BoxConstraints(
-                                    maxWidth: 150,
-                                  ),
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.vertical,
-                                    child:
-                                        Text('Brand ${firstval + index + 1}'),
-                                  ),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 100,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Text('SKU${firstval + index + 1}'),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 150,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Text(
-                                      'Product Name ${firstval + index + 1}'),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 100,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child:
-                                      Text('Model No ${firstval + index + 1}'),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 100,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Text('MRP ${firstval + index + 1}'),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 200,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Column(
+                scrollDirection: Axis.horizontal,
+                child: DataTable(
+                  showBottomBorder: true,
+                  dataRowMaxHeight: 100,
+                  columns: [
+                    DataColumn(
+                        label: Text('COMPANY NAME',
+                            style: AppColors().headerStyle)),
+                    DataColumn(
+                        label:
+                            Text('CATEGORY', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label: Text('IMAGE', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label: Text('BRAND', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label: Text('SKU', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label: Text('PRODUCT NAME',
+                            style: AppColors().headerStyle)),
+                    DataColumn(
+                        label:
+                            Text('MODEL NO', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label: Text('MRP', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label:
+                            Text('QUANTITY', style: AppColors().headerStyle)),
+                    DataColumn(
+                      label: ElevatedButton(
+                        onPressed: () {
+                          // Save all action
+                        },
+                        child: const Text('Save All'),
+                      ),
+                    ),
+                    DataColumn(
+                        label:
+                            Text('FLIPKART', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label:
+                            Text('SNAPDEAL', style: AppColors().headerStyle)),
+                    DataColumn(
+                        label:
+                            Text('AMAZON.IN', style: AppColors().headerStyle)),
+                  ],
+                  rows: manageInventoryProvider.inventoryList.map((inventory) {
+                    return DataRow(
+                      cells: [
+                        DataCell(Text(
+                            handleNullValue(inventory.product?.companyName))),
+                        DataCell(
+                            Text(handleNullValue(inventory.product?.category))),
+                        DataCell(Image.network(
+                          handleNullValue(inventory.product?.imageUrl),
+                          width: 100,
+                          height: 100,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Text('Image failed to load');
+                          },
+                        )),
+                        DataCell(
+                            Text(handleNullValue(inventory.product?.brand))),
+                        DataCell(Text(handleNullValue(inventory.product?.sku))),
+                        DataCell(Text(
+                            handleNullValue(inventory.product?.displayName))),
+                        DataCell(
+                            Text(handleNullValue(inventory.product?.modelNo))),
+                        DataCell(Text(handleNullValue(
+                            inventory.product?.mrp as String?))),
+                        DataCell(
+                          Container(
+                            constraints: const BoxConstraints(maxWidth: 200),
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                      Column(
                                         children: [
-                                          Column(
-                                            children: [
-                                              Container(
-                                                height: 30,
-                                                width: 130,
-                                                decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                        color:
-                                                            AppColors.black)),
-                                                child: Center(
-                                                    child: Text(
-                                                        "Quantity ${firstval + index + 1}")),
-                                              ),
-                                              const SizedBox(height: 3),
-                                              buttonForThisPage(),
-                                            ],
+                                          Container(
+                                            height: 30,
+                                            width: 130,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                  color: AppColors.black),
+                                            ),
+                                            child: Center(
+                                              child:
+                                                  Text(handleNullValue("50")),
+                                            ),
                                           ),
-                                          const SizedBox(width: 4),
-                                          const InkWell(
-                                            child: Icon(Icons.cloud,
-                                                color: AppColors.cardsgreen),
-                                          ),
+                                          const SizedBox(height: 3),
+                                          buttonForThisPage(),
                                         ],
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(DateTime.now().toString()),
+                                      const SizedBox(width: 4),
+                                      const InkWell(
+                                        child: Icon(
+                                          Icons.cloud,
+                                          color: AppColors.cardsgreen,
+                                        ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              )),
-                              DataCell(ElevatedButton(
-                                onPressed: () {
-                                  // Save action
-                                },
-                                child: const Text('Save All'),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 100,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child:
-                                      Text('Flipkart ${firstval + index + 1}'),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 100,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child:
-                                      Text('Snapdeal ${firstval + index + 1}'),
-                                ),
-                              )),
-                              DataCell(Container(
-                                constraints: const BoxConstraints(
-                                  maxWidth: 100,
-                                ),
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.vertical,
-                                  child: Text('Amazon ${firstval + index + 1}'),
-                                ),
-                              )),
-                            ],
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(DateTime.now().toString()),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          // ),
                         ),
-                      ),
-                    ],
-                  ),
+                        DataCell(ElevatedButton(
+                          onPressed: () {
+                            // Save action for individual item
+                          },
+                          child: const Text('Save'),
+                        )),
+                        DataCell(Text(
+                            handleNullValue(inventory.product?.flipkartLink))),
+                        DataCell(Text(
+                            handleNullValue(inventory.product?.snapdealLink))),
+                        DataCell(Text(
+                            handleNullValue(inventory.product?.amazonLink))),
+                      ],
+                    );
+                  }).toList(),
                 ),
               ),
-              const SizedBox(
-                height: 10,
-              ),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   InkWell(
-                    child: const FaIcon(
-                      FontAwesomeIcons.chevronLeft,
-                    ),
+                    child: const FaIcon(FontAwesomeIcons.chevronLeft),
                     onTap: () {
-                      // selectedPage = 1;
                       manageInventoryProvider.upDateSelectedPage(1);
-                      // setState(() {});
                     },
                   ),
                   Pagination(
                     numOfPages: manageInventoryProvider.numberofPages,
-                    selectedPage:manageInventoryProvider.selectedPage,
+                    selectedPage: manageInventoryProvider.selectedPage,
                     pagesVisible: 5,
                     spacing: 10,
                     onPageChanged: (page) {
-                      print("page is here $page");
-                      // setState(() {
-                        // firstval = (page - 1) * 5;
-                        // lastval = firstval + 5;
-                        manageInventoryProvider.upDateSelectedPage(page);
-                        // selectedPage = page;
-                      // });
-                      // setState(() {
-                        
-                      // });
+                      manageInventoryProvider.upDateSelectedPage(page);
                     },
                     nextIcon: const Icon(
                       Icons.chevron_right_rounded,
@@ -503,20 +404,16 @@ class _ManageInventoryState extends State<ManageInventory> {
                       backgroundColor:
                           MaterialStateProperty.all(AppColors.primaryBlue),
                       shape: MaterialStateProperty.all(const CircleBorder(
-                        side: BorderSide(
-                          color: AppColors.primaryBlue,
-                          width: 1,
-                        ),
+                        side:
+                            BorderSide(color: AppColors.primaryBlue, width: 1),
                       )),
                     ),
                     inactiveBtnStyle: ButtonStyle(
                       elevation: MaterialStateProperty.all(0),
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                       shape: MaterialStateProperty.all(const CircleBorder(
-                        side: BorderSide(
-                          color: AppColors.primaryBlue,
-                          width: 1,
-                        ),
+                        side:
+                            BorderSide(color: AppColors.primaryBlue, width: 1),
                       )),
                     ),
                     inactiveTextStyle: const TextStyle(
@@ -526,27 +423,24 @@ class _ManageInventoryState extends State<ManageInventory> {
                     ),
                   ),
                   InkWell(
-                    child: const FaIcon(
-                      FontAwesomeIcons.chevronRight,
-                    ),
+                    child: const FaIcon(FontAwesomeIcons.chevronRight),
                     onTap: () {
-                      // selectedPage = 10;
-                      manageInventoryProvider.upDateSelectedPage(manageInventoryProvider.numberofPages);
-                      // setState(() {});
+                      manageInventoryProvider.upDateSelectedPage(
+                          manageInventoryProvider.numberofPages);
                     },
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      height:30,
-                      width:50,
-                      decoration:BoxDecoration(
-                        border:Border.all(
-                          color:AppColors.lightBlue
-                        ),
-                        
+                      height: 30,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.lightBlue),
                       ),
-                      child:Center(child: Text('${manageInventoryProvider.selectedPage}/${manageInventoryProvider.numberofPages}')),
+                      child: Center(
+                        child: Text(
+                            '${manageInventoryProvider.selectedPage}/${manageInventoryProvider.numberofPages}'),
+                      ),
                     ),
                   ),
                 ],
@@ -564,12 +458,12 @@ class buttonForThisPage extends StatelessWidget {
   final double height;
   final String buttonTitle;
 
-  buttonForThisPage({
-    super.key,
+  const buttonForThisPage({
+    Key? key,
     this.width = 150,
     this.height = 30,
     this.buttonTitle = 'View Details',
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -578,9 +472,10 @@ class buttonForThisPage extends StatelessWidget {
       height: height,
       child: ElevatedButton(
         style: const ButtonStyle(
-            fixedSize: MaterialStatePropertyAll(Size(130, 7))),
+          fixedSize: MaterialStatePropertyAll(Size(130, 7)),
+        ),
         onPressed: () {
-          // Save action
+          // View details action
         },
         child: Text(buttonTitle),
       ),

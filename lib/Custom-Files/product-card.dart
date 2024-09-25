@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inventory_management/model/product_model.dart';
 
 class Product {
   final String sku;
@@ -26,6 +27,25 @@ class Product {
     required this.accUnit,
     required this.upcEan,
   });
+
+  // Add this method to handle JSON to Dart conversion
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      sku: json['sku'] ?? 'NA',
+      category: json['category'] ?? 'NA',
+      brand: json['brand'] ?? 'NA',
+      mrp: json['mrp'] ?? 'NA',
+      createdDate: json['createdDate'] ?? 'NA',
+      lastUpdated: json['lastUpdated'] ?? 'NA',
+      listedOn: (json['listedOn'] as List<dynamic>? ?? [])
+          .map((e) => e as String)
+          .toList(),
+      accSku: json['accSku'] ?? 'NA',
+      colour: json['colour'] ?? 'NA',
+      accUnit: json['accUnit'] ?? 'NA',
+      upcEan: json['upcEan'] ?? 'NA',
+    );
+  }
 }
 
 class ProductCard extends StatelessWidget {
@@ -111,12 +131,12 @@ class ProductCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'SKU: $sku',
+                'SKU: ${sku.isNotEmpty ? sku : 'NA'}',
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              Text('CATEGORY: $category'),
-              Text('BRAND: $brand'),
-              Text('MRP: $mrp'),
+              Text('CATEGORY: ${category.isNotEmpty ? category : 'NA'}'),
+              Text('BRAND: ${brand.isNotEmpty ? brand : 'NA'}'),
+              Text('MRP: ${mrp.isNotEmpty ? mrp : 'NA'}'),
             ],
           ),
         ),
@@ -125,10 +145,10 @@ class ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('ACC SKU: $accSku'),
-              Text('COLOUR: $colour'),
-              Text('ACC UNIT: $accUnit'),
-              Text('UPC/EAN: $upcEan'),
+              Text('ACC SKU: ${accSku.isNotEmpty ? accSku : 'NA'}'),
+              Text('COLOUR: ${colour.isNotEmpty ? colour : 'NA'}'),
+              Text('ACC UNIT: ${accUnit.isNotEmpty ? accUnit : 'NA'}'),
+              Text('UPC/EAN: ${upcEan.isNotEmpty ? upcEan : 'NA'}'),
             ],
           ),
         ),
@@ -137,8 +157,10 @@ class ProductCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('CREATED DATE: $createdDate'),
-              Text('LAST UPDATED: $lastUpdated'),
+              Text(
+                  'CREATED DATE: ${createdDate.isNotEmpty ? createdDate : 'NA'}'),
+              Text(
+                  'LAST UPDATED: ${lastUpdated.isNotEmpty ? lastUpdated : 'NA'}'),
             ],
           ),
         ),
@@ -151,18 +173,18 @@ class ProductCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'SKU: $sku',
+          'SKU: ${sku.isNotEmpty ? sku : 'NA'}',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        Text('CATEGORY: $category'),
-        Text('BRAND: $brand'),
-        Text('MRP: $mrp'),
-        Text('ACC SKU: $accSku'),
-        Text('COLOUR: $colour'),
-        Text('ACC UNIT: $accUnit'),
-        Text('UPC/EAN: $upcEan'),
-        Text('CREATED DATE: $createdDate'),
-        Text('LAST UPDATED: $lastUpdated'),
+        Text('CATEGORY: ${category.isNotEmpty ? category : 'NA'}'),
+        Text('BRAND: ${brand.isNotEmpty ? brand : 'NA'}'),
+        Text('MRP: ${mrp.isNotEmpty ? mrp : 'NA'}'),
+        Text('ACC SKU: ${accSku.isNotEmpty ? accSku : 'NA'}'),
+        Text('COLOUR: ${colour.isNotEmpty ? colour : 'NA'}'),
+        Text('ACC UNIT: ${accUnit.isNotEmpty ? accUnit : 'NA'}'),
+        Text('UPC/EAN: ${upcEan.isNotEmpty ? upcEan : 'NA'}'),
+        Text('CREATED DATE: ${createdDate.isNotEmpty ? createdDate : 'NA'}'),
+        Text('LAST UPDATED: ${lastUpdated.isNotEmpty ? lastUpdated : 'NA'}'),
       ],
     );
   }
