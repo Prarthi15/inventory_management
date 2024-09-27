@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:inventory_management/model/combo_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ComboApi with ChangeNotifier {
   final String baseUrl =
@@ -12,7 +13,6 @@ class ComboApi with ChangeNotifier {
   Future<void> createCombo(
       Combo combo, List<Uint8List>? images, List<String> imageNames) async {
     try {
-      // Get the token using the token retrieval method
       final token = await _getToken();
       if (token == null) {
         throw Exception("Authentication token is missing.");
@@ -20,12 +20,6 @@ class ComboApi with ChangeNotifier {
 
       var uri = Uri.parse('$baseUrl/combo');
       var request = http.MultipartRequest('POST', uri);
-
-      // Log the URL and method
-      debugPrint('Request URL: $uri');
-      debugPrint('Request Method: POST');
-
-      // Add authentication token in the header
       request.headers['Authorization'] = 'Bearer $token';
 
       // Add combo fields as text
@@ -35,21 +29,15 @@ class ComboApi with ChangeNotifier {
       request.fields['comboSku'] = combo.comboSku;
       request.fields['products'] = jsonEncode(combo.products);
 
-      debugPrint('Request Fields:');
-      debugPrint('name: ${combo.name}');
-      debugPrint('mrp: ${combo.mrp}');
-      debugPrint('cost: ${combo.cost}');
-      debugPrint('comboSku: ${combo.comboSku}');
-      debugPrint('products: ${jsonEncode(combo.products)}');
-
       // Attach selected images to the request
       if (images != null && images.isNotEmpty) {
         for (int i = 0; i < images.length; i++) {
           request.files.add(
             http.MultipartFile.fromBytes(
-              'images', // Ensure this matches your server's expected field name
+              'images',
               images[i],
               filename: imageNames[i],
+              contentType: MediaType('image', 'png'),
             ),
           );
           debugPrint('Added image: ${imageNames[i]}');
@@ -61,25 +49,26 @@ class ComboApi with ChangeNotifier {
       debugPrint('Response status: ${response.statusCode}');
 
       // Handle response
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
+        // Change this to check for 201
         print('Combo created successfully');
-        // Optionally, you can decode the response if your server returns any data
         var responseData = await http.Response.fromStream(response);
         print('Response Data: ${responseData.body}');
       } else {
-        // Handle the error based on status code
         print('Failed to create combo: ${response.statusCode}');
+        var responseData = await http.Response.fromStream(response);
+        debugPrint('Response Body: ${responseData.body}');
         throw Exception('Failed to create combo: ${response.statusCode}');
       }
     } catch (e) {
-      // Handle exceptions and provide feedback
       print('Error occurred: $e');
       throw Exception('Error creating combo: $e');
     }
   }
 
   // Get all combos
-  Future<List<Map<String, dynamic>>> getCombos() async {
+  Future<List<Map<String, dynamic>>> getCombos(
+      {int page = 1, int limit = 10}) async {
     try {
       final token = await _getToken();
       if (token == null) {
@@ -87,11 +76,11 @@ class ComboApi with ChangeNotifier {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/combo/'),
+        Uri.parse('$baseUrl/combo?page=$page&limit=$limit'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
-      print('Response status: ${response.statusCode}');
+      //print('Response status: ${response.statusCode}');
       //print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
@@ -101,12 +90,13 @@ class ComboApi with ChangeNotifier {
         // Handle different response structures here
         if (decodedResponse is List) {
           // If it's a list, return it directly
-          print("list");
+          //print("list");
           return List<Map<String, dynamic>>.from(decodedResponse);
         } else if (decodedResponse is Map) {
           // If it's a map, check if it contains the list under a specific key
-          print("map");
+          //print("map");
           final comboList = decodedResponse['combos'] as List<dynamic>? ?? [];
+          //print("comboList: $comboList");
           return List<Map<String, dynamic>>.from(comboList);
         } else {
           throw Exception('Unexpected JSON format');
@@ -120,7 +110,7 @@ class ComboApi with ChangeNotifier {
     }
   }
 
-  Future<List<dynamic>> getAllProducts() async {
+  Future<Map<String, dynamic>> getAllProducts() async {
     try {
       final token = await _getToken(); // Fetch token dynamically
 
@@ -139,11 +129,12 @@ class ComboApi with ChangeNotifier {
       //print('get products response: ${response.body}');
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body); // Return the list of products
+        return jsonDecode(response.body); // Return the full JSON response
       } else {
         throw Exception('Failed to load products: ${response.statusCode}');
       }
     } catch (error) {
+      print('Error in getAllProducts: $error');
       throw Exception('Error: $error');
     }
   }

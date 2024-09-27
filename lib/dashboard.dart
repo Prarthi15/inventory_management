@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/book_page.dart';
+import 'package:inventory_management/checker_page.dart';
 import 'package:inventory_management/combo_page.dart';
 import 'package:inventory_management/create-label-page.dart';
 import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/manifest_page.dart';
 import 'package:inventory_management/marketplace_page.dart';
 import 'package:inventory_management/order-page.dart';
+import 'package:inventory_management/packer_page.dart';
+import 'package:inventory_management/picker_page.dart';
+import 'package:inventory_management/orders_page.dart';
 
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
+import 'package:inventory_management/racked_page.dart';
 import 'package:inventory_management/show-label-page.dart';
 import 'Custom-Files/colors.dart';
 import 'package:inventory_management/product_manager.dart';
@@ -25,7 +31,6 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-
   String selectedDrawerItem = 'Dashboard';
 
   DateTime? lastUpdatedTime;
@@ -156,37 +161,37 @@ class _DashboardPageState extends State<DashboardPage> {
       children: <Widget>[
         Expanded(
           child: SingleChildScrollView(
-            scrollDirection:Axis.vertical,
+            scrollDirection: Axis.vertical,
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                      const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text(
-              'Katyayani',
-              style: TextStyle(
-                fontSize: 27,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primaryBlue,
-              ),
-            ),
-                      ),
-                      const SizedBox(height: 20),
-                      _buildDrawerItem(
-            icon: Icons.dashboard,
-            text: 'Dashboard',
-            isSelected: selectedDrawerItem == 'Dashboard',
-            onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
-                      ),
-                      _buildOrdersSection(isSmallScreen),
-                      _buildInventorySection(isSmallScreen),
-                      _buildMasterSection(isSmallScreen),
-                      _buildDrawerItem(
-            icon: Icons.analytics,
-            text: 'Accounting',
-            isSelected: selectedDrawerItem == 'Accounting',
-            onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
-                      ),
+                const Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text(
+                    'Katyayani',
+                    style: TextStyle(
+                      fontSize: 27,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primaryBlue,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildDrawerItem(
+                  icon: Icons.dashboard,
+                  text: 'Dashboard',
+                  isSelected: selectedDrawerItem == 'Dashboard',
+                  onTap: () => _onDrawerItemTapped('Dashboard', isSmallScreen),
+                ),
+                _buildOrdersSection(isSmallScreen),
+                _buildInventorySection(isSmallScreen),
+                _buildMasterSection(isSmallScreen),
+                _buildDrawerItem(
+                  icon: Icons.analytics,
+                  text: 'Accounting',
+                  isSelected: selectedDrawerItem == 'Accounting',
+                  onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
+                ),
               ],
             ),
           ),
@@ -215,7 +220,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-    Widget _buildOrdersSection(bool isSmallScreen) {
+  Widget _buildOrdersSection(bool isSmallScreen) {
     return Theme(
       data: ThemeData(
         dividerColor: Colors.transparent,
@@ -244,13 +249,25 @@ class _DashboardPageState extends State<DashboardPage> {
             ? const Color.fromRGBO(6, 90, 216, 0.1)
             : null,
         children: <Widget>[
-           Padding(
+          Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
               icon: Icons.menu_book,
               text: 'Order Page',
               isSelected: selectedDrawerItem == 'Order Page',
               onTap: () => _onDrawerItemTapped('Order Page', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: _buildDrawerItem(
+              icon: Icons.assignment_rounded,
+              text: 'Orders',
+              isSelected: selectedDrawerItem == 'Orders Page',
+              onTap: () => _onDrawerItemTapped('Orders Page', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -276,9 +293,8 @@ class _DashboardPageState extends State<DashboardPage> {
             child: _buildDrawerItem(
               icon: Icons.local_shipping,
               text: 'Picker',
-              isSelected: selectedDrawerItem == 'Picker',
-              onTap: () =>
-                  _onDrawerItemTapped('Picker', isSmallScreen),
+              isSelected: selectedDrawerItem == 'Picker Page',
+              onTap: () => _onDrawerItemTapped('Picker Page', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -289,8 +305,8 @@ class _DashboardPageState extends State<DashboardPage> {
             child: _buildDrawerItem(
               icon: Icons.backpack_rounded,
               text: 'Packer',
-              isSelected: selectedDrawerItem == 'Packer',
-              onTap: () => _onDrawerItemTapped('Packer', isSmallScreen),
+              isSelected: selectedDrawerItem == 'Packer Page',
+              onTap: () => _onDrawerItemTapped('Packer Page', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -301,20 +317,32 @@ class _DashboardPageState extends State<DashboardPage> {
             child: _buildDrawerItem(
               icon: Icons.check_circle,
               text: 'Checker',
-              isSelected: selectedDrawerItem == 'Checker',
-              onTap: () => _onDrawerItemTapped('Checker', isSmallScreen),
+              isSelected: selectedDrawerItem == 'Checker Page',
+              onTap: () => _onDrawerItemTapped('Checker Page', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
             ),
           ),
-            Padding(
+          Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
               icon: Icons.shelves,
               text: 'Racked',
-              isSelected: selectedDrawerItem == 'Racked',
-              onTap: () => _onDrawerItemTapped('Racked', isSmallScreen),
+              isSelected: selectedDrawerItem == 'Racked Page',
+              onTap: () => _onDrawerItemTapped('Racked Page', isSmallScreen),
+              isIndented: true,
+              iconSize: 20,
+              fontSize: 14,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10.0),
+            child: _buildDrawerItem(
+              icon: Icons.star_border,
+              text: 'Manifest',
+              isSelected: selectedDrawerItem == 'Manifest Page',
+              onTap: () => _onDrawerItemTapped('Manifest Page', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -421,7 +449,8 @@ class _DashboardPageState extends State<DashboardPage> {
               icon: Icons.production_quantity_limits,
               text: 'Create Label Page',
               isSelected: selectedDrawerItem == 'Create Label Page',
-              onTap: () => _onDrawerItemTapped('Create Label Page', isSmallScreen),
+              onTap: () =>
+                  _onDrawerItemTapped('Create Label Page', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -474,7 +503,8 @@ class _DashboardPageState extends State<DashboardPage> {
               icon: Icons.add_business,
               text: 'Marketplace Master',
               isSelected: selectedDrawerItem == 'Marketplace Master',
-              onTap: () => _onDrawerItemTapped('Marketplace Master', isSmallScreen),
+              onTap: () =>
+                  _onDrawerItemTapped('Marketplace Master', isSmallScreen),
               isIndented: true,
               iconSize: 20,
               fontSize: 14,
@@ -555,7 +585,7 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildMainContent(String selectedDrawerItem, bool isSmallScreen) {
     switch (selectedDrawerItem) {
       case 'Dashboard':
-      // return Products();
+        // return Products();
         return _buildDashboardContent(isSmallScreen);
       case 'Sales Orders':
         return const Center(child: Text("Sales Orders content goes here"));
@@ -567,11 +597,23 @@ class _DashboardPageState extends State<DashboardPage> {
         return const ManageInventory();
       case 'Order Page':
         return const OrdersPage();
+      case 'Orders Page':
+        return const OrdersNewPage();
       case 'Book Page':
         return const BookPage();
+      case 'Picker Page':
+        return const PickerPage();
+      case 'Packer Page':
+        return const PackerPage();
+      case 'Checker Page':
+        return const CheckerPage();
+      case 'Racked Page':
+        return const RackedPage();
+      case 'Manifest Page':
+        return const ManifestPage();
       case 'Product Master':
         return const ProductDashboardPage();
-       case 'Create Label Page':
+      case 'Create Label Page':
         return const CreateLabelPage();
       case 'Label Page':
         return const LabelPage();

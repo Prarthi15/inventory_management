@@ -24,7 +24,6 @@ class MarketplaceProvider with ChangeNotifier {
   Product? get selectedProduct => _selectedProduct;
   bool get loading => _loading;
 
-
   final marketplaceApi = MarketplaceApi();
   final comboApi = ComboApi();
 
@@ -63,18 +62,35 @@ class MarketplaceProvider with ChangeNotifier {
     }
   }
 
-Future<void> fetchProducts() async {
+  Future<void> fetchProducts() async {
     _loading = true;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to show loading state
     try {
       final api = ComboApi();
-      final productList = await api.getAllProducts();
-      _products = productList.map<Product>((json) => Product.fromJson(json)).toList();
-    } catch (e) {
-      // Handle errors
+
+      // Fetch the full response (which contains the 'products' array)
+      final response = await api.getAllProducts();
+
+      // Extract the 'products' array from the response
+      final productList = response['products'];
+
+      // Print raw productList for debugging
+      print("productList in provider: $productList");
+
+      // Map the 'products' array into the Product model list
+      _products =
+          productList.map<Product>((json) => Product.fromJson(json)).toList();
+
+      // Print the mapped products for debugging
+      print("products in provider: $_products");
+    } catch (e, stacktrace) {
+      // Log error details
+      print('Error fetching products: $e');
+      print('Stacktrace: $stacktrace');
+    } finally {
+      _loading = false; // Stop loading once the process is done
+      notifyListeners(); // Notify listeners to hide loading state and update UI
     }
-    _loading = false;
-    notifyListeners();
   }
 
   void selectProduct(Product product) {
@@ -148,47 +164,47 @@ Future<void> fetchProducts() async {
   }
 
   // Save the marketplace
- Future<void> saveMarketplace() async {
-  isSaving = true; // Start saving
-  notifyListeners(); // Notify UI to show progress indicator
+  Future<void> saveMarketplace() async {
+    isSaving = true; // Start saving
+    notifyListeners(); // Notify UI to show progress indicator
 
-  // Validate SKU maps
-  final invalidSkuMaps = skuMaps.where((skuMap) => skuMap.mktpSku.isEmpty).toList();
+    // Validate SKU maps
+    final invalidSkuMaps =
+        skuMaps.where((skuMap) => skuMap.mktpSku.isEmpty).toList();
 
-  if (invalidSkuMaps.isNotEmpty) {
-    // Show an error message or handle invalid data
-    print('Error: Some SKU maps are missing the mktp_sku.');
-    
-    // Stop saving if there are invalid SKU maps
-    isSaving = false;
-    notifyListeners();
-    return; // Exit early if invalid data
+    if (invalidSkuMaps.isNotEmpty) {
+      // Show an error message or handle invalid data
+      print('Error: Some SKU maps are missing the mktp_sku.');
+
+      // Stop saving if there are invalid SKU maps
+      isSaving = false;
+      notifyListeners();
+      return; // Exit early if invalid data
+    }
+
+    // Prepare the new marketplace data
+    final newMarketplace = Marketplace(
+      name: nameController.text,
+      skuMap: List.from(skuMaps), // Create a copy of SKU maps
+    );
+
+    try {
+      // API call to save the marketplace
+      await marketplaceApi.createMarketplace(newMarketplace);
+
+      // Fetch the updated list of marketplaces
+      await fetchMarketplaces();
+
+      // Reset form and clear inputs after successful save
+      toggleForm(); // Hide the form after saving
+      skuMaps.clear();
+      nameController.clear();
+    } catch (e) {
+      // Handle any errors
+      print('Error creating marketplace: $e');
+    } finally {
+      isSaving = false; // Stop saving
+      notifyListeners(); // Notify UI to hide progress indicator
+    }
   }
-
-  // Prepare the new marketplace data
-  final newMarketplace = Marketplace(
-    name: nameController.text,
-    skuMap: List.from(skuMaps), // Create a copy of SKU maps
-  );
-
-  try {
-    // API call to save the marketplace
-    await marketplaceApi.createMarketplace(newMarketplace);
-
-    // Fetch the updated list of marketplaces
-    await fetchMarketplaces();
-
-    // Reset form and clear inputs after successful save
-    toggleForm(); // Hide the form after saving
-    skuMaps.clear();
-    nameController.clear();
-  } catch (e) {
-    // Handle any errors
-    print('Error creating marketplace: $e');
-  } finally {
-    isSaving = false; // Stop saving
-    notifyListeners(); // Notify UI to hide progress indicator
-  }
-}
-
 }

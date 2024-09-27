@@ -48,8 +48,20 @@ class MarketplaceApi {
     final response = await http.get(Uri.parse(baseUrl), headers: headers);
 
     if (response.statusCode == 200) {
-      final List<dynamic> marketplaceJson = jsonDecode(response.body);
-      return marketplaceJson.map((json) => Marketplace.fromJson(json)).toList();
+      // Decode the response as a Map (JSON object)
+      final Map<String, dynamic> responseJson = jsonDecode(response.body);
+
+      // Access the 'marketplaces' list within the 'data' field
+      if (responseJson.containsKey('data') &&
+          responseJson['data'].containsKey('marketplaces')) {
+        final List<dynamic> marketplaceJson =
+            responseJson['data']['marketplaces'];
+        return marketplaceJson
+            .map((json) => Marketplace.fromJson(json))
+            .toList();
+      } else {
+        throw Exception('Expected "marketplaces" field not found in response');
+      }
     } else {
       throw Exception('Failed to load marketplaces: ${response.body}');
     }
