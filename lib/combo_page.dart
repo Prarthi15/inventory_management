@@ -125,6 +125,8 @@ class _ComboPageState extends State<ComboPage> {
               getDropValue(); // Generate the dropdown items
             }
 
+            print(items);
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -453,4 +455,28 @@ class _ComboPageState extends State<ComboPage> {
       // ),
     );
   }
+}
+
+class CustomDropdownItem<T> extends DropdownItem<T> {
+  CustomDropdownItem({
+    required String label,
+    required T value,
+    bool disabled = false,
+    bool selected = false,
+  }) : super(
+          label: label,
+          value: value,
+          disabled: disabled,
+          selected: selected,
+        );
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is CustomDropdownItem<T> && other.value == value;
+  }
+
+  @override
+  int get hashCode => value.hashCode;
 }

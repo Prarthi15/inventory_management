@@ -127,6 +127,7 @@ class ComboProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // fetch products
   Future<void> fetchProducts() async {
     _loading = true;
     notifyListeners(); // Notify listeners to show loading state

@@ -13,6 +13,7 @@ class ComboApi with ChangeNotifier {
   Future<void> createCombo(
       Combo combo, List<Uint8List>? images, List<String> imageNames) async {
     try {
+      // Get the token using the token retrieval method
       final token = await _getToken();
       if (token == null) {
         throw Exception("Authentication token is missing.");
