@@ -282,13 +282,25 @@ class CreateAccountFormState extends State<CreateAccountForm> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     try {
-      await authProvider.registerOtp(_email!, _otpController.text,_password!);
-      setState(() {
-        _isOtpVerified = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('OTP verified successfully!')),
-      );
+      // Call the OTP verification method and await the result
+      final result = await authProvider.registerOtp(
+          _email!, _otpController.text, _password!);
+
+      // Check if the response indicates success
+      if (result['success'] == true) {
+        setState(() {
+          _isOtpVerified = true;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('OTP verified successfully!')),
+        );
+      } else {
+        // Handle the case where OTP verification fails
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Incorrect OTP. Please try again.')),
+        );
+      }
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to verify OTP: $error')),
@@ -547,10 +559,6 @@ class CreateAccountFormState extends State<CreateAccountForm> {
       ),
     );
   }
-
- 
-
- 
 
   void _register() async {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
