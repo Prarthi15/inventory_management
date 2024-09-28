@@ -5,22 +5,16 @@ import 'package:inventory_management/book_page.dart';
 import 'package:inventory_management/checker_page.dart';
 import 'package:inventory_management/combo_page.dart';
 import 'package:inventory_management/label_upload.dart';
-<<<<<<< HEAD
-=======
 import 'package:inventory_management/create-label-page.dart';
->>>>>>> f473345096dc5995656ea73ea052460f71878895
 import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/manifest_page.dart';
 import 'package:inventory_management/marketplace_page.dart';
 import 'package:inventory_management/order-page.dart';
 import 'package:inventory_management/product_upload.dart';
-<<<<<<< HEAD
-=======
 import 'package:inventory_management/packer_page.dart';
 import 'package:inventory_management/picker_page.dart';
 import 'package:inventory_management/orders_page.dart';
->>>>>>> f473345096dc5995656ea73ea052460f71878895
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
