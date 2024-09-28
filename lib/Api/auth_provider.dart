@@ -308,7 +308,6 @@ class AuthProvider with ChangeNotifier {
       // print('Create Category Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-            
         return {'success': true, 'data': json.decode(response.body)};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);
@@ -555,7 +554,7 @@ class AuthProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Include the token here
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode(body),
       );
@@ -566,6 +565,7 @@ class AuthProvider with ChangeNotifier {
         throw Exception('Failed to create warehouse: ${response.statusCode}');
       }
     } catch (e) {
+      print('Error occurred while creating product: $e');
       throw Exception('Error creating warehouse: $e');
     }
   }
@@ -648,9 +648,11 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 201) {
         return 'Product created successfully!';
       } else {
+        print('Response: ${response.body}');
         return 'Failed to create product. Status code: ${response.statusCode}\nResponse: ${response.body}';
       }
     } catch (e) {
+      print('Error occurred while creating product: $e');
       return 'Error occurred while creating product: $e';
     }
   }
