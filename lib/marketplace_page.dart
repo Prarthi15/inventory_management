@@ -151,7 +151,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
             const Text(
               'Existing Marketplaces:',
               style: TextStyle(
-                fontSize: 22,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),
@@ -175,13 +175,18 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
                       return Card(
                         margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
-                        elevation: 4,
+                            vertical: 12, horizontal: 16),
+                        elevation:
+                            6, // Enhanced shadow for better card visibility
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              // Marketplace title with delete option
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -189,13 +194,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
                                   Text(
                                     marketplace.name,
                                     style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
                                   ),
                                   IconButton(
-                                    icon: const Icon(Icons.delete),
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.blueGrey),
                                     onPressed: () {
-                                      // Confirm deletion
+                                      // Confirm deletion dialog
                                       showDialog(
                                         context: context,
                                         builder: (BuildContext context) {
@@ -214,11 +222,12 @@ class _MarketplacePageState extends State<MarketplacePage> {
                                               TextButton(
                                                 onPressed: () {
                                                   provider.deleteMarketplace(
-                                                      marketplace
-                                                          .id!); // Implement delete method
+                                                      marketplace.id!);
                                                   Navigator.of(context).pop();
                                                 },
-                                                child: const Text('Delete'),
+                                                child: const Text('Delete',
+                                                    style: TextStyle(
+                                                        color: Colors.red)),
                                               ),
                                             ],
                                           );
@@ -229,43 +238,97 @@ class _MarketplacePageState extends State<MarketplacePage> {
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+
+                              // Products within the marketplace
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: marketplace.skuMap.map((skuMap) {
                                   final product = skuMap.product;
+
+                                  // Fetch the product image if it exists
+                                  final imageUrl =
+                                      (product?.images as List<dynamic>?)
+                                                  ?.isNotEmpty ==
+                                              true
+                                          ? product!.images![0]
+                                          : null;
+
                                   return Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'SKU: ${skuMap.mktpSku}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                    padding: const EdgeInsets.only(right: 12.0),
+                                    child: Card(
+                                      elevation: 3,
+                                      margin: const EdgeInsets.only(top: 8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // Display product image or a placeholder icon if no image is found
+                                            imageUrl != null
+                                                ? Image.network(
+                                                    imageUrl,
+                                                    width: 80,
+                                                    height: 80,
+                                                    fit: BoxFit.cover,
+                                                    errorBuilder: (context,
+                                                            error,
+                                                            stackTrace) =>
+                                                        const Icon(Icons.image,
+                                                            size: 80,
+                                                            color: Colors.grey),
+                                                  )
+                                                : const Icon(Icons.image,
+                                                    size: 80,
+                                                    color: Colors.grey),
+
+                                            const SizedBox(width: 12),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  'SKU: ${skuMap.mktpSku}',
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black87,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Text(
+                                                  'Product Name: ${product?.displayName ?? 'Unknown'}',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: product != null
+                                                        ? Colors.black87
+                                                        : Colors.grey,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  'Product SKU: ${product?.sku ?? 'N/A'}',
+                                                  style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: product != null
+                                                        ? Colors.black54
+                                                        : Colors.grey,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Product: ${product?.displayName ?? 'Unknown'}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          'Product SKU: ${product?.sku ?? 'N/A'}',
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ],
+                                      ),
                                     ),
                                   );
                                 }).toList(),
+                              ),
+                              const SizedBox(
+                                width: 8,
                               ),
                             ],
                           ),
@@ -278,6 +341,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ),
           ],
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Call the method to fetch marketplaces
+          Provider.of<MarketplaceProvider>(context, listen: false)
+              .fetchMarketplaces();
+        },
+        backgroundColor: Colors.blue,
+        tooltip: 'Fetch Marketplaces',
+        child: const Icon(Icons.refresh),
       ),
     );
   }
