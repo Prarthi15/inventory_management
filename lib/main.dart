@@ -18,34 +18,53 @@ import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/provider/category_provider.dart';
 import 'package:inventory_management/provider/combo_provider.dart';
+import 'package:inventory_management/provider/label_data_provider.dart';
 import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
-import 'package:inventory_management/provider/show-details-order-provider.dart';
+import 'package:inventory_management/provider/product_data_provider.dart';
+import 'package:inventory_management/reset_password.dart';
+import 'package:inventory_management/provider/orders_provider.dart';
+import 'package:inventory_management/provider/picker_provider.dart';
+import 'package:inventory_management/provider/packer_provider.dart';
+import 'package:inventory_management/provider/checker_provider.dart';
+import 'package:inventory_management/provider/racked_provider.dart';
+import 'package:inventory_management/provider/manifest_provider.dart';
+import 'package:inventory_management/provider/checker_provider.dart';
+import 'package:inventory_management/provider/location_provider.dart';
+import 'package:inventory_management/provider/manage-inventory-provider.dart';
 import 'package:inventory_management/show-label-page.dart';
-
 import 'package:provider/provider.dart';
+
 // import 'package:inventory_management/create_account.dart';
 // prarthi2474@gmail.com
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider(create:(context)=>LabelApi()),
+      ChangeNotifierProvider(create: (context) => LabelApi()),
       ChangeNotifierProvider(create: (context) => AuthProvider()),
       ChangeNotifierProvider(create: (context) => CheckBoxProvider()),
       ChangeNotifierProvider(create: (context) => ManagementProvider()),
-      
-      ChangeNotifierProvider(create: (context)=>LabelPageApi()),
+
+      ChangeNotifierProvider(create: (context) => LabelPageApi()),
       ChangeNotifierProvider(create: (context) => MarketplaceProvider()),
       ChangeNotifierProvider(create: (context) => BookProvider()),
       ChangeNotifierProvider(create: (context) => ProductProvider()),
       ChangeNotifierProvider(create: (context) => ComboProvider()),
-      ChangeNotifierProvider(create: (context) => OrderItemProvider()),
+      ChangeNotifierProvider(create: (context) => PickerProvider()),
+      ChangeNotifierProvider(create: (context) => PackerProvider()),
+      ChangeNotifierProvider(create: (context) => CheckerProvider()),
+      ChangeNotifierProvider(create: (context) => ManifestProvider()),
+      ChangeNotifierProvider(create: (context) => RackedProvider()),
+      ChangeNotifierProvider(create: (context) => OrdersProvider()),
+      // ChangeNotifierProvider(create: (context) => CheckBoxProvider()),
       ChangeNotifierProvider(
         create: (context) => LocationProvider(
             authProvider: Provider.of<AuthProvider>(context, listen: false)),
       ),
       ChangeNotifierProvider(create: (context) => CategoryProvider()),
+      ChangeNotifierProvider(create: (context) => ProductDataProvider()),
+      ChangeNotifierProvider(create: (context) => LabelDataProvider()),
     ],
     child: const MyApp(),
   ));
@@ -72,9 +91,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-
-      home:Home(),
-
+      home: Home(),
     );
   }
 }
@@ -87,7 +104,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
- AuthProvider? authprovider;
+  AuthProvider? authprovider;
   @override
   void initState() {
     // TODO: implement initState
@@ -101,24 +118,23 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     // var prov=Provider.of<AuthProvider>(context,listen:true);
-     
+
     return Consumer<AuthProvider>(
-      builder:(context,authprovider, child)=>FutureBuilder<String?>(
-        future:authprovider.getToken(),
-         builder:(context,snap){
-          if(snap.connectionState==ConnectionState.waiting){
-            return const CircularProgressIndicator();
-          }else if(snap.hasData){
-            if(authprovider.isAuthenticated){
-              return const DashboardPage();
-            }else{
+      builder: (context, authprovider, child) => FutureBuilder<String?>(
+          future: authprovider.getToken(),
+          builder: (context, snap) {
+            if (snap.connectionState == ConnectionState.waiting) {
+              return const CircularProgressIndicator();
+            } else if (snap.hasData) {
+              if (authprovider.isAuthenticated) {
+                return const DashboardPage();
+              } else {
+                return const LoginPage();
+              }
+            } else {
               return const LoginPage();
             }
-          }else {
-            return const LoginPage();
-          }
-         } 
-         ),
+          }),
       // home: const LoginPage(),
       // routes: {
       //   '/login': (context) => const LoginPage(),

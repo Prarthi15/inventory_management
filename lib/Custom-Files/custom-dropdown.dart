@@ -4,6 +4,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 // import 'package:inventory_management/Api/auth_provider.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Api/products-provider.dart';
 import 'package:provider/provider.dart';
 

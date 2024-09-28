@@ -17,6 +17,9 @@ class ComboPage extends StatefulWidget {
 }
 
 class _ComboPageState extends State<ComboPage> {
+  int currentPage = 1;
+  int totalCombos = 0;
+
   Product? product;
   ComboProvider? comboProvider;
   final _idController = TextEditingController();
@@ -26,8 +29,9 @@ class _ComboPageState extends State<ComboPage> {
   final _costController = TextEditingController();
 
   //final productController = MultiSelectController<String>();
- 
+
   late final MultiSelectController<String> productController;
+  List<DropdownItem<String>> items = [];
 
   void _clearFormFields() {
     _idController.clear();
@@ -42,7 +46,6 @@ class _ComboPageState extends State<ComboPage> {
     ComboProvider comboProvider =
         Provider.of<ComboProvider>(context, listen: false);
 
-    // Get the selected product IDs directly from the dropdown's selections
     List<String?> selectedProductIds =
         comboProvider.selectedProducts.map((product) => product.id).toList();
 
@@ -73,33 +76,62 @@ class _ComboPageState extends State<ComboPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      comboProvider = Provider.of<ComboProvider>(context, listen: false);
-
+      final comboProvider = Provider.of<ComboProvider>(context, listen: false);
+      comboProvider.fetchCombos(page: currentPage, limit: 10);
+      //comboProvider.fetchProducts();
       productController = MultiSelectController<String>();
-      // print(1);
-      // print(object)
       getDropValue();
+      // print(1);
     });
   }
 
+  // Function to load more combos
+  void loadMoreCombos() async {
+    currentPage++;
+    final comboProvider = Provider.of<ComboProvider>(context, listen: false);
+    await comboProvider.fetchCombos(page: currentPage, limit: 10);
+  }
+
   void getDropValue() async {
-    await comboProvider!.fetchCombos();
-    await comboProvider!.fetchProducts();
-    print("new style");
-    for (int i = 0; i < comboProvider!.products.length; i++) {
-      print("heello i am divyansh");
-      comboProvider!.addItem('$i:${comboProvider!.products[i].displayName}', comboProvider!.products[i].id);
-      // items.add(DropdownItem<String>(
-      //   label: '$i:${comboProvider!.products[i].displayName}',
-      //   value: comboProvider!.products[i].id,
-      // ));
+    await Provider.of<ComboProvider>(context, listen: false).fetchProducts();
+    print("getDropValue");
+
+    List<DropdownItem<String>> newItems = [];
+    ComboProvider comboProvider =
+        Provider.of<ComboProvider>(context, listen: false);
+
+    for (int i = 0; i < comboProvider.products.length; i++) {
+      newItems.add(DropdownItem<String>(
+        label: '$i: ${comboProvider.products[i].displayName ?? 'Unknown'}',
+        value: comboProvider.products[i].id,
+      ));
     }
 
-    print("length of it is here ${comboProvider!.item.length}");
-    // setState(() {
-  
-    // });
+    //print("items in drop down: $newItems");
+
+    setState(() {
+      items = newItems;
+    });
   }
+
+  // void getDropValue() async {
+  //   await comboProvider!.fetchCombos();
+  //   await comboProvider!.fetchProducts();
+  //   print("new style");
+  //   for (int i = 0; i < comboProvider!.products.length; i++) {
+  //     print("heello i am divyansh");
+  //     comboProvider!.addItem('$i:${comboProvider!.products[i].displayName}', comboProvider!.products[i].id);
+  //     // items.add(DropdownItem<String>(
+  //     //   label: '$i:${comboProvider!.products[i].displayName}',
+  //     //   value: comboProvider!.products[i].id,
+  //     // ));
+  //   }
+
+  //   print("length of it is here ${comboProvider!.item.length}");
+  //   // setState(() {
+  
+  //   // });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +140,11 @@ class _ComboPageState extends State<ComboPage> {
         padding: const EdgeInsets.all(16.0),
         child: Consumer<ComboProvider>(
           builder: (context, comboProvider, child) {
-            // print("hete i am $items");
+            if (comboProvider.products.isNotEmpty && items.isEmpty) {
+              getDropValue(); // Generate the dropdown items
+            }
+
+            print(items);
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,46 +157,45 @@ class _ComboPageState extends State<ComboPage> {
                 ),
                 if (comboProvider.isFormVisible) ...[
                   const SizedBox(height: 16),
-                  // TextField(
-                  //   controller: _idController,
-                  //   decoration: const InputDecoration(labelText: 'ID'),
-                  // ),
-                  const SizedBox(height: 16),
+
                   TextField(
                     controller: _nameController,
                     decoration: const InputDecoration(labelText: 'Name'),
                   ),
                   const SizedBox(height: 16),
-                  MultiDropdown<String>(
-                    items:comboProvider.item,
-                    controller: productController,
-                    searchEnabled: true,
-                    chipDecoration: const ChipDecoration(
-                      backgroundColor: Colors.yellow,
-                      wrap: true,
-                      runSpacing: 2,
-                      spacing: 10,
-                    ),
-                    fieldDecoration: FieldDecoration(
-                      hintText: 'Select Products',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.grey),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Colors.black87),
-                      ),
-                    ),
-                    dropdownDecoration: const DropdownDecoration(
-                      maxHeight: 500,
-                    ),
-                    onSelectionChange: (selectedItems) {
-                      debugPrint(
-                          'Selected items (product IDs): $selectedItems');
-                      comboProvider.selectProductsByIds(selectedItems);
-                    },
-                  ),
+                  items.isEmpty
+                      ? const CircularProgressIndicator() // Show loading if items are not ready
+                      : MultiDropdown<String>(
+                          items: items,
+                          controller: productController,
+                          searchEnabled: true,
+                          chipDecoration: const ChipDecoration(
+                            backgroundColor: Colors.yellow,
+                            wrap: true,
+                            runSpacing: 2,
+                            spacing: 10,
+                          ),
+                          fieldDecoration: FieldDecoration(
+                            hintText: 'Select Products',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.grey),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide:
+                                  const BorderSide(color: Colors.black87),
+                            ),
+                          ),
+                          dropdownDecoration: const DropdownDecoration(
+                            maxHeight: 500,
+                          ),
+                          onSelectionChange: (selectedItems) {
+                            debugPrint(
+                                'Selected items (product IDs): $selectedItems');
+                            comboProvider.selectProductsByIds(selectedItems);
+                          },
+                        ),
 
                   const SizedBox(height: 16),
                   TextField(
@@ -244,7 +279,7 @@ class _ComboPageState extends State<ComboPage> {
                   const Text(
                     'Existing Combos:',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
                     ),
@@ -259,51 +294,119 @@ class _ComboPageState extends State<ComboPage> {
                         itemCount: comboProvider.combosList.length,
                         itemBuilder: (context, index) {
                           final combo = comboProvider.combosList[index];
+                          final images =
+                              combo['images'] as List<dynamic>? ?? [];
                           final products =
-                              (combo['products'] as List<dynamic>?) ?? [];
+                              combo['products'] as List<dynamic>? ?? [];
+
                           return Card(
-                            margin: const EdgeInsets.symmetric(vertical: 8),
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 16),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Name: ${combo['name'] ?? 'N/A'}'),
-                                  Text('MRP: ${combo['mrp'] ?? 'N/A'}'),
-                                  Text('Cost: ${combo['cost'] ?? 'N/A'}'),
-                                  Text('SKU: ${combo['sku'] ?? 'N/A'}'),
-                                  if (products.isNotEmpty) ...[
+                                  Row(
+                                    children: [
+                                      Text(
+                                        combo['name'] ?? 'N/A',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'MRP: ₹${combo['mrp'] ?? 'N/A'}',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.grey[700]),
+                                  ),
+                                  Text(
+                                    'Cost: ₹${combo['cost'] ?? 'N/A'}',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.grey[700]),
+                                  ),
+                                  Text(
+                                    'SKU: ${combo['comboSku'] ?? 'N/A'}',
+                                    style: TextStyle(
+                                        fontSize: 16, color: Colors.grey[700]),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  if (images.isNotEmpty) ...[
+                                    const Text(
+                                      'Images:',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
                                     const SizedBox(height: 8),
-                                    const Text('Products:'),
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: images.map((imageUrl) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(8.0),
+                                              child: Image.network(
+                                                imageUrl,
+                                                width: 100,
+                                                height: 100,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                  if (products.isNotEmpty) ...[
+                                    const Text(
+                                      'Products:',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
                                     Column(
                                       children: products.map((product) {
-                                        // Ensure that 'image' field exists and is a list of URLs.
-                                        final imageUrl = (product['images']
-                                                        as List<dynamic>?)
-                                                    ?.isNotEmpty ==
-                                                true
-                                            ? product['images'][0]
-                                            : null;
-
                                         return ListTile(
-                                          leading: imageUrl != null
-                                              ? Image.network(
-                                                  imageUrl,
-                                                  width: 50,
-                                                  height: 50,
-                                                  fit: BoxFit.cover,
-                                                )
-                                              : const Icon(
-                                                  Icons.image,
-                                                  size: 50,
-                                                  color: Colors.grey,
-                                                ),
                                           title: Text(
-                                              product['displayName'] ?? 'N/A'),
+                                            product['displayName']
+                                                    ?.toString() ??
+                                                'No Name Available',
+                                            style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500),
+                                          ),
                                           subtitle: Text(
-                                              'SKU: ${product['sku'] ?? 'N/A'}'),
+                                            'SKU: ${product['sku']?.toString() ?? 'No SKU Available'}',
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey[600]),
+                                          ),
                                         );
                                       }).toList(),
+                                    ),
+                                  ] else ...[
+                                    const Text(
+                                      'No products available for this combo.',
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.grey),
                                     ),
                                   ],
                                 ],
@@ -312,8 +415,48 @@ class _ComboPageState extends State<ComboPage> {
                           );
                         },
                       ),
+                    )
+                  else if (!comboProvider.loading &&
+                      comboProvider.combosList.isEmpty) ...[
+                    const Text(
+                      'No combos available.',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
                     ),
-                ],
+                  ],
+                  // Pagination Controls
+                  if (!comboProvider.loading &&
+                      comboProvider.combosList.isNotEmpty) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: ElevatedButton(
+                            onPressed: currentPage > 1
+                                ? () {
+                                    setState(() {
+                                      currentPage--;
+                                    });
+                                    loadMoreCombos();
+                                  }
+                                : null,
+                            child: const Text('Previous'),
+                          ),
+                        ),
+                        Text('Page $currentPage'),
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              loadMoreCombos();
+                            },
+                            child: const Text('Next'),
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ]
 
                 // Do not touch this code - End
               ],
@@ -321,6 +464,14 @@ class _ComboPageState extends State<ComboPage> {
           },
         ),
       ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     Provider.of<ComboProvider>(context, listen: false).fetchCombos();
+      //   },
+      //   backgroundColor: Colors.blue,
+      //   tooltip: 'Fetch Combos',
+      //   child: const Icon(Icons.refresh),
+      // ),
     );
   }
 }

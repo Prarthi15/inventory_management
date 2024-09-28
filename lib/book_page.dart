@@ -100,7 +100,6 @@ class BookPage extends StatelessWidget {
                     child: DataTable(
                       dataRowHeight: 300,
                       columnSpacing: 30.0,
-                      showCheckboxColumn:false,
                       columns: [
                         // DataColumn with checkbox to select/deselect all products
                         DataColumn(
@@ -157,9 +156,6 @@ class BookPage extends StatelessWidget {
                         bookProvider.selectedProducts.length,
                         (index) => DataRow(
                           selected: bookProvider.selectedProducts[index],
-                           onSelectChanged: (selected) {
-                              Navigator.push(context,MaterialPageRoute(builder:(context)=>  ShowDetailsOfOrderItem(numberOfItme:const [30,20], title:const ["title 1","title 2"],)));
-                             },
                           cells: [
                             // Checkbox for each row
                             DataCell(

@@ -17,6 +17,12 @@ class ComboProvider with ChangeNotifier {
   List<Product> _selectedProducts = [];
   bool _loading = false;
 
+
+  // Pagination state variables
+  int _currentPage = 1; // Track current page
+  int _totalPages = 1; // Track total pages (comes from API)
+  int _limit = 10; // Default limit per page (you can change this as needed)
+
   Combo? get combo => _combo;
   bool get isFormVisible => _isFormVisible;
   List<Combo> get comboList => _comboList;
@@ -32,7 +38,7 @@ class ComboProvider with ChangeNotifier {
   List<String> imageNames = [];
 
   ComboProvider() {
-    _loadCombos();
+    fetchCombos();
   }
 
   // Toggles the visibility of the combo creation form
@@ -93,11 +99,12 @@ class ComboProvider with ChangeNotifier {
     }
   }
 
-  Future<void> fetchCombos() async {
+  Future<void> fetchCombos({int page = 1, int limit = 10}) async {
     _loading = true;
     notifyListeners();
     try {
-      _combosList = await comboApi.getCombos();
+      _combosList = await comboApi.getCombos(page: page, limit: limit);
+      //print("comboProvider.combosList : $_combosList");
     } catch (e) {
       print('Error fetching combos: $e');
     }
@@ -135,26 +142,33 @@ class ComboProvider with ChangeNotifier {
   // fetch products
   Future<void> fetchProducts() async {
     _loading = true;
-    notifyListeners();
+    notifyListeners(); // Notify listeners to show loading state
     try {
       final api = ComboApi();
-      final productList = await api.getAllProducts();
+
+      // Fetch the full response (which contains the 'products' array)
+      final response = await api.getAllProducts();
+
+      // Extract the 'products' array from the response
+      final productList = response['products'];
+
+      // Print raw productList for debugging
+      //print("productList in provider: $productList");
+
+      // Map the 'products' array into the Product model list
       _products =
           productList.map<Product>((json) => Product.fromJson(json)).toList();
 
-      /*
-    // Print the IDs of the fetched products
-    print('Fetched product IDs:');
-    for (var product in _products) {
-    print(product.id); // Ensure 'id' is a valid field in your Product class
+      // Print the mapped products for debugging
+      //print("products in provider: $_products");
+    } catch (e, stacktrace) {
+      // Log error details
+      print('Error fetching products: $e');
+      print('Stacktrace: $stacktrace');
+    } finally {
+      _loading = false; // Stop loading once the process is done
+      notifyListeners(); // Notify listeners to hide loading state and update UI
     }
-      */
-
-    } catch (e) {
-      // Handle errors
-    }
-    _loading = false;
-    notifyListeners();
   }
 
   // void selectProducts(List<Product> products) {
@@ -162,9 +176,10 @@ class ComboProvider with ChangeNotifier {
   //   notifyListeners();
   // }
 
-    // Method to select products by IDs
+  // Method to select products by IDs
   void selectProductsByIds(List<String?> productIds) {
-    _selectedProducts = _products.where((product) => productIds.contains(product.id)).toList();
+    _selectedProducts =
+        _products.where((product) => productIds.contains(product.id)).toList();
     notifyListeners();
   }
 }

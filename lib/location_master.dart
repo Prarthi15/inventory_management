@@ -49,7 +49,7 @@ class _LocationMasterState extends State<LocationMaster> {
         children: [
           if (!locationProvider.isCreatingNewLocation)
             _buildButtonRow(context, buttonWidth, buttonHeight, fontSize),
-          const SizedBox(height: 30),
+          const SizedBox(height: 10),
           locationProvider.isCreatingNewLocation
               ? const NewLocationForm()
               : _buildMainTable(context),
@@ -112,30 +112,45 @@ class _LocationMasterState extends State<LocationMaster> {
   Widget _buildMainTable(BuildContext context) {
     final locationProvider = Provider.of<LocationProvider>(context);
 
-    //column names
+    // Column names
     final columnNames = [
-      'Location Name',
-      'Location Key',
-      'City',
-      'State',
-      'Country',
-      'Zip',
-      'Holds Stock',
-      'Copy Master from Primary',
+      'Warehouse Name',
+      'Warehouse Key',
+      'Location',
+      'Warehouse Pincode',
+      'Pincodes',
     ];
 
-    //rows data
+    // Rows data
     final rowsData = locationProvider.warehouses.map((warehouse) {
+      String location;
+      if (warehouse['location'] is String) {
+        location = warehouse['location'];
+      } else if (warehouse['location'] is Map) {
+        // Extract from billingAddress
+        final billingAddress = warehouse['location']['billingAddress'];
+        final country = billingAddress['country'] ?? 'N/A';
+        final state = billingAddress['state'] ?? 'N/A';
+        final city = billingAddress['city'] ?? 'N/A';
+        location = '$city, $state, $country';
+      } else {
+        location = 'N/A';
+      }
+      String pincodeList;
+      if (warehouse['pincode'] is List) {
+        pincodeList = warehouse['pincode'].join(', ');
+      } else if (warehouse['pincode'] is String) {
+        pincodeList = warehouse['pincode'];
+      } else {
+        pincodeList = 'N/A';
+      }
+
       return {
-        'Location Name': warehouse['locationName'] ?? 'N/A',
-        'Location Key': warehouse['locationKey'] ?? 'N/A',
-        'City': warehouse['city'] ?? 'N/A',
-        'State': warehouse['state'] ?? 'N/A',
-        'Country': warehouse['country'] ?? 'N/A',
-        'Zip': warehouse['zip'] ?? 'N/A',
-        'Holds Stock': (warehouse['holdsStock'] ?? false) ? 'Yes' : 'No',
-        'Copy Master from Primary':
-            (warehouse['copyMasterSkuFromPrimary'] ?? false) ? 'Yes' : 'No',
+        'Warehouse Name': warehouse['name'] ?? 'N/A',
+        'Warehouse Key': warehouse['_id'] ?? 'N/A',
+        'Location': location,
+        'Warehouse Pincode': warehouse['warehousePincode'] ?? 'N/A',
+        'Pincodes': pincodeList,
       };
     }).toList();
 
@@ -168,11 +183,14 @@ class _LocationMasterState extends State<LocationMaster> {
                         ),
                       ),
                     ),
+                    onChanged: (value) {
+                      locationProvider.filterWarehouses(value);
+                    },
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             CustomDataTable(
               columnNames: columnNames,
               rowsData: rowsData,
