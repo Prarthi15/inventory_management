@@ -40,6 +40,7 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
   Widget build(BuildContext context) {
     final categoryProvider = Provider.of<CategoryProvider>(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
       backgroundColor: AppColors.lightGrey,
       body: Padding(
@@ -177,21 +178,28 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
                     ],
                   ),
             const SizedBox(height: 24.0),
-            Expanded(
-              child: ListView.builder(
-                itemCount: categoryProvider.categories.length,
-                itemBuilder: (context, index) {
-                  return CategoryCard(
-                    category: categoryProvider.categories[index],
-                    isSmallScreen: isSmallScreen,
-                    cardColor: AppColors.white,
-                    shadowColor: AppColors.shadowblack1,
-                    elevation: 3,
-                    borderRadius: 12,
-                  );
-                },
+
+            // Display Loader when fetching data
+            if (categoryProvider.isFetching)
+              Center(
+                child: CircularProgressIndicator(),
+              )
+            else
+              Expanded(
+                child: ListView.builder(
+                  itemCount: categoryProvider.categories.length,
+                  itemBuilder: (context, index) {
+                    return CategoryCard(
+                      category: categoryProvider.categories[index],
+                      isSmallScreen: isSmallScreen,
+                      cardColor: AppColors.white,
+                      shadowColor: AppColors.shadowblack1,
+                      elevation: 3,
+                      borderRadius: 12,
+                    );
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),

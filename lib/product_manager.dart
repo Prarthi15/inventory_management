@@ -8,20 +8,19 @@ import 'Custom-Files/product-card.dart';
 import 'Custom-Files/filter-section.dart';
 
 class ProductDashboardPage extends StatefulWidget {
-  const ProductDashboardPage({super.key});
+  const ProductDashboardPage({Key? key}) : super(key: key);
 
   @override
   _ProductDashboardPageState createState() => _ProductDashboardPageState();
 }
 
 class _ProductDashboardPageState extends State<ProductDashboardPage> {
-  final int _itemsPerPage = 10;
-  final int _totalItems = 50;
+  final int _itemsPerPage = 20;
   final List<Product> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
   bool _showCreateProduct = false;
-  int _page = 0;
+  int _currentPage = 1;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -51,41 +50,54 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
 
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final response = await authProvider.getAllProducts();
+      final response = await authProvider.getAllProducts(
+          page: _currentPage, itemsPerPage: _itemsPerPage);
 
       if (response['success']) {
         final List<dynamic> productData = response['data'];
         final newProducts = productData.map((data) {
           return Product(
-              sku: data['sku'] ?? '-',
-              category: data['category'] ?? '-',
-              brand: data['brand'] ?? '-',
-              mrp: data['mrp']?.toString() ?? '-',
-              createdDate: data['createdAt'] ?? '-',
-              lastUpdated: data['updatedAt'] ?? '-',
-              accSku: data['parentSku'] ?? '-',
-              colour: data['colour'] ?? '-',
-              upcEan: data['ean'] ?? '-');
+            sku: data['sku'] ?? '-',
+            category: data['category'] ?? '-',
+            brand: data['brand'] ?? '-',
+            mrp: data['mrp']?.toString() ?? '-',
+            createdDate: data['createdAt'] ?? '-',
+            lastUpdated: data['updatedAt'] ?? '-',
+            accSku: data['parentSku'] ?? '-',
+            colour: data['colour'] ?? '-',
+            upcEan: data['ean'] ?? '-',
+            displayName: data['displayName'] ?? '-',
+            parentSku: data['parentSku'] ?? '-',
+            ean: data['ean'] ?? '-',
+            description: data['description'] ?? '-',
+            technicalName: data['technicalName'] ?? '-',
+            weight: data['weight']?.toString() ?? '-',
+            cost: data['cost']?.toString() ?? '-',
+            tax_rule: data['tax_rule'] ?? '-',
+            grade: data['grade'] ?? '-',
+            shopifyImage: data['shopifyImage'] ?? '-',
+          );
         }).toList();
 
         setState(() {
           _products.addAll(newProducts);
-          _isLoading = false;
-          _hasMore = _products.length < _totalItems;
-          _page++;
+          _hasMore = newProducts.length == _itemsPerPage;
+          if (_hasMore) {
+            _currentPage++;
+          }
         });
       } else {
-        // Handle API failure (e.g., show an error message)
         setState(() {
-          _isLoading = false;
           _hasMore = false;
         });
       }
     } catch (error) {
-      // Handle exceptions or network errors
+      setState(() {
+        _hasMore = false;
+      });
+    } finally {
       setState(() {
         _isLoading = false;
-        _hasMore = false;
       });
     }
   }
@@ -99,85 +111,86 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       body: Row(
         children: [
           // Sidebar
-          !_showCreateProduct
-              ? ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: isWideScreen ? 240 : 200,
-                    minHeight: MediaQuery.of(context).size.height,
-                  ),
-                  child: Container(
-                    color: Colors.grey[200],
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Search...',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                          ),
+          if (!_showCreateProduct)
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isWideScreen
+                    ? 240
+                    : MediaQuery.of(context).size.width * 0.5,
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Container(
+                color: Colors.grey[200],
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8.0),
                         ),
-                        const SizedBox(height: 16),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                FilterSection(
-                                  title: 'Category',
-                                  items: const [
-                                    'NPK Fertilizer',
-                                    'Hydroponic Nutrients',
-                                    'Chemical product',
-                                    'Organic Pest Control',
-                                    'Lure & Traps',
-                                  ],
-                                  searchQuery: _searchQuery,
-                                ),
-                                FilterSection(
-                                  title: 'Brand',
-                                  items: const [
-                                    'Katyayani Organics',
-                                    'Katyayani',
-                                    'KATYAYNI',
-                                    'Samarthaa (Bulk)',
-                                    'quinalphos 25%ec',
-                                  ],
-                                  searchQuery: _searchQuery,
-                                ),
-                                FilterSection(
-                                  title: 'Product Type',
-                                  items: const [
-                                    'Simple Products',
-                                    'Products with Variants',
-                                    'Virtual Combos',
-                                    'Physical Combos(Kits)',
-                                  ],
-                                  searchQuery: _searchQuery,
-                                ),
-                                FilterSection(
-                                  title: 'Colour',
-                                  items: const [
-                                    'NA',
-                                    'shown an image',
-                                    'Multicolour',
-                                    '0',
-                                  ],
-                                  searchQuery: _searchQuery,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                )
-              : const SizedBox(),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FilterSection(
+                              title: 'Category',
+                              items: const [
+                                'NPK Fertilizer',
+                                'Hydroponic Nutrients',
+                                'Chemical product',
+                                'Organic Pest Control',
+                                'Lure & Traps',
+                              ],
+                              searchQuery: _searchQuery,
+                            ),
+                            FilterSection(
+                              title: 'Brand',
+                              items: const [
+                                'Katyayani Organics',
+                                'Katyayani',
+                                'KATYAYNI',
+                                'Samarthaa (Bulk)',
+                                'quinalphos 25%ec',
+                              ],
+                              searchQuery: _searchQuery,
+                            ),
+                            FilterSection(
+                              title: 'Product Type',
+                              items: const [
+                                'Simple Products',
+                                'Products with Variants',
+                                'Virtual Combos',
+                                'Physical Combos(Kits)',
+                              ],
+                              searchQuery: _searchQuery,
+                            ),
+                            FilterSection(
+                              title: 'Colour',
+                              items: const [
+                                'NA',
+                                'shown an image',
+                                'Multicolour',
+                                '0',
+                              ],
+                              searchQuery: _searchQuery,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           // Main Content
           Expanded(
             child: Container(
@@ -185,29 +198,41 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  !_showCreateProduct
-                      ? ElevatedButton(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (!_showCreateProduct)
+                        ElevatedButton(
                           onPressed: () {
-                            _showCreateProduct = !_showCreateProduct;
-                            print("here is show product $_showCreateProduct");
-                            setState(() {});
+                            setState(() {
+                              _showCreateProduct = !_showCreateProduct;
+                            });
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primaryBlue),
                           child: const Text('Create Products'),
                         )
-                      : CustomButton(
+                      else
+                        CustomButton(
                           width: 40,
                           height: 40,
                           onTap: () {
-                            _showCreateProduct = !_showCreateProduct;
-                            //  print("here is show product $_showCreateProduct");
-                            setState(() {});
+                            setState(() {
+                              _showCreateProduct = !_showCreateProduct;
+                            });
                           },
                           color: AppColors.lightBlue,
                           textColor: AppColors.black,
                           fontSize: 12,
-                          text: 'Back'),
+                          text: 'Back',
+                        ),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Total Products: ${_products.length}',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   Expanded(
                     child: !_showCreateProduct
@@ -230,15 +255,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                                 }
                                 final product = _products[index];
                                 return ProductCard(
-                                  sku: product.sku,
-                                  category: product.category,
-                                  brand: product.brand,
-                                  mrp: product.mrp,
-                                  createdDate: product.createdDate,
-                                  lastUpdated: product.lastUpdated,
-                                  accSku: product.accSku,
-                                  colour: product.colour,
-                                  upcEan: product.upcEan,
+                                  product: product,
                                 );
                               },
                             ),

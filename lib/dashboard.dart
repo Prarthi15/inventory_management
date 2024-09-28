@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/combo_page.dart';
+import 'package:inventory_management/label_upload.dart';
 import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/order-page.dart';
-import 'package:inventory_management/product_display.dart';
+import 'package:inventory_management/product_upload.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
@@ -187,11 +188,18 @@ class _DashboardPageState extends State<DashboardPage> {
                   onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
                 ),
                 _buildDrawerItem(
-                  icon: Icons.production_quantity_limits,
-                  text: 'View Product',
-                  isSelected: selectedDrawerItem == 'View Product',
+                  icon: Icons.upload_file,
+                  text: 'Upload Products',
+                  isSelected: selectedDrawerItem == 'Upload Products',
                   onTap: () =>
-                      _onDrawerItemTapped('View Product', isSmallScreen),
+                      _onDrawerItemTapped('Upload Products', isSmallScreen),
+                ),
+                _buildDrawerItem(
+                  icon: Icons.new_label,
+                  text: 'Upload Labels',
+                  isSelected: selectedDrawerItem == 'Upload Labels',
+                  onTap: () =>
+                      _onDrawerItemTapped('Upload Labels', isSmallScreen),
                 ),
               ],
             ),
@@ -433,8 +441,10 @@ class _DashboardPageState extends State<DashboardPage> {
         return const LocationMaster();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
-      case 'View Product':
+      case 'Upload Products':
         return const ProductDataDisplay();
+      case 'Upload Labels':
+        return const LabelUpload();
       case 'Settings':
         return const Center(child: Text("Settings content goes here"));
       default:
