@@ -189,14 +189,10 @@ class _ManageInventoryState extends State<ManageInventory> {
                     Text('Filters', style: AppColors().simpleHeadingStyle),
                     Container(
                       height: 80,
-                      // width: 300,
                       decoration: BoxDecoration(
                           border: Border.all(
                               color: AppColors.black.withOpacity(0.2)),
-                          borderRadius: BorderRadius.circular(10)
-                          // color:Colors.amber
-                          // color: Colors.amberAccent,
-                          ),
+                          borderRadius: BorderRadius.circular(10)),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: SizedBox(
