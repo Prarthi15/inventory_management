@@ -212,6 +212,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                               backgroundColor: AppColors.primaryBlue),
                           child: const Text('Create Products'),
                         )
+
                       else
                         CustomButton(
                           width: 40,
@@ -233,6 +234,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 16),
                   Expanded(
                     child: !_showCreateProduct
