@@ -22,8 +22,6 @@ class _ManageInventoryState extends State<ManageInventory> {
     return value ?? 'NA';
   }
 
-  int _nextQuantity = 1;
-
   @override
   Widget build(BuildContext context) {
     var manageInventoryProvider = Provider.of<ManagementProvider>(context);

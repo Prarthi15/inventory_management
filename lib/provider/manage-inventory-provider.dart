@@ -92,8 +92,10 @@ class ManagementProvider extends ChangeNotifier {
       print('Full Response from API: $response');
 
       // Check if the response contains 'inventories' key
-      if (response.containsKey('inventories')) {
-        List<dynamic>? inventories = response['inventories'] as List<dynamic>?;
+      if (response['data'] != null &&
+          response['data'].containsKey('inventories')) {
+        List<dynamic>? inventories =
+            response['data']['inventories'] as List<dynamic>?;
 
         // Check if inventories list is null or empty
         if (inventories == null || inventories.isEmpty) {
