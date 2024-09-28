@@ -11,10 +11,13 @@ class CategoryProvider with ChangeNotifier {
   final TextEditingController searchController = TextEditingController();
   final TextEditingController categoryNameController = TextEditingController();
 
+  // Getters
   List<String> get categories => _filteredCategories;
-
   bool get isCreatingCategory => _isCreatingCategory;
   bool get isSearchMode => _isSearchMode;
+
+  // Add this getter to access `_isFetching`
+  bool get isFetching => _isFetching;
 
   Future<void> fetchAllCategories() async {
     List<String> allCategories = [];
