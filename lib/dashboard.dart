@@ -26,7 +26,7 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
 
-  String selectedDrawerItem = 'Dashboard';
+  String selectedDrawerItem = 'Create Label Page';
 
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();

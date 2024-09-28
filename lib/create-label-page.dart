@@ -17,6 +17,7 @@ class CreateLabelPage extends StatefulWidget {
 }
 
 class _CreateLabelPageState extends State<CreateLabelPage> {
+  
   // final TextEditingController _nameController = TextEditingController();
   // final TextEditingController _labelSkuController = TextEditingController();
   // final TextEditingController _imageController = TextEditingController();
@@ -25,6 +26,7 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
   // final TextEditingController _quantityController = TextEditingController();
   LabelPageApi ? labelPageProvider;
   // final ScrollController controller = ScrollController();
+  final GlobalKey<DropdownSearchState<String>> _dropdownKey = GlobalKey<DropdownSearchState<String>>();
 
   // void _resetFields() {
   //   _nameController.clear();
@@ -46,7 +48,7 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
           backgroundColor: Colors.green,
         ),
       );
-      labelPageProvider!.clearControllers();
+      labelPageProvider!.clearControllers(_dropdownKey);
       labelPageProvider!.buttonTapStatus();
     } else {
       throw res["res"];
@@ -91,7 +93,7 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
         scrolledUnderElevation: 0,
       ),
       body:Consumer<LabelPageApi>(
-        builder:(context,pro,child)=>labelPageProvider!.isloading? ResponsiveLayout(
+        builder:(context,pro,child)=>true? ResponsiveLayout(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: ScrollConfiguration(
@@ -107,7 +109,7 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
                     _buildCardTextField(labelPageProvider!.imageController, "Image URL"),
                     _buildCardTextField(labelPageProvider!.descriptionController, "Description"),
                     // _buildCardTextField(_productIdController, "Product ID"),
-                    dropDown(),
+                    // dropDown(),
                     _buildCardTextField(
                       labelPageProvider!.quantityController,
                       "Quantity",
@@ -117,7 +119,7 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildRoundedButton("Reset", Colors.grey,labelPageProvider!.clearControllers),
+                        _buildRoundedButton("Reset", Colors.grey,(){labelPageProvider!.clearControllers(_dropdownKey);}),
                         _buildRoundedButton(
                             "Save", Colors.blueAccent, _saveLabel,loader:true),
                       ],
@@ -177,6 +179,12 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
       curve: Curves.easeInOut,
       child: ElevatedButton(
         onPressed:!(labelPageProvider!.buttonTap )?onPressed:null,
+        // onPressed:(){
+        //   _dropdownKey.currentState?.clear();
+        //   // Key("dipu").clearButtonProps();
+        //   // dip;
+
+        // },
         style: ElevatedButton.styleFrom(
           backgroundColor: color,
           shape: RoundedRectangleBorder(
@@ -310,13 +318,15 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
   return DropdownButtonHideUnderline(
     child: Card(
       elevation: 10,
-      child: DropdownSearch<String>(
+      child: DropdownSearch<String>.multiSelection(
+        key:_dropdownKey,
         dropdownDecoratorProps: DropDownDecoratorProps(
           baseStyle: GoogleFonts.daiBannaSil(
             fontWeight: FontWeight.bold,
             fontSize: 18,
             color: Colors.blueAccent,
           ),
+          
           dropdownSearchDecoration: InputDecoration(
             labelText: 'Product Name: ',
             labelStyle: GoogleFonts.daiBannaSil(
@@ -340,8 +350,7 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
             .entries
             .map((entry) => "${entry.key}:${entry.value['displayName'] as String? ?? 'null value'}")
             .toList(),
-        selectedItem: "Select a product",
-        popupProps: PopupProps.menu(
+        popupProps: PopupPropsMultiSelection.menu(
           menuProps: MenuProps(
             elevation: 10,
             barrierColor: Colors.transparent.withOpacity(0.5),
@@ -367,7 +376,7 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
               ),
             );
           },
-          showSelectedItems: true,
+          showSelectedItems:false,
           showSearchBox: true,
           searchFieldProps: TextFieldProps(
             decoration: InputDecoration(
@@ -398,17 +407,29 @@ class _CreateLabelPageState extends State<CreateLabelPage> {
           ),
           scrollbarProps: const ScrollbarProps(),
         ),
-        onChanged: (String? newValue) {
-          if (newValue != null && newValue != "Select a product") {
-            List<String> parts = newValue.split(':');
+        // onChanged: (String? newValue) {
+        //   if (newValue != null && newValue != "Select a product") {
+        //     List<String> parts = newValue.split(':');
+        //     int selectedIndex = int.parse(parts[0]);
+        //     String displayName = parts[1];
+            
+            
+        //     labelPageProvider!.updateSelectedIndex(selectedIndex);
+        //     // var selectedProduct = labelPageProvider!.productDeatils[selectedIndex];
+        //     // print("Full product details: $selectedProduct");
+        //   }
+        // },
+        onChanged:(arr){
+          labelPageProvider!.selectedListIndexClear();
+          List<int>index=[];
+          List<String>data=[];
+          for(String a in arr){
+            data.add(a);
+            List<String> parts = a.split(':');
             int selectedIndex = int.parse(parts[0]);
-            String displayName = parts[1];
-            
-            
-            labelPageProvider!.updateSelectedIndex(selectedIndex);
-            // var selectedProduct = labelPageProvider!.productDeatils[selectedIndex];
-            // print("Full product details: $selectedProduct");
+            index.add(selectedIndex);
           }
+          labelPageProvider!.updateSelectedIndex(index);
         },
       ),
     ),

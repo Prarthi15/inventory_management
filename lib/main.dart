@@ -20,6 +20,7 @@ import 'package:inventory_management/provider/category_provider.dart';
 import 'package:inventory_management/provider/combo_provider.dart';
 import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
+import 'package:inventory_management/provider/show-details-order-provider.dart';
 import 'package:inventory_management/show-label-page.dart';
 
 import 'package:provider/provider.dart';
@@ -39,7 +40,7 @@ void main() {
       ChangeNotifierProvider(create: (context) => BookProvider()),
       ChangeNotifierProvider(create: (context) => ProductProvider()),
       ChangeNotifierProvider(create: (context) => ComboProvider()),
-      // ChangeNotifierProvider(create: (context) => CheckBoxProvider()),
+      ChangeNotifierProvider(create: (context) => OrderItemProvider()),
       ChangeNotifierProvider(
         create: (context) => LocationProvider(
             authProvider: Provider.of<AuthProvider>(context, listen: false)),
