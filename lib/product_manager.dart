@@ -212,6 +212,10 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                               backgroundColor: AppColors.primaryBlue),
                           child: const Text('Create Products'),
                         )
+<<<<<<< HEAD
+=======
+
+>>>>>>> f473345096dc5995656ea73ea052460f71878895
                       else
                         CustomButton(
                           width: 40,
@@ -233,6 +237,10 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                       ),
                     ],
                   ),
+<<<<<<< HEAD
+=======
+
+>>>>>>> f473345096dc5995656ea73ea052460f71878895
                   const SizedBox(height: 16),
                   Expanded(
                     child: !_showCreateProduct
