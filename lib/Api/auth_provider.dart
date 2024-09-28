@@ -11,6 +11,7 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _isAuthenticated;
   Future<Map<String, dynamic>> register(String email, String password) async {
     final url = Uri.parse('$_baseUrl/register');
+   
 
     try {
       final response = await http.post(
@@ -129,8 +130,8 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.setString('authToken', token);
+
   }
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {

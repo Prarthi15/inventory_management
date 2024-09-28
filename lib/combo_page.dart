@@ -114,6 +114,25 @@ class _ComboPageState extends State<ComboPage> {
     });
   }
 
+  // void getDropValue() async {
+  //   await comboProvider!.fetchCombos();
+  //   await comboProvider!.fetchProducts();
+  //   print("new style");
+  //   for (int i = 0; i < comboProvider!.products.length; i++) {
+  //     print("heello i am divyansh");
+  //     comboProvider!.addItem('$i:${comboProvider!.products[i].displayName}', comboProvider!.products[i].id);
+  //     // items.add(DropdownItem<String>(
+  //     //   label: '$i:${comboProvider!.products[i].displayName}',
+  //     //   value: comboProvider!.products[i].id,
+  //     // ));
+  //   }
+
+  //   print("length of it is here ${comboProvider!.item.length}");
+  //   // setState(() {
+  
+  //   // });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

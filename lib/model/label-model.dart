@@ -3,7 +3,7 @@ class LabelModel {
   String labelSku;
   String image;
   String description;
-  String productId;
+  List<Map<String, String>> products; 
   int quantity;
 
   LabelModel({
@@ -11,19 +11,19 @@ class LabelModel {
     required this.labelSku,
     required this.image,
     required this.description,
-    required this.productId,
+    required this.products,
     required this.quantity,
   });
 
   // Factory method to create a LabelModel instance from JSON
   factory LabelModel.fromJson(Map<String, dynamic> json) {
     return LabelModel(
-      name: json['name'],
-      labelSku: json['labelSku'],
-      image: json['image'],
-      description: json['description'],
-      productId: json['product_id'],
-      quantity: json['quantity'],
+      name: json['name'] as String,
+      labelSku: json['labelSku'] as String,
+      image: json['image'] as String,
+      description: json['description'] as String,
+      products: List<Map<String, String>>.from(json['products'] ?? []), 
+      quantity: json['quantity'] as int,
     );
   }
 
@@ -34,7 +34,7 @@ class LabelModel {
       'labelSku': labelSku,
       'image': image,
       'description': description,
-      'product_id': productId,
+      'products':products, 
       'quantity': quantity,
     };
   }

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:inventory_management/model/combo_model.dart';
 import 'package:inventory_management/Api/combo_api.dart';
+import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -10,10 +11,12 @@ class ComboProvider with ChangeNotifier {
   Combo? _combo;
   bool _isFormVisible = false;
   List<Combo> _comboList = [];
-
+  List<DropdownItem<String>> _items = [];
+  List<DropdownItem<String>> get item=>_items;
   List<Product> _products = [];
   List<Product> _selectedProducts = [];
   bool _loading = false;
+
 
   // Pagination state variables
   int _currentPage = 1; // Track current page
@@ -44,9 +47,18 @@ class ComboProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Sets the current combo and notifies listeners
   void setCombo(Combo combo) {
     _combo = combo;
+    notifyListeners();
+  }
+
+
+  // Sets the current combo and notifies listeners
+  void addItem(String label,String value) {
+    // _combo = combo;
+    _items.add(DropdownItem<String>(label: label, value: value));
+
+    print("item len  ${_items.length}");
     notifyListeners();
   }
 

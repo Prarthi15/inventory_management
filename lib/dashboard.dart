@@ -2,8 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:inventory_management/book_page.dart';
-import 'package:inventory_management/checker_page.dart';
 import 'package:inventory_management/combo_page.dart';
+import 'package:inventory_management/create-label-page.dart';
+import 'package:inventory_management/location_master.dart';
+import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/marketplace_page.dart';
+import 'package:inventory_management/order-page.dart';
+
+import 'package:inventory_management/products.dart';
+import 'package:inventory_management/category_master.dart';
+import 'package:inventory_management/dashboard_cards.dart';
+import 'package:inventory_management/checker_page.dart';
 import 'package:inventory_management/label_upload.dart';
 import 'package:inventory_management/create-label-page.dart';
 import 'package:inventory_management/location_master.dart';
@@ -32,7 +41,8 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String selectedDrawerItem = 'Dashboard';
+
+  String selectedDrawerItem = 'Create Label Page';
 
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
