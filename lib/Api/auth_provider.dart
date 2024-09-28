@@ -316,7 +316,6 @@ class AuthProvider with ChangeNotifier {
       // print('Create Category Response Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-            
         return {'success': true, 'data': json.decode(response.body)};
       } else if (response.statusCode == 400) {
         final errorResponse = json.decode(response.body);
@@ -372,8 +371,10 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> getAllProducts() async {
-    final url = Uri.parse('$_baseUrl/products');
+  Future<Map<String, dynamic>> getAllProducts(
+      {int page = 1, int itemsPerPage = 10}) async {
+    // Append query parameters for pagination (page number and items per page)
+    final url = Uri.parse('$_baseUrl/products?page=$page&limit=$itemsPerPage');
 
     try {
       final token = await getToken();
@@ -385,48 +386,46 @@ class AuthProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Include token in headers
+          'Authorization': 'Bearer $token',
         },
       );
 
       print('Get All Products Response: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body) as List<dynamic>;
+        final List<dynamic> data = json.decode(response.body)['products'];
 
-        // Extract only required fields
+        // Extract required fields and log them
         final products = data.map((product) {
-          return {
+          final extractedProduct = {
+            'id': product['_id'] ?? '-',
+            'displayName': product['displayName'] ?? '-',
             'parentSku': product['parentSku'] ?? '-',
             'sku': product['sku'] ?? '-',
             'ean': product['ean'] ?? '-',
-            'brand': product['brand'] ?? '-',
-            'category': product['category'] ?? '-',
+            'description': product['description'] ?? '-',
+            'technicalName': product['technicalName'] ?? '-',
+            'tax_rule': product['tax_rule'] ?? '-',
+            'weight': product['weight'] ?? '-',
             'mrp': product['mrp']?.toString() ?? '-',
+            'cost': product['cost']?.toString() ?? '-',
+            'grade': product['grade'] ?? '-',
+            'shopifyImage': product['shopifyImage'] ?? '-',
             'createdAt': product['createdAt'] ?? '-',
             'updatedAt': product['updatedAt'] ?? '-',
           };
-        }).toList();
 
-        // Print each product's required fields
-        for (var product in products) {
-          print('Parent SKU: ${product['parentSku']}');
-          print('SKU: ${product['sku']}');
-          print('EAN: ${product['ean']}');
-          print('Brand: ${product['brand']}');
-          print('Category: ${product['category']}');
-          print('MRP: ${product['mrp']}');
-          print('Created At: ${product['createdAt']}');
-          print('Updated At: ${product['updatedAt']}');
-          print('-----------------------------------');
-        }
+          // Print each product's required fields
+          print('Product Details: $extractedProduct');
+          return extractedProduct;
+        }).toList();
 
         return {'success': true, 'data': products};
       } else {
         return {
           'success': false,
           'message':
-              'Failed to load products. Status code: ${response.statusCode}'
+              'Failed to load products. Status code: ${response.statusCode}',
         };
       }
     } catch (error) {
@@ -456,46 +455,40 @@ class AuthProvider with ChangeNotifier {
       print('Get All Warehouses Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body) as List<dynamic>;
+        final data =
+            json.decode(response.body)['data']['warehouses'] as List<dynamic>;
 
         // Extract the required fields for each warehouse
         final warehouses = data.map((warehouse) {
-          final location =
-              warehouse['location'] ?? {}; // Access the 'location' object
-          final billingAddress =
-              location['billingAddress'] ?? {}; // Access 'billingAddress'
-
+          final pincodeList = warehouse['pincode'] as List<dynamic>? ?? [];
           return {
-            'locationName': warehouse['name'] ?? '-', // Warehouse name
-            'locationKey': warehouse['_id'] ?? '-', // Warehouse ID
-            'city': billingAddress['city'] ?? '-', // City from billingAddress
-            'state':
-                billingAddress['state'] ?? '-', // State from billingAddress
-            'country':
-                billingAddress['country'] ?? '-', // Country from billingAddress
-            'zip': billingAddress['zipCode'] ?? '-', // Zip from billingAddress
-            'holdsStock': location['holdStocks'] ?? false, // Holds stock flag
-            'copyMasterFromPrimary': location['copyMasterSkuFromPrimary'] ??
-                false, // Copy Master flag
+            'name': warehouse['name'] ?? '-',
+            '_id': warehouse['_id'] ?? '-',
+            'location': warehouse['location'] ?? '-',
+            'warehousePincode': warehouse['warehousePincode'] ?? '-',
+            'pincode': pincodeList.isNotEmpty ? pincodeList.join(', ') : '-',
+            'createdAt': warehouse['createdAt'] ?? '-',
+            'updatedAt': warehouse['updatedAt'] ?? '-',
           };
         }).toList();
 
-        // Print the data in the terminal
+        // Print the data for debugging
         for (var warehouse in warehouses) {
           print('--- Warehouse ---');
-          print('Location Name: ${warehouse['locationName']}');
-          print('Location Key: ${warehouse['locationKey']}');
-          print('City: ${warehouse['city']}');
-          print('State: ${warehouse['state']}');
-          print('Country: ${warehouse['country']}');
-          print('Zip: ${warehouse['zip']}');
-          print('Holds Stock: ${warehouse['holdsStock'] ? "Yes" : "No"}');
-          print(
-              'Copy Master from Primary: ${warehouse['copyMasterFromPrimary'] ? "Yes" : "No"}');
+          print('Name: ${warehouse['name']}');
+          print('ID: ${warehouse['_id']}');
+          print('Location: ${warehouse['location']}');
+          print('Warehouse Pincode: ${warehouse['warehousePincode']}');
+          print('Pincode List: ${warehouse['pincode']}');
+          print('Created At: ${warehouse['createdAt']}');
+          print('Updated At: ${warehouse['updatedAt']}');
           print('------------------');
         }
 
-        return {'success': true, 'data': warehouses};
+        return {
+          'success': true,
+          'data': {'warehouses': warehouses}
+        };
       } else {
         return {
           'success': false,
@@ -569,7 +562,7 @@ class AuthProvider with ChangeNotifier {
         url,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token', // Include the token here
+          'Authorization': 'Bearer $token',
         },
         body: jsonEncode(body),
       );
@@ -580,6 +573,7 @@ class AuthProvider with ChangeNotifier {
         throw Exception('Failed to create warehouse: ${response.statusCode}');
       }
     } catch (e) {
+      print('Error occurred while creating product: $e');
       throw Exception('Error creating warehouse: $e');
     }
   }
@@ -643,6 +637,55 @@ class AuthProvider with ChangeNotifier {
     } catch (error) {
       print('Error: $error'); // Debugging line
       return {'success': false, 'message': 'An error occurred'};
+    }
+  }
+
+  Future<String?> createProduct(Map<String, dynamic> productData) async {
+    final url = Uri.parse('$_baseUrl/products/');
+    try {
+      final token = await getToken();
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(productData),
+      );
+
+      if (response.statusCode == 201) {
+        return 'Product created successfully!';
+      } else {
+        print('Response: ${response.body}');
+        return 'Failed to create product. Status code: ${response.statusCode}\nResponse: ${response.body}';
+      }
+    } catch (e) {
+      print('Error occurred while creating product: $e');
+      return 'Error occurred while creating product: $e';
+    }
+  }
+
+  Future<String?> createLabel(Map<String, dynamic> labelData) async {
+    final url = Uri.parse('$_baseUrl/label/');
+    try {
+      final token = await getToken();
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(labelData),
+      );
+
+      if (response.statusCode == 201) {
+        return 'Label created successfully!';
+      } else {
+        return 'Failed to create label: ${response.statusCode}\n${response.body}';
+      }
+    } catch (e) {
+      print('Error occurred while creating label: $e');
+      return 'Error occurred while creating label: $e';
     }
   }
 

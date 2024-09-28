@@ -4,16 +4,17 @@ import 'package:intl/intl.dart';
 import 'package:inventory_management/book_page.dart';
 import 'package:inventory_management/checker_page.dart';
 import 'package:inventory_management/combo_page.dart';
+import 'package:inventory_management/label_upload.dart';
 import 'package:inventory_management/create-label-page.dart';
 import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/manifest_page.dart';
 import 'package:inventory_management/marketplace_page.dart';
 import 'package:inventory_management/order-page.dart';
+import 'package:inventory_management/product_upload.dart';
 import 'package:inventory_management/packer_page.dart';
 import 'package:inventory_management/picker_page.dart';
 import 'package:inventory_management/orders_page.dart';
-
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
@@ -191,6 +192,20 @@ class _DashboardPageState extends State<DashboardPage> {
                   text: 'Accounting',
                   isSelected: selectedDrawerItem == 'Accounting',
                   onTap: () => _onDrawerItemTapped('Accounting', isSmallScreen),
+                ),
+                _buildDrawerItem(
+                  icon: Icons.upload_file,
+                  text: 'Upload Products',
+                  isSelected: selectedDrawerItem == 'Upload Products',
+                  onTap: () =>
+                      _onDrawerItemTapped('Upload Products', isSmallScreen),
+                ),
+                _buildDrawerItem(
+                  icon: Icons.new_label,
+                  text: 'Upload Labels',
+                  isSelected: selectedDrawerItem == 'Upload Labels',
+                  onTap: () =>
+                      _onDrawerItemTapped('Upload Labels', isSmallScreen),
                 ),
               ],
             ),
@@ -627,6 +642,10 @@ class _DashboardPageState extends State<DashboardPage> {
         return const MarketplacePage();
       case 'Accounting':
         return const Center(child: Text("Accounting content goes here"));
+      case 'Upload Products':
+        return const ProductDataDisplay();
+      case 'Upload Labels':
+        return const LabelUpload();
       case 'Settings':
         return const Center(child: Text("Settings content goes here"));
       default:

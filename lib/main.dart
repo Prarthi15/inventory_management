@@ -18,6 +18,11 @@ import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/provider/category_provider.dart';
 import 'package:inventory_management/provider/combo_provider.dart';
+import 'package:inventory_management/provider/label_data_provider.dart';
+import 'package:inventory_management/provider/location_provider.dart';
+import 'package:inventory_management/provider/manage-inventory-provider.dart';
+import 'package:inventory_management/provider/product_data_provider.dart';
+import 'package:inventory_management/reset_password.dart';
 import 'package:inventory_management/provider/orders_provider.dart';
 import 'package:inventory_management/provider/picker_provider.dart';
 import 'package:inventory_management/provider/packer_provider.dart';
@@ -28,7 +33,6 @@ import 'package:inventory_management/provider/checker_provider.dart';
 import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
 import 'package:inventory_management/show-label-page.dart';
-
 import 'package:provider/provider.dart';
 
 // import 'package:inventory_management/create_account.dart';
@@ -59,6 +63,8 @@ void main() {
             authProvider: Provider.of<AuthProvider>(context, listen: false)),
       ),
       ChangeNotifierProvider(create: (context) => CategoryProvider()),
+      ChangeNotifierProvider(create: (context) => ProductDataProvider()),
+      ChangeNotifierProvider(create: (context) => LabelDataProvider()),
     ],
     child: const MyApp(),
   ));

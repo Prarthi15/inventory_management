@@ -8,6 +8,12 @@ class LocationProvider with ChangeNotifier {
 
   LocationProvider({required this.authProvider});
 
+  List<Map<String, dynamic>> _warehouses = [];
+  List<Map<String, dynamic>> _filteredWarehouses = [];
+
+  List<Map<String, dynamic>> get warehouses =>
+      _filteredWarehouses.isNotEmpty ? _filteredWarehouses : _warehouses;
+
   bool _isCreatingNewLocation = false;
   int _selectedCountryIndex = 0;
   int _selectedStateIndex = 0;
@@ -27,9 +33,7 @@ class LocationProvider with ChangeNotifier {
   final List<Map<String, dynamic>> _locations = [];
   List<Map<String, dynamic>> get locations => _locations;
 
-  List<Map<String, dynamic>> _warehouses = [];
   bool _isLoading = false;
-  List<Map<String, dynamic>> get warehouses => _warehouses;
   bool get isLoading => _isLoading;
 
   String? _errorMessage;
@@ -76,7 +80,6 @@ class LocationProvider with ChangeNotifier {
 
   void selectLocationType(int index) {
     _selectedLocationTypeIndex = index;
-
     notifyListeners();
   }
 
@@ -89,7 +92,7 @@ class LocationProvider with ChangeNotifier {
     } else {
       _holdsStock = null;
     }
-    notifyListeners(); // This will trigger UI updates
+    notifyListeners();
   }
 
   void updateCopysku(String? value) {
@@ -101,7 +104,7 @@ class LocationProvider with ChangeNotifier {
     } else {
       _copysku = null;
     }
-    notifyListeners(); // This will trigger UI updates
+    notifyListeners();
   }
 
   void updateCopyAddress(bool value) {
@@ -121,10 +124,17 @@ class LocationProvider with ChangeNotifier {
     final result = await getAllWarehouses();
 
     if (result['success']) {
-      _warehouses = result['data'];
+      final warehousesData = result['data']['warehouses'];
+
+      if (warehousesData is List) {
+        _warehouses = List<Map<String, dynamic>>.from(warehousesData);
+      } else {
+        _warehouses = [];
+        _errorMessage = 'Unexpected data format';
+      }
     } else {
       _warehouses = [];
-      // Handle error message as needed
+      _errorMessage = 'Error fetching warehouses';
     }
 
     _isLoading = false;
@@ -160,28 +170,24 @@ class LocationProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> getAllWarehouses() async {
-    return await authProvider.getAllWarehouses(); // Use the authProvider
+    return await authProvider.getAllWarehouses();
   }
 
   Future<bool> createWarehouse(Map<String, dynamic> location) async {
     try {
-      // Extract and convert types as necessary
       final taxIdentificationNumber = location['taxIdentificationNumber'] is int
           ? location['taxIdentificationNumber'] as int
-          : int.tryParse(location['taxIdentificationNumber'].toString()) ??
-              0; // Default to 0 if parsing fails
+          : int.tryParse(location['taxIdentificationNumber'].toString()) ?? 0;
 
       final holdStocks = location['holdStocks'] is bool
           ? location['holdStocks'] as bool
-          : location['holdStocks'] == 'true'; // Handle boolean conversion
+          : location['holdStocks'] == 'true';
 
       final copyMasterSkuFromPrimary =
           location['copyMasterSkuFromPrimary'] is bool
               ? location['copyMasterSkuFromPrimary'] as bool
-              : location['copyMasterSkuFromPrimary'] ==
-                  'true'; // Handle boolean conversion
+              : location['copyMasterSkuFromPrimary'] == 'true';
 
-      // Call the API method and pass the data extracted from the location map
       final response = await authProvider.createWarehouse(
         name: location['name'] as String,
         email: location['email'] as String,
@@ -216,18 +222,30 @@ class LocationProvider with ChangeNotifier {
       } else {
         _successMessage = null;
         _errorMessage = response['message'] ?? 'Failed to create warehouse.';
-        print(
-            'Error while creating warehouse: $_errorMessage'); // Print error in terminal
+        print('Error while creating warehouse: $_errorMessage');
         return false;
       }
     } catch (e) {
       _successMessage = null;
       _errorMessage = 'An unexpected error occurred: $e';
-      print(
-          'Exception while creating warehouse: $e'); // Print exception in terminal
+      print('Exception while creating warehouse: $e');
       return false;
     } finally {
       notifyListeners();
     }
+  }
+
+  void filterWarehouses(String query) {
+    if (query.isEmpty) {
+      _filteredWarehouses = [];
+    } else {
+      _filteredWarehouses = _warehouses.where((warehouse) {
+        final name = warehouse['name']?.toLowerCase() ?? '';
+        final location = warehouse['location']?.toLowerCase() ?? '';
+        return name.contains(query.toLowerCase()) ||
+            location.contains(query.toLowerCase());
+      }).toList();
+    }
+    notifyListeners();
   }
 }
