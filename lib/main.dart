@@ -22,6 +22,7 @@ import 'package:inventory_management/provider/label_data_provider.dart';
 import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/provider/manage-inventory-provider.dart';
 import 'package:inventory_management/provider/product_data_provider.dart';
+import 'package:inventory_management/provider/show-details-order-provider.dart';
 import 'package:inventory_management/reset_password.dart';
 import 'package:inventory_management/provider/orders_provider.dart';
 import 'package:inventory_management/provider/picker_provider.dart';
@@ -65,6 +66,7 @@ void main() {
       ChangeNotifierProvider(create: (context) => CategoryProvider()),
       ChangeNotifierProvider(create: (context) => ProductDataProvider()),
       ChangeNotifierProvider(create: (context) => LabelDataProvider()),
+      ChangeNotifierProvider(create: (context) => OrderItemProvider()),
     ],
     child: const MyApp(),
   ));
