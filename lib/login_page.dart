@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
+import 'package:inventory_management/create_account.dart';
+import 'package:inventory_management/dashboard.dart';
 import 'package:provider/provider.dart';
+// import 'Api/auth_provider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -297,9 +300,10 @@ class _LoginFormState extends State<LoginForm> {
                             backgroundColor: AppColors.primaryGreen,
                           ),
                         );
-                        Navigator.pushReplacementNamed(context, '/dashboard');
                         _emailController.clear();
                         _passwordController.clear();
+                        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) =>const DashboardPage(),));
+                        
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -338,7 +342,8 @@ class _LoginFormState extends State<LoginForm> {
                 const Text("Don't have an account?"),
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/createAccount');
+                    // Navigator.pushNamed(context, '/createAccount');
+                    Navigator.push(context,MaterialPageRoute(builder:(context)=>const CreateAccountPage()));
                   },
                   child: const Text(
                     "Create Account",
