@@ -459,7 +459,6 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
-// <<<<<<< HEAD
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
               text: 'Create Label Page',
@@ -473,7 +472,6 @@ class _DashboardPageState extends State<DashboardPage> {
           ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
-// <<<<<<< HEAD
             child: _buildDrawerItem(
               icon: Icons.production_quantity_limits,
               text: 'Product Master',

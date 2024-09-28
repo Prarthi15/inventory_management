@@ -8,14 +8,14 @@ import 'Custom-Files/product-card.dart';
 import 'Custom-Files/filter-section.dart';
 
 class ProductDashboardPage extends StatefulWidget {
-  const ProductDashboardPage({Key? key}) : super(key: key);
+  const ProductDashboardPage({super.key});
 
   @override
   _ProductDashboardPageState createState() => _ProductDashboardPageState();
 }
 
 class _ProductDashboardPageState extends State<ProductDashboardPage> {
-  final int _itemsPerPage = 20;
+  final int _itemsPerPage = 30;
   final List<Product> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
@@ -56,27 +56,32 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       if (response['success']) {
         final List<dynamic> productData = response['data'];
         final newProducts = productData.map((data) {
-          return Product(
-            sku: data['sku'] ?? '-',
-            category: data['category'] ?? '-',
-            brand: data['brand'] ?? '-',
-            mrp: data['mrp']?.toString() ?? '-',
-            createdDate: data['createdAt'] ?? '-',
-            lastUpdated: data['updatedAt'] ?? '-',
-            accSku: data['parentSku'] ?? '-',
+          Product product = Product(
+            sku: data['sku'],
+            parentSku: data['parentSku'],
+            ean: data['ean'],
+            description: data['description'],
+            categoryName: data['categoryName'] ?? '-',
             colour: data['colour'] ?? '-',
-            upcEan: data['ean'] ?? '-',
-            displayName: data['displayName'] ?? '-',
-            parentSku: data['parentSku'] ?? '-',
-            ean: data['ean'] ?? '-',
-            description: data['description'] ?? '-',
-            technicalName: data['technicalName'] ?? '-',
-            weight: data['weight']?.toString() ?? '-',
-            cost: data['cost']?.toString() ?? '-',
-            tax_rule: data['tax_rule'] ?? '-',
+            netWeight: data['netWeight']?.toString() ?? '-',
+            grossWeight: data['grossWeight']?.toString() ?? '-',
+            labelSku: data['labelSku'] ?? '-',
+            box_name: data['box_name'] ?? '-',
             grade: data['grade'] ?? '-',
-            shopifyImage: data['shopifyImage'] ?? '-',
+            technicalName: data['technicalName'] ?? '-',
+            length: data['length']?.toString() ?? '-',
+            width: data['width']?.toString() ?? '-',
+            height: data['height']?.toString() ?? '-',
+            //weight: data['weight']?.toString() ?? '-',
+            mrp: data['mrp']?.toString() ?? '-',
+            cost: data['cost']?.toString() ?? '-',
+            tax_rule: data['tax_rule']?.toString() ?? '-',
+            shopifyImage: data['shopifyImage'] ?? '',
+            createdDate: data['createdAt'],
+            lastUpdated: data['updatedAt'],
+            displayName: data['displayName'] ?? '-',
           );
+          return product;
         }).toList();
 
         setState(() {
@@ -212,7 +217,6 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                               backgroundColor: AppColors.primaryBlue),
                           child: const Text('Create Products'),
                         )
-
                       else
                         CustomButton(
                           width: 40,
@@ -230,11 +234,10 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                       const SizedBox(width: 16),
                       Text(
                         'Total Products: ${_products.length}',
-                        style: TextStyle(fontSize: 16),
+                        style: const TextStyle(fontSize: 16),
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
                   Expanded(
                     child: !_showCreateProduct
@@ -263,7 +266,6 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                             ),
                           )
                         : const Products(),
-
                   ),
                 ],
               ),

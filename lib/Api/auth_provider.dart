@@ -4,14 +4,13 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
-  bool _isAuthenticated=false;
+  bool _isAuthenticated = false;
   final String _baseUrl =
       'https://inventory-management-backend-s37u.onrender.com';
 
-   bool get isAuthenticated => _isAuthenticated;
+  bool get isAuthenticated => _isAuthenticated;
   Future<Map<String, dynamic>> register(String email, String password) async {
     final url = Uri.parse('$_baseUrl/register');
-   
 
     try {
       final response = await http.post(
@@ -130,9 +129,8 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    
-    await prefs.setString('authToken', token);
 
+    await prefs.setString('authToken', token);
   }
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {
@@ -227,7 +225,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<Map<String, dynamic>> getAllCategories(
-      {int page = 1, int limit =70, String? name}) async {
+      {int page = 1, int limit = 70, String? name}) async {
     final url = Uri.parse('$_baseUrl/category/?page=$page&limit=$limit');
 
     try {
@@ -402,11 +400,19 @@ class AuthProvider with ChangeNotifier {
             'displayName': product['displayName'] ?? '-',
             'parentSku': product['parentSku'] ?? '-',
             'sku': product['sku'] ?? '-',
+            'netWeight': product['netWeight']?.toString() ?? '-',
+            'grossWeight': product['grossWeight']?.toString() ?? '-',
             'ean': product['ean'] ?? '-',
             'description': product['description'] ?? '-',
             'technicalName': product['technicalName'] ?? '-',
+            'labelSku': product['label']?['labelSku'] ?? '-',
+            'box_name': product['boxSize']?['box_name'] ?? '-',
+            'categoryName': product['category']?['name'] ?? '-',
+            'length': product['dimensions']?['length']?.toString() ?? '-',
+            'width': product['dimensions']?['width']?.toString() ?? '-',
+            'height': product['dimensions']?['height']?.toString() ?? '-',
             'tax_rule': product['tax_rule'] ?? '-',
-            'weight': product['weight'] ?? '-',
+            //'weight': product['weight'] ?? '-',
             'mrp': product['mrp']?.toString() ?? '-',
             'cost': product['cost']?.toString() ?? '-',
             'grade': product['grade'] ?? '-',
@@ -417,6 +423,7 @@ class AuthProvider with ChangeNotifier {
 
           // Print each product's required fields
           print('Product Details: $extractedProduct');
+          print('------------------------------------------------');
           return extractedProduct;
         }).toList();
 
