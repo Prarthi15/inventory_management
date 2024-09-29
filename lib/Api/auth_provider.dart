@@ -695,41 +695,6 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> getProduct(
-      {String? sku,
-      String? displayName,
-      String? labelSku,
-      String? technicalName}) async {
-    try {
-      String query = '?';
-      if (sku != null && sku.isNotEmpty) {
-        query += 'sku=$sku&';
-      }
-      if (displayName != null && displayName.isNotEmpty) {
-        query += 'displayName=$displayName&';
-      }
-      if (labelSku != null && labelSku.isNotEmpty) {
-        query += 'ean=$labelSku&';
-      }
-      if (technicalName != null && technicalName.isNotEmpty) {
-        query += 'ean=$technicalName&';
-      }
-
-      query =
-          query.endsWith('&') ? query.substring(0, query.length - 1) : query;
-
-      final response = await http.get(Uri.parse('$_baseUrl/products$query'));
-
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        return {'success': false, 'message': 'Failed to fetch product'};
-      }
-    } catch (e) {
-      return {'success': false, 'message': 'Error: $e'};
-    }
-  }
-
 //get all brand name
 //  Future<Map<String, dynamic>> getAllBrandName(
 //       {int page = 1, int limit = 20, String? name}) async {
