@@ -11,7 +11,6 @@ class AuthProvider with ChangeNotifier {
   bool get isAuthenticated => _isAuthenticated;
   Future<Map<String, dynamic>> register(String email, String password) async {
     final url = Uri.parse('$_baseUrl/register');
-   
 
     try {
       final response = await http.post(
@@ -131,7 +130,6 @@ class AuthProvider with ChangeNotifier {
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('authToken', token);
-
   }
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {
@@ -694,6 +692,41 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       print('Error occurred while creating label: $e');
       return 'Error occurred while creating label: $e';
+    }
+  }
+
+  Future<Map<String, dynamic>> getProduct(
+      {String? sku,
+      String? displayName,
+      String? labelSku,
+      String? technicalName}) async {
+    try {
+      String query = '?';
+      if (sku != null && sku.isNotEmpty) {
+        query += 'sku=$sku&';
+      }
+      if (displayName != null && displayName.isNotEmpty) {
+        query += 'displayName=$displayName&';
+      }
+      if (labelSku != null && labelSku.isNotEmpty) {
+        query += 'ean=$labelSku&';
+      }
+      if (technicalName != null && technicalName.isNotEmpty) {
+        query += 'ean=$technicalName&';
+      }
+
+      query =
+          query.endsWith('&') ? query.substring(0, query.length - 1) : query;
+
+      final response = await http.get(Uri.parse('$_baseUrl/products$query'));
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {'success': false, 'message': 'Failed to fetch product'};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Error: $e'};
     }
   }
 

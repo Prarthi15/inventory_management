@@ -72,7 +72,6 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
             length: data['length']?.toString() ?? '-',
             width: data['width']?.toString() ?? '-',
             height: data['height']?.toString() ?? '-',
-            //weight: data['weight']?.toString() ?? '-',
             mrp: data['mrp']?.toString() ?? '-',
             cost: data['cost']?.toString() ?? '-',
             tax_rule: data['tax_rule']?.toString() ?? '-',
@@ -110,13 +109,13 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   @override
   Widget build(BuildContext context) {
     final isWideScreen = MediaQuery.of(context).size.width > 800;
+    final isSmallScreen = MediaQuery.of(context).size.width < 800;
 
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Row(
         children: [
-          // Sidebar
-          if (!_showCreateProduct)
+          if (isWideScreen && !_showCreateProduct)
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: isWideScreen
@@ -130,13 +129,32 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                    SizedBox(
+                      width: 300,
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: 'Search...',
+                          prefixIcon:
+                              const Icon(Icons.search, color: Colors.orange),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 10.0, horizontal: 16.0),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                              color: Colors.orange,
+                              width: 2.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            borderSide: const BorderSide(
+                              color: Colors.orange,
+                              width: 2.0,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -196,41 +214,65 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                 ),
               ),
             ),
-          // Main Content
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (isSmallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: 'Search...',
+                            prefixIcon: const Icon(Icons.search,
+                                color: AppColors.primaryBlue),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 16.0),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                color: AppColors.primaryBlue,
+                                width: 2.0,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                color: AppColors.primaryBlue,
+                                width: 2.0,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      if (!_showCreateProduct)
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _showCreateProduct = !_showCreateProduct;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryBlue),
-                          child: const Text('Create Products'),
-                        )
-                      else
-                        CustomButton(
-                          width: 40,
-                          height: 40,
-                          onTap: () {
-                            setState(() {
-                              _showCreateProduct = !_showCreateProduct;
-                            });
-                          },
-                          color: AppColors.lightBlue,
-                          textColor: AppColors.black,
-                          fontSize: 12,
-                          text: 'Back',
-                        ),
+                      Row(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _showCreateProduct = !_showCreateProduct;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryBlue,
+                            ),
+                            child: Text(
+                              _showCreateProduct ? 'Back' : 'Create Products',
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(width: 16),
                       Text(
                         'Total Products: ${_products.length}',
@@ -250,20 +292,16 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                               }
                               return false;
                             },
-                            child: ListView.builder(
-                              itemCount:
-                                  _products.length + (_isLoading ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                if (index >= _products.length) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                }
-                                final product = _products[index];
-                                return ProductCard(
-                                  product: product,
-                                );
-                              },
-                            ),
+                            child: _products.isEmpty
+                                ? const Center(
+                                    child: CircularProgressIndicator())
+                                : ListView.builder(
+                                    itemCount: _products.length,
+                                    itemBuilder: (context, index) {
+                                      return ProductCard(
+                                          product: _products[index]);
+                                    },
+                                  ),
                           )
                         : const Products(),
                   ),

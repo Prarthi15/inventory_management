@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "newdemoproject-c11ed"
-  }
+    "default": "inventory-management-7a979",
+    "prod": "inventory-management-7a979"
+  },
+  "targets": {},
+  "etags": {}
 }

@@ -130,6 +130,7 @@ class ProductCard extends StatelessWidget {
       children: [
         _buildImage(),
         const SizedBox(height: 12),
+        _buildTitle(product.displayName),
         _buildText('SKU', product.sku),
         _buildText('Parent SKU', product.parentSku),
         _buildText('EAN', product.ean),

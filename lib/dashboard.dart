@@ -5,6 +5,7 @@ import 'package:inventory_management/book_page.dart';
 import 'package:inventory_management/combo_page.dart';
 import 'package:inventory_management/create-label-page.dart';
 import 'package:inventory_management/location_master.dart';
+import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/marketplace_page.dart';
 import 'package:inventory_management/order-page.dart';
@@ -29,6 +30,7 @@ import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
 import 'package:inventory_management/racked_page.dart';
 import 'package:inventory_management/show-label-page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Custom-Files/colors.dart';
 import 'package:inventory_management/product_manager.dart';
 
@@ -229,7 +231,42 @@ class _DashboardPageState extends State<DashboardPage> {
                 icon: Icons.logout,
                 text: 'Logout',
                 isSelected: selectedDrawerItem == 'Logout',
-                onTap: () => _onDrawerItemTapped('Logout', isSmallScreen),
+                onTap: () async {
+                  try {
+                    SharedPreferences _pref =
+                        await SharedPreferences.getInstance();
+                    bool cleared = await _pref.clear();
+
+                    if (cleared) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Logout successful!'),
+                          backgroundColor: AppColors.primaryGreen,
+                        ),
+                      );
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error: Could not clear session.'),
+                          backgroundColor: AppColors.cardsred,
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('An error occurred during logout.'),
+                        backgroundColor: AppColors.cardsred,
+                      ),
+                    );
+                  }
+                },
               ),
               _buildDrawerItem(
                 icon: Icons.settings,
