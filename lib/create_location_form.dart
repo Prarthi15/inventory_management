@@ -29,13 +29,36 @@ class _NewLocationFormState extends State<NewLocationForm> {
   final _shippingCityController = TextEditingController();
   final _shippingZipCodeController = TextEditingController();
   final _shippingPhoneNumberController = TextEditingController();
+  final _warehousePincodeController = TextEditingController();
+  final _pincodeController = TextEditingController();
 
   final bool holdStock = true;
   final bool copyStock = true;
 
   @override
+  void initState() {
+    super.initState();
+    _userEmailController.addListener(_onEmailChanged);
+  }
+
+  @override
+  void dispose() {
+    _userEmailController.dispose();
+    super.dispose();
+  }
+
+  void _onEmailChanged() {
+    // Notify the provider whenever the email changes
+    Provider.of<LocationProvider>(context, listen: false)
+        .validateEmail(_userEmailController.text);
+  }
+
+  @override
   Widget build(BuildContext context) {
     final locationProvider = Provider.of<LocationProvider>(context);
+    final isWideScreen = MediaQuery.of(context).size.width > 800;
+    String? _errorMessage;
+    final isEmailValid = Provider.of<LocationProvider>(context).isEmailValid;
 
     return Expanded(
       child: SingleChildScrollView(
@@ -55,48 +78,132 @@ class _NewLocationFormState extends State<NewLocationForm> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                labelWithRequiredSymbol('Warehouse Name'),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _warehouseNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Warehouse Name',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                if (isWideScreen)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            labelWithRequiredSymbol('Warehouse Name'),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              controller: _warehouseNameController,
+                              decoration: InputDecoration(
+                                labelText: 'Warehouse Name',
+                                hintText: 'Warehouse Name',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.never,
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter warehouse name';
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            labelWithRequiredSymbol('User Email'),
+                            TextFormField(
+                              controller: _userEmailController,
+                              decoration: InputDecoration(
+                                labelText: 'User Email',
+                                hintText: 'User Email',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.never,
+                                suffixIcon: isEmailValid
+                                    ? const Icon(Icons.check_circle,
+                                        color: Colors.green)
+                                    : const Icon(Icons.error,
+                                        color: Colors.red),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter user email';
+                                }
+                                // Basic email validation is handled by the provider
+                                return isEmailValid
+                                    ? null
+                                    : 'Please enter a valid email address';
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                else ...[
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      labelWithRequiredSymbol('Warehouse Name'),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _warehouseNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Warehouse Name',
+                          hintText: 'Warehouse Name',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter warehouse name';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter warehouse name';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                labelWithRequiredSymbol('User Email'),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _userEmailController,
-                  decoration: InputDecoration(
-                    labelText: 'User Email',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                  const SizedBox(height: 16),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      labelWithRequiredSymbol('User Email'),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _userEmailController,
+                        decoration: InputDecoration(
+                          labelText: 'User Email',
+                          hintText: 'User Email',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          floatingLabelBehavior: FloatingLabelBehavior.never,
+                          suffixIcon: isEmailValid
+                              ? const Icon(Icons.check_circle,
+                                  color: Colors.green)
+                              : const Icon(Icons.error, color: Colors.red),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter user email';
+                          }
+                          // Basic email validation is handled by the provider
+                          return isEmailValid
+                              ? null
+                              : 'Please enter a valid email address';
+                        },
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter user email';
-                    }
-                    // Basic email validation using regex
-                    String pattern =
-                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
-                    RegExp regex = RegExp(pattern);
-                    if (!regex.hasMatch(value)) {
-                      return 'Please enter a valid email address';
-                    }
-                    return null;
-                  },
-                ),
+                ],
                 const SizedBox(height: 24),
                 labelWithRequiredSymbol('Enter Other Details'),
                 const SizedBox(height: 8),
@@ -243,43 +350,65 @@ class _NewLocationFormState extends State<NewLocationForm> {
                   },
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Checkbox(
-                      value: locationProvider.copyAddress,
-                      onChanged: (bool? value) {
-                        locationProvider.updateCopyAddress(value ?? false);
+                Consumer<LocationProvider>(
+                  builder: (context, locationProvider, child) {
+                    return Row(
+                      children: [
+                        Checkbox(
+                          value: locationProvider.copyAddress,
+                          onChanged: (bool? value) {
+                            locationProvider.updateCopyAddress(value ?? false);
 
-                        if (value == true) {
-                          // Copy billing address to shipping address
-                          locationProvider.updateShippingAddress(
-                            address1: _billingAddress1Controller.text,
-                            address2: _billingAddress2Controller.text,
-                            city: _cityController.text,
-                            zipCode: _zipCodeController.text,
-                            phoneNumber: _phoneNumberController.text,
-                          );
-                        } else {
-                          // Clear shipping address fields if unchecked
-                          locationProvider.updateShippingAddress(
-                            address1: '',
-                            address2: '',
-                            city: '',
-                            zipCode: '',
-                            phoneNumber: '',
-                          );
-                        }
-                      },
-                    ),
-                    const Text(
-                      'Copy Billing Address to Shipping Address',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
+                            if (value == true) {
+                              // Copy billing address to shipping address and update controllers
+                              _shippingAddress1Controller.text =
+                                  _billingAddress1Controller.text;
+                              _shippingAddress2Controller.text =
+                                  _billingAddress2Controller.text;
+                              _shippingCityController.text =
+                                  _cityController.text;
+                              _shippingZipCodeController.text =
+                                  _zipCodeController.text;
+                              _shippingPhoneNumberController.text =
+                                  _phoneNumberController.text;
+
+                              // Notify provider to update any additional state
+                              locationProvider.updateShippingAddress(
+                                address1: _billingAddress1Controller.text,
+                                address2: _billingAddress2Controller.text,
+                                city: _cityController.text,
+                                zipCode: _zipCodeController.text,
+                                phoneNumber: _phoneNumberController.text,
+                              );
+                            } else {
+                              // Clear shipping address fields and controllers if unchecked
+                              _shippingAddress1Controller.clear();
+                              _shippingAddress2Controller.clear();
+                              _shippingCityController.clear();
+                              _shippingZipCodeController.clear();
+                              _shippingPhoneNumberController.clear();
+
+                              locationProvider.updateShippingAddress(
+                                address1: '',
+                                address2: '',
+                                city: '',
+                                zipCode: '',
+                                phoneNumber: '',
+                              );
+                            }
+                          },
+                        ),
+                        const Text(
+                          'Copy Billing Address to Shipping Address',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
                 const SizedBox(height: 16),
                 labelWithRequiredSymbol('Shipping Address'),
@@ -478,6 +607,110 @@ class _NewLocationFormState extends State<NewLocationForm> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                const Text(
+                  'Warehouse Pincode',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _warehousePincodeController,
+                  decoration: InputDecoration(
+                    labelText: 'Warehouse Pincode',
+                    hintText: 'Warehouse Pincode',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Pincodes',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: 250,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _pincodeController,
+                          decoration: InputDecoration(
+                            hintText: 'Enter Pincode',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            suffixIcon: IconButton(
+                              icon:
+                                  const Icon(Icons.add, color: AppColors.green),
+                              onPressed: () {
+                                locationProvider
+                                    .addPincode(_pincodeController.text);
+                                _pincodeController.clear();
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (locationProvider.validationMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      locationProvider.validationMessage!,
+                      style: const TextStyle(
+                        color: AppColors.cardsred,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  children: locationProvider.pincodes.map((pincode) {
+                    final index = locationProvider.pincodes.indexOf(pincode);
+                    return GestureDetector(
+                      child: Chip(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(
+                            color: Colors.green,
+                            width: 2,
+                          ),
+                        ),
+                        backgroundColor: AppColors.white,
+                        label: Text(
+                          pincode,
+                          style: const TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                        deleteIcon: const Icon(Icons.delete_outline,
+                            color: AppColors.cardsred),
+                        onDeleted: () {
+                          locationProvider.removePincode(index);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Pincode $pincode removed')),
+                          );
+                        },
+                        avatar: const CircleAvatar(
+                          backgroundColor: AppColors.green,
+                          child: Icon(Icons.pin_drop, color: AppColors.white),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -485,6 +718,8 @@ class _NewLocationFormState extends State<NewLocationForm> {
                       width: 120,
                       height: 40,
                       onTap: () {
+                        locationProvider.resetForm();
+                        _pincodeController.clear();
                         locationProvider.toggleCreatingNewLocation();
                       },
                       color: AppColors.grey,
@@ -551,6 +786,12 @@ class _NewLocationFormState extends State<NewLocationForm> {
                             'holdStocks': locationProvider.holdsStock ?? false,
                             'copyMasterSkuFromPrimary':
                                 locationProvider.copysku ?? false,
+                            'pincode': locationProvider.pincodes.isNotEmpty
+                                ? locationProvider.pincodes
+                                : [],
+                            'warehousePincode': int.tryParse(
+                                    _warehousePincodeController.text) ??
+                                0,
                           };
 
                           final success =
@@ -570,11 +811,11 @@ class _NewLocationFormState extends State<NewLocationForm> {
 
                           ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
-                          // if (success) {
-                          //   // Navigate back to the LocationMaster page
-                          //   Navigator.of(context)
-                          //       .pushReplacementNamed('/location-master');
-                          // }
+                          if (success) {
+                            locationProvider.refreshContent();
+                            _formKey.currentState?.reset();
+                            locationProvider.toggleCreatingNewLocation();
+                          }
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -593,6 +834,9 @@ class _NewLocationFormState extends State<NewLocationForm> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ],
+                ),
+                const SizedBox(
+                  height: 25,
                 ),
               ],
             ),

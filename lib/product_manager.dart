@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart'; // Make sure to import your CustomButton
+import 'package:inventory_management/Custom-Files/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'Custom-Files/colors.dart';
 import 'products.dart';
@@ -268,7 +269,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                         ],
                       ),
                       const SizedBox(width: 16),
-                      if (!_showCreateProduct) // Only show when not creating a product
+                      if (!_showCreateProduct)
                         Text(
                           'Total Products: ${_products.length}',
                           style: const TextStyle(fontSize: 16),
@@ -288,15 +289,14 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                               return false;
                             },
                             child: _products.isEmpty
-                                ? const Center(
-                                    child: CircularProgressIndicator())
+                                ? const Center(child: ProductLoadingAnimation())
                                 : ListView.builder(
                                     itemCount:
                                         _products.length + (_hasMore ? 1 : 0),
                                     itemBuilder: (context, index) {
                                       if (index == _products.length) {
                                         return const Center(
-                                            child: CircularProgressIndicator());
+                                            child: ProductLoadingAnimation());
                                       }
                                       final product = _products[index];
                                       return ProductCard(product: product);
