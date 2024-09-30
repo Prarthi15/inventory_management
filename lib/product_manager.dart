@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/Custom-Files/custom-button.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
+import 'package:inventory_management/Custom-Files/custom-button.dart'; // Make sure to import your CustomButton
+import 'package:inventory_management/Custom-Files/loading_indicator.dart';
+import 'package:provider/provider.dart';
 import 'Custom-Files/colors.dart';
 import 'products.dart';
 import 'Custom-Files/product-card.dart';
@@ -13,14 +16,12 @@ class ProductDashboardPage extends StatefulWidget {
 }
 
 class _ProductDashboardPageState extends State<ProductDashboardPage> {
-  final int _itemsPerPage = 10;
-  final int _totalItems = 50;
+  final int _itemsPerPage = 30;
   final List<Product> _products = [];
   bool _isLoading = false;
   bool _hasMore = true;
   bool _showCreateProduct = false;
-
-  int _page = 0;
+  int _currentPage = 1;
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
@@ -43,186 +44,266 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
 
   Future<void> _loadMoreProducts() async {
     if (_isLoading || !_hasMore) return;
+
     setState(() {
       _isLoading = true;
     });
 
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final response = await authProvider.getAllProducts(
+          page: _currentPage, itemsPerPage: _itemsPerPage);
 
-    final newProducts = List.generate(_itemsPerPage, (index) {
-      final skuIndex = _page * _itemsPerPage + index;
-      return Product(
-        sku: 'K - $skuIndex',
-        category: 'Category $skuIndex',
-        brand: 'Brand $skuIndex',
-        mrp: '${skuIndex * 10}',
-        createdDate: '2024-01-13 15:07:57',
-        lastUpdated: '2024-08-09 11:12:13',
-        listedOn: ['Woo', 'Amazon', 'Catty'],
-        accSku: 'ACC-${skuIndex * 2}',
-        colour: 'Color $skuIndex',
-        accUnit: 'Unit $skuIndex',
-        upcEan: 'UPC-$skuIndex',
-      );
-    }).toList();
+      if (response['success']) {
+        final List<dynamic> productData = response['data'];
+        final newProducts = productData.map((data) {
+          Product product = Product(
+            sku: data['sku'],
+            parentSku: data['parentSku'],
+            ean: data['ean'],
+            description: data['description'],
+            categoryName: data['categoryName'] ?? '-',
+            colour: data['colour'] ?? '-',
+            netWeight: data['netWeight']?.toString() ?? '-',
+            grossWeight: data['grossWeight']?.toString() ?? '-',
+            labelSku: data['labelSku'] ?? '-',
+            box_name: data['box_name'] ?? '-',
+            grade: data['grade'] ?? '-',
+            technicalName: data['technicalName'] ?? '-',
+            length: data['length']?.toString() ?? '-',
+            width: data['width']?.toString() ?? '-',
+            height: data['height']?.toString() ?? '-',
+            mrp: data['mrp']?.toString() ?? '-',
+            cost: data['cost']?.toString() ?? '-',
+            tax_rule: data['tax_rule']?.toString() ?? '-',
+            shopifyImage: data['shopifyImage'] ?? '',
+            createdDate: data['createdAt'],
+            lastUpdated: data['updatedAt'],
+            displayName: data['displayName'] ?? '-',
+          );
+          return product;
+        }).toList();
 
-    setState(() {
-      _products.addAll(newProducts);
-      _isLoading = false;
-      _hasMore = _products.length < _totalItems;
-      _page++;
-    });
+        setState(() {
+          _products.addAll(newProducts);
+          _hasMore = newProducts.length == _itemsPerPage;
+          if (_hasMore) {
+            _currentPage++;
+          }
+        });
+      } else {
+        setState(() {
+          _hasMore = false;
+        });
+      }
+    } catch (error) {
+      setState(() {
+        _hasMore = false;
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final isWideScreen = MediaQuery.of(context).size.width > 800;
+    final isSmallScreen = MediaQuery.of(context).size.width < 800;
 
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Row(
         children: [
-          // Sidebar
-         !_showCreateProduct? ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: isWideScreen ? 240 : 200,
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Container(
-              color: Colors.grey[200],
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search...',
-                      prefixIcon: const Icon(Icons.search),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+          if (isWideScreen && !_showCreateProduct)
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: isWideScreen
+                    ? 240
+                    : MediaQuery.of(context).size.width * 0.5,
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Container(
+                color: Colors.grey[200],
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Search bar shown only when not creating a product
+                    if (!_showCreateProduct)
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: 'Search...',
+                            prefixIcon:
+                                const Icon(Icons.search, color: Colors.orange),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 16.0),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.orange, width: 2.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.orange, width: 2.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Filters section
+                            FilterSection(
+                                title: 'Category',
+                                items: const [
+                                  'NPK Fertilizer',
+                                  'Hydroponic Nutrients',
+                                  'Chemical product',
+                                  'Organic Pest Control',
+                                  'Lure & Traps',
+                                ],
+                                searchQuery: _searchQuery),
+                            FilterSection(
+                                title: 'Brand',
+                                items: const [
+                                  'Katyayani Organics',
+                                  'Katyayani',
+                                  'KATYAYNI',
+                                  'Samarthaa (Bulk)',
+                                  'quinalphos 25%ec',
+                                ],
+                                searchQuery: _searchQuery),
+                            FilterSection(
+                                title: 'Product Type',
+                                items: const [
+                                  'Simple Products',
+                                  'Products with Variants',
+                                  'Virtual Combos',
+                                  'Physical Combos(Kits)',
+                                ],
+                                searchQuery: _searchQuery),
+                            FilterSection(
+                                title: 'Colour',
+                                items: const [
+                                  'NA',
+                                  'shown an image',
+                                  'Multicolour',
+                                  '0',
+                                ],
+                                searchQuery: _searchQuery),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FilterSection(
-                            title: 'Category',
-                            items: const [
-                              'NPK Fertilizer',
-                              'Hydroponic Nutrients',
-                              'Chemical product',
-                              'Organic Pest Control',
-                              'Lure & Traps',
-                            ],
-                            searchQuery: _searchQuery,
-                          ),
-                          FilterSection(
-                            title: 'Brand',
-                            items: const [
-                              'Katyayani Organics',
-                              'Katyayani',
-                              'KATYAYNI',
-                              'Samarthaa (Bulk)',
-                              'quinalphos 25%ec',
-                            ],
-                            searchQuery: _searchQuery,
-                          ),
-                          FilterSection(
-                            title: 'Product Type',
-                            items: const [
-                              'Simple Products',
-                              'Products with Variants',
-                              'Virtual Combos',
-                              'Physical Combos(Kits)',
-                            ],
-                            searchQuery: _searchQuery,
-                          ),
-                          FilterSection(
-                            title: 'Colour',
-                            items: const [
-                              'NA',
-                              'shown an image',
-                              'Multicolour',
-                              '0',
-                            ],
-                            searchQuery: _searchQuery,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ):const SizedBox(),
-          // Main Content
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                !_showCreateProduct?ElevatedButton(
-                    onPressed: () {
-                     _showCreateProduct=!_showCreateProduct;
-                     print("here is show product $_showCreateProduct");
-                     setState(() {
-                       
-                     });
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryBlue),
-                    child: const Text('Create Products'),
-                  ):CustomButton(width:40, height:40, onTap:(){
-                _showCreateProduct=!_showCreateProduct;
-                    //  print("here is show product $_showCreateProduct");
-                     setState(() {
-                       
-                     });
-              }, color:AppColors.lightBlue, textColor:AppColors.black, fontSize:12, text: 'Back'
-              ),
+                  if (isSmallScreen &&
+                      !_showCreateProduct) // Hide search bar on small screens
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: 'Search...',
+                            prefixIcon: const Icon(Icons.search,
+                                color: AppColors.primaryBlue),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 16.0),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primaryBlue, width: 2.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primaryBlue, width: 2.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          CustomButton(
+                            width: 150,
+                            height: 37,
+                            onTap: () {
+                              setState(() {
+                                _showCreateProduct = !_showCreateProduct;
+                              });
+                            },
+                            color: AppColors.primaryBlue,
+                            textColor: Colors.white,
+                            fontSize: 16,
+                            text:
+                                _showCreateProduct ? 'Back' : 'Create Products',
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 16),
+                      if (!_showCreateProduct)
+                        Text(
+                          'Total Products: ${_products.length}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                    ],
+                  ),
                   const SizedBox(height: 16),
                   Expanded(
-                    child:!_showCreateProduct?NotificationListener<ScrollNotification>(
-                      onNotification: (ScrollNotification scrollInfo) {
-                        if (!_isLoading &&
-                            scrollInfo.metrics.pixels ==
-                                scrollInfo.metrics.maxScrollExtent) {
-                          _loadMoreProducts();
-                        }
-                        return false;
-                      },
-                      child: ListView.builder(
-                        itemCount: _products.length + (_isLoading ? 1 : 0),
-                        itemBuilder: (context, index) {
-                          if (index >= _products.length) {
-                            return const Center(
-                                child: CircularProgressIndicator());
-                          }
-                          final product = _products[index];
-                          return ProductCard(
-                            sku: product.sku,
-                            category: product.category,
-                            brand: product.brand,
-                            mrp: product.mrp,
-                            createdDate: product.createdDate,
-                            lastUpdated: product.lastUpdated,
-                            listedOn: product.listedOn,
-                            accSku: product.accSku,
-                            colour: product.colour,
-                            accUnit: product.accUnit,
-                            upcEan: product.upcEan,
-                          );
-                        },
-                      ),
-                    ):Products(),
-
+                    child: !_showCreateProduct
+                        ? NotificationListener<ScrollNotification>(
+                            onNotification: (ScrollNotification scrollInfo) {
+                              if (!_isLoading &&
+                                  scrollInfo.metrics.pixels ==
+                                      scrollInfo.metrics.maxScrollExtent) {
+                                _loadMoreProducts();
+                              }
+                              return false;
+                            },
+                            child: _products.isEmpty
+                                ? const Center(child: ProductLoadingAnimation())
+                                : ListView.builder(
+                                    itemCount:
+                                        _products.length + (_hasMore ? 1 : 0),
+                                    itemBuilder: (context, index) {
+                                      if (index == _products.length) {
+                                        return const Center(
+                                            child: ProductLoadingAnimation());
+                                      }
+                                      final product = _products[index];
+                                      return ProductCard(product: product);
+                                    },
+                                  ),
+                          )
+                        : const Products(),
                   ),
                 ],
               ),
