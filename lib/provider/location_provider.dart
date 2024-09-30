@@ -39,6 +39,54 @@ class LocationProvider with ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
 
+  List<String> pincodes = [];
+  String? validationMessage;
+
+  bool _isEmailValid = false;
+
+  bool get isEmailValid => _isEmailValid;
+
+  void setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners(); // Notify listeners when the state changes
+  }
+
+  // Helper methods for handling success and error
+  void _setError(String message) {
+    _errorMessage = message;
+    _successMessage = null;
+    notifyListeners();
+  }
+
+  void _setSuccess(String message) {
+    _successMessage = message;
+    _errorMessage = null;
+    notifyListeners();
+  }
+
+  void validateEmail(String email) {
+    String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+    RegExp regex = RegExp(pattern);
+    _isEmailValid = regex.hasMatch(email);
+    notifyListeners();
+  }
+
+  void addPincode(String pincode) {
+    if (pincode.isEmpty) {
+      validationMessage = 'Please enter a pincode';
+      notifyListeners();
+    } else {
+      pincodes.add(pincode);
+      validationMessage = null; // Clear validation message
+      notifyListeners();
+    }
+  }
+
+  void removePincode(int index) {
+    pincodes.removeAt(index);
+    notifyListeners();
+  }
+
   List<Map<String, dynamic>> countries = [
     {'name': 'India'},
     {'name': 'USA'},
@@ -56,7 +104,7 @@ class LocationProvider with ChangeNotifier {
   List<Map<String, dynamic>> locationTypes = [
     {'name': 'Warehouse'},
     {'name': 'Retail Store'},
-    {'name': 'Distribution Center'}
+    {'name': 'Distribution Center'},
   ];
 
   bool get hasError => _errorMessage != null;
@@ -129,15 +177,18 @@ class LocationProvider with ChangeNotifier {
       if (warehousesData is List) {
         _warehouses = List<Map<String, dynamic>>.from(warehousesData);
       } else {
-        _warehouses = [];
-        _errorMessage = 'Unexpected data format';
+        _setError('Unexpected data format');
       }
     } else {
-      _warehouses = [];
-      _errorMessage = 'Error fetching warehouses';
+      _setError('Error fetching warehouses');
     }
 
     _isLoading = false;
+    notifyListeners();
+  }
+
+  void refreshContent() async {
+    await fetchWarehouses();
     notifyListeners();
   }
 
@@ -166,6 +217,8 @@ class LocationProvider with ChangeNotifier {
     _shippingCity = city;
     _shippingZipCode = zipCode;
     _shippingPhoneNumber = phoneNumber;
+    print(
+        "Shipping Address Updated: $_shippingAddress1, $_shippingCity, $_shippingZipCode, $_shippingPhoneNumber");
     notifyListeners();
   }
 
@@ -187,6 +240,11 @@ class LocationProvider with ChangeNotifier {
           location['copyMasterSkuFromPrimary'] is bool
               ? location['copyMasterSkuFromPrimary'] as bool
               : location['copyMasterSkuFromPrimary'] == 'true';
+
+      // Extract pincodes from location if available
+      final List<String> pincodes = location['pincode'] is List<String>
+          ? List<String>.from(location['pincode'])
+          : [];
 
       final response = await authProvider.createWarehouse(
         name: location['name'] as String,
@@ -213,39 +271,59 @@ class LocationProvider with ChangeNotifier {
         locationType: locationTypes[_selectedLocationTypeIndex]['name'],
         holdStocks: holdStocks,
         copyMasterSkuFromPrimary: copyMasterSkuFromPrimary,
+        pincodes: pincodes,
+        warehousePincode: location['warehousePincode'] as int,
       );
 
       if (response['success']) {
-        _successMessage = 'Warehouse created successfully!';
-        _errorMessage = null;
+        _setSuccess('Warehouse created successfully!');
         return true;
       } else {
-        _successMessage = null;
-        _errorMessage = response['message'] ?? 'Failed to create warehouse.';
+        _setError(response['message'] ?? 'Failed to create warehouse.');
         print('Error while creating warehouse: $_errorMessage');
         return false;
       }
     } catch (e) {
-      _successMessage = null;
-      _errorMessage = 'An unexpected error occurred: $e';
-      print('Exception while creating warehouse: $e');
+      _setError('An error occurred: $e');
+      print('Error while creating warehouse: $e');
       return false;
-    } finally {
-      notifyListeners();
     }
   }
 
+  // Filtered warehouses
   void filterWarehouses(String query) {
     if (query.isEmpty) {
-      _filteredWarehouses = [];
+      _filteredWarehouses.clear();
     } else {
       _filteredWarehouses = _warehouses.where((warehouse) {
         final name = warehouse['name']?.toLowerCase() ?? '';
-        final location = warehouse['location']?.toLowerCase() ?? '';
+        final email = warehouse['email']?.toLowerCase() ?? '';
         return name.contains(query.toLowerCase()) ||
-            location.contains(query.toLowerCase());
+            email.contains(query.toLowerCase());
       }).toList();
     }
+    notifyListeners();
+  }
+
+  Future<bool> deleteWarehouse(BuildContext context, String warehouseId) async {
+    bool isDeleted = await authProvider.deleteWarehouse(warehouseId);
+
+    if (isDeleted) {
+      warehouses.removeWhere((warehouse) => warehouse['_id'] == warehouseId);
+      notifyListeners();
+    }
+
+    return isDeleted;
+  }
+
+  void resetForm() {
+    pincodes.clear();
+    _selectedCountryIndex =
+        _selectedStateIndex = _selectedLocationTypeIndex = 0;
+    _holdsStock = _copysku = null;
+    _copyAddress = false;
+    validationMessage = _errorMessage = _successMessage = null;
+
     notifyListeners();
   }
 }

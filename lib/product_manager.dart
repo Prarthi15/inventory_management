@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:inventory_management/Api/auth_provider.dart';
-import 'package:inventory_management/Custom-Files/custom-button.dart';
+import 'package:inventory_management/Custom-Files/custom-button.dart'; // Make sure to import your CustomButton
+import 'package:inventory_management/Custom-Files/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'Custom-Files/colors.dart';
 import 'products.dart';
@@ -72,7 +73,6 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
             length: data['length']?.toString() ?? '-',
             width: data['width']?.toString() ?? '-',
             height: data['height']?.toString() ?? '-',
-            //weight: data['weight']?.toString() ?? '-',
             mrp: data['mrp']?.toString() ?? '-',
             cost: data['cost']?.toString() ?? '-',
             tax_rule: data['tax_rule']?.toString() ?? '-',
@@ -110,13 +110,13 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   @override
   Widget build(BuildContext context) {
     final isWideScreen = MediaQuery.of(context).size.width > 800;
+    final isSmallScreen = MediaQuery.of(context).size.width < 800;
 
     return Scaffold(
       backgroundColor: AppColors.white,
       body: Row(
         children: [
-          // Sidebar
-          if (!_showCreateProduct)
+          if (isWideScreen && !_showCreateProduct)
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: isWideScreen
@@ -130,64 +130,78 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                    // Search bar shown only when not creating a product
+                    if (!_showCreateProduct)
+                      SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: 'Search...',
+                            prefixIcon:
+                                const Icon(Icons.search, color: Colors.orange),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 16.0),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.orange, width: 2.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: Colors.orange, width: 2.0),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
                     const SizedBox(height: 16),
                     Expanded(
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            // Filters section
                             FilterSection(
-                              title: 'Category',
-                              items: const [
-                                'NPK Fertilizer',
-                                'Hydroponic Nutrients',
-                                'Chemical product',
-                                'Organic Pest Control',
-                                'Lure & Traps',
-                              ],
-                              searchQuery: _searchQuery,
-                            ),
+                                title: 'Category',
+                                items: const [
+                                  'NPK Fertilizer',
+                                  'Hydroponic Nutrients',
+                                  'Chemical product',
+                                  'Organic Pest Control',
+                                  'Lure & Traps',
+                                ],
+                                searchQuery: _searchQuery),
                             FilterSection(
-                              title: 'Brand',
-                              items: const [
-                                'Katyayani Organics',
-                                'Katyayani',
-                                'KATYAYNI',
-                                'Samarthaa (Bulk)',
-                                'quinalphos 25%ec',
-                              ],
-                              searchQuery: _searchQuery,
-                            ),
+                                title: 'Brand',
+                                items: const [
+                                  'Katyayani Organics',
+                                  'Katyayani',
+                                  'KATYAYNI',
+                                  'Samarthaa (Bulk)',
+                                  'quinalphos 25%ec',
+                                ],
+                                searchQuery: _searchQuery),
                             FilterSection(
-                              title: 'Product Type',
-                              items: const [
-                                'Simple Products',
-                                'Products with Variants',
-                                'Virtual Combos',
-                                'Physical Combos(Kits)',
-                              ],
-                              searchQuery: _searchQuery,
-                            ),
+                                title: 'Product Type',
+                                items: const [
+                                  'Simple Products',
+                                  'Products with Variants',
+                                  'Virtual Combos',
+                                  'Physical Combos(Kits)',
+                                ],
+                                searchQuery: _searchQuery),
                             FilterSection(
-                              title: 'Colour',
-                              items: const [
-                                'NA',
-                                'shown an image',
-                                'Multicolour',
-                                '0',
-                              ],
-                              searchQuery: _searchQuery,
-                            ),
+                                title: 'Colour',
+                                items: const [
+                                  'NA',
+                                  'shown an image',
+                                  'Multicolour',
+                                  '0',
+                                ],
+                                searchQuery: _searchQuery),
                           ],
                         ),
                       ),
@@ -196,46 +210,70 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                 ),
               ),
             ),
-          // Main Content
           Expanded(
             child: Container(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (isSmallScreen &&
+                      !_showCreateProduct) // Hide search bar on small screens
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: SizedBox(
+                        width: 300,
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            hintText: 'Search...',
+                            prefixIcon: const Icon(Icons.search,
+                                color: AppColors.primaryBlue),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 16.0),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primaryBlue, width: 2.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                              borderSide: const BorderSide(
+                                  color: AppColors.primaryBlue, width: 2.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      if (!_showCreateProduct)
-                        ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _showCreateProduct = !_showCreateProduct;
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryBlue),
-                          child: const Text('Create Products'),
-                        )
-                      else
-                        CustomButton(
-                          width: 40,
-                          height: 40,
-                          onTap: () {
-                            setState(() {
-                              _showCreateProduct = !_showCreateProduct;
-                            });
-                          },
-                          color: AppColors.lightBlue,
-                          textColor: AppColors.black,
-                          fontSize: 12,
-                          text: 'Back',
-                        ),
-                      const SizedBox(width: 16),
-                      Text(
-                        'Total Products: ${_products.length}',
-                        style: const TextStyle(fontSize: 16),
+                      Row(
+                        children: [
+                          CustomButton(
+                            width: 150,
+                            height: 37,
+                            onTap: () {
+                              setState(() {
+                                _showCreateProduct = !_showCreateProduct;
+                              });
+                            },
+                            color: AppColors.primaryBlue,
+                            textColor: Colors.white,
+                            fontSize: 16,
+                            text:
+                                _showCreateProduct ? 'Back' : 'Create Products',
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ],
                       ),
+                      const SizedBox(width: 16),
+                      if (!_showCreateProduct)
+                        Text(
+                          'Total Products: ${_products.length}',
+                          style: const TextStyle(fontSize: 16),
+                        ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -250,20 +288,20 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
                               }
                               return false;
                             },
-                            child: ListView.builder(
-                              itemCount:
-                                  _products.length + (_isLoading ? 1 : 0),
-                              itemBuilder: (context, index) {
-                                if (index >= _products.length) {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
-                                }
-                                final product = _products[index];
-                                return ProductCard(
-                                  product: product,
-                                );
-                              },
-                            ),
+                            child: _products.isEmpty
+                                ? const Center(child: ProductLoadingAnimation())
+                                : ListView.builder(
+                                    itemCount:
+                                        _products.length + (_hasMore ? 1 : 0),
+                                    itemBuilder: (context, index) {
+                                      if (index == _products.length) {
+                                        return const Center(
+                                            child: ProductLoadingAnimation());
+                                      }
+                                      final product = _products[index];
+                                      return ProductCard(product: product);
+                                    },
+                                  ),
                           )
                         : const Products(),
                   ),

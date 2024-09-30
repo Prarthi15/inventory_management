@@ -30,7 +30,14 @@ class CustomDataTable extends StatelessWidget {
     List<DataRow> rows = rowsData.map((data) {
       return DataRow(
         cells: columnNames.map((columnName) {
-          return DataCell(Text(data[columnName] ?? 'N/A'));
+          var cellData = data[columnName];
+          if (cellData is Widget) {
+            // If the cell data is a widget, return it as a DataCell
+            return DataCell(cellData);
+          } else {
+            // Otherwise, treat it as a string and return it in a Text widget
+            return DataCell(Text(cellData?.toString() ?? 'N/A'));
+          }
         }).toList(),
       );
     }).toList();
