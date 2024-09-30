@@ -3,9 +3,11 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:inventory_management/Api/label-api.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
+import 'package:pagination_flutter/pagination.dart';
 import 'package:provider/provider.dart';
 
 class LabelPage extends StatefulWidget {
@@ -33,9 +35,10 @@ class _LabelPageState extends State<LabelPage> {
   Widget build(BuildContext context) {
     return Consumer<LabelApi>(
       builder: (context, l, child) => Scaffold(
-        body: l.labelInformation.isNotEmpty
+        body: l.labelInformation.isNotEmpty&&l.loading
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Row(
                     children: [
@@ -74,7 +77,7 @@ class _LabelPageState extends State<LabelPage> {
                               ),
                             ),
                             onChanged: (value) async{
-                            l.filterLable(value);
+                            l.searchByLabel(value);
                              
                             },
                           ),
@@ -198,67 +201,17 @@ class _LabelPageState extends State<LabelPage> {
                                                         fontSize: 18,
                                                         fontWeight:
                                                             FontWeight.bold)),
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      fieldTitle(
-                                                          'Product Name',
-                                                          l.labelInformation[
-                                                                          index]
-                                                                      [
-                                                                      "product_id"] !=
-                                                                  null
-                                                              ? l.labelInformation[
-                                                                              index]
-                                                                          [
-                                                                          "product_id"]
-                                                                      [
-                                                                      "displayName"] ??
-                                                                  'null'
-                                                              : 'null',
-                                                          width: 140,
-                                                          fontWeight:
-                                                              FontWeight.w600),
-                                                      fieldTitle(
-                                                          'Sku',
-                                                          l.labelInformation[
-                                                                          index]
-                                                                      [
-                                                                      "product_id"] !=
-                                                                  null
-                                                              ? l.labelInformation[
-                                                                              index]
-                                                                          [
-                                                                          "product_id"]
-                                                                      ["sku"] ??
-                                                                  'null'
-                                                              : 'null',
-                                                          width: 140,
-                                                          fontWeight:
-                                                              FontWeight.w600),
-                                                      fieldTitle(
-                                                          'Technical Name',
-                                                          l.labelInformation[
-                                                                          index]
-                                                                      [
-                                                                      "product_id"] !=
-                                                                  null
-                                                              ? l.labelInformation[
-                                                                              index]
-                                                                          [
-                                                                          "product_id"]
-                                                                      [
-                                                                      "technicalName"] ??
-                                                                  'null'
-                                                              : 'null',
-                                                          width: 140,
-                                                          fontWeight:
-                                                              FontWeight.w600),
+                                                Column(
+                                                 children: [
+                                                   for(int i=0;i<5;i++)
+                                                  const Column(
+                                                    children:[
+                                                       Text("hee;p00"),
+                                                        Text("hee;p01"),
+                                                      Text("hee;p02"),
                                                     ],
-                                                  ),
+                                                   )
+                                                 ],
                                                 ),
                                               ],
                                             ),
@@ -268,7 +221,7 @@ class _LabelPageState extends State<LabelPage> {
                                                         ["quantity"]
                                                     .toString()),
                                             fieldTitle(
-                                                "Description",
+                                                "Description ${index}",
                                                 l.labelInformation[index]
                                                         ["description"] ??
                                                     'null'),
@@ -283,9 +236,91 @@ class _LabelPageState extends State<LabelPage> {
                           ),
                         );
                       },
-                      itemCount: l.labelInformation.length - 0,
+                      itemCount:l.labelInformation.length,
                     ),
                   ),
+                  // const Spacer(),
+                   Row(
+                children: [
+                  InkWell(
+                    child: const FaIcon(FontAwesomeIcons.chevronLeft),
+                    onTap: () async{
+                       l.updateCurrentPage(l.totalPage);
+                        await l.getLabel();
+                    },
+                  ),
+                  Pagination(
+                    numOfPages:l.totalPage,
+                    selectedPage:l.currentPage,
+                    pagesVisible: 5,
+                    spacing: 10,
+                    onPageChanged: (page)async {
+                      l.updateCurrentPage(page);
+                       await l.getLabel();
+                    },
+                    nextIcon: const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.primaryBlue,
+                      size: 20,
+                    ),
+                    previousIcon: const Icon(
+                      Icons.chevron_left_rounded,
+                      color: AppColors.primaryBlue,
+                      size: 20,
+                    ),
+                    activeTextStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    activeBtnStyle: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(AppColors.primaryBlue),
+                      shape: MaterialStateProperty.all(const CircleBorder(
+                        side:
+                            BorderSide(color: AppColors.primaryBlue, width: 1),
+                      )),
+                    ),
+                    inactiveBtnStyle: ButtonStyle(
+                      elevation: MaterialStateProperty.all(0),
+                      backgroundColor: MaterialStateProperty.all(Colors.white),
+                      shape: MaterialStateProperty.all(const CircleBorder(
+                        side:
+                            BorderSide(color: AppColors.primaryBlue, width: 1),
+                      )),
+                    ),
+                    inactiveTextStyle: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.primaryBlue,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  InkWell(
+                    child: const FaIcon(FontAwesomeIcons.chevronRight),
+                    onTap: ()async {
+                        l.updateCurrentPage(l.totalPage);
+                        await l.getLabel();
+                        
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height: 30,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.lightBlue),
+                      ),
+                      child: Center(
+                        child: Text(
+                            '${l.currentPage}/${l.totalPage}'),
+                      ),
+                    ),
+                  ),
+                ]
+              )
+            
+            
                 ],
               )
             : const Center(

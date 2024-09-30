@@ -113,10 +113,6 @@ class _HomeState extends State<Home> {
     super.initState();
     // getData();
   }
-  // void getData()async{
-  //    authprovider=Provider.of<AuthProvider>(context,listen:true);
-  //    await authprovider!.getToken();
-  // }
   @override
   Widget build(BuildContext context) {
     // var prov=Provider.of<AuthProvider>(context,listen:true);
