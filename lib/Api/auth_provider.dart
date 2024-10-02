@@ -649,7 +649,8 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<String?> createProduct(Map<String, dynamic> productData) async {
+  Future<Map<String, dynamic>?> createProduct(
+      List<Map<String, dynamic>> productData) async {
     final url = Uri.parse('$_baseUrl/products/');
     try {
       final token = await getToken();
@@ -659,18 +660,53 @@ class AuthProvider with ChangeNotifier {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
         },
-        body: json.encode(productData),
+        body: json.encode({'products': productData}),
       );
 
-      if (response.statusCode == 201) {
-        return 'Product created successfully!';
+      // Print the full response for debugging purposes
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+        print(
+            'Response Data: ${jsonEncode(responseData)}'); // Print structured response
+
+        return {
+          'message':
+              responseData['message'] ?? 'Products uploaded successfully.',
+          'successfulProducts': responseData['successfulProducts'],
+          'failedProducts': responseData['failedProducts'],
+        };
       } else {
-        print('Response: ${response.body}');
-        return 'Failed to create product. Status code: ${response.statusCode}\nResponse: ${response.body}';
+        final errorResponse = json.decode(response.body);
+        String errorMessage;
+
+        if (response.statusCode == 400) {
+          errorMessage = 'Validation error: ${errorResponse['message']}';
+        } else if (response.statusCode == 401) {
+          errorMessage = 'Authorization failed. Please check your credentials.';
+        } else {
+          errorMessage =
+              'Failed to create product. Status code: ${response.statusCode} - ${errorResponse['message'] ?? 'Unknown error'}';
+        }
+
+        print(
+            'Error Response: ${jsonEncode(errorResponse)}'); // Print structured error response
+
+        return {
+          'message': errorMessage,
+          'successfulProducts': [],
+          'failedProducts': [],
+        };
       }
     } catch (e) {
       print('Error occurred while creating product: $e');
-      return 'Error occurred while creating product: $e';
+      return {
+        'message': 'An unexpected error occurred: $e',
+        'successfulProducts': [],
+        'failedProducts': [],
+      };
     }
   }
 
@@ -729,6 +765,47 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
+
+  Future<Map<String, dynamic>> searchProductsByDisplayName(
+      String displayName) async {
+    final url = '$_baseUrl?displayName=${Uri.encodeComponent(displayName)}';
+
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No token found'};
+      }
+
+      // Make the HTTP GET request
+      final response = await http.get(
+        Uri.parse(url), // Ensure URL is parsed
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      // Check the response status code
+      if (response.statusCode == 200) {
+        print("Response Status: ${response.statusCode}");
+        print("Response Body: ${response.body}");
+        return json.decode(response.body);
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to load products, status code: ${response.statusCode}',
+        };
+      }
+    } catch (error) {
+      // Handle exceptions (network errors, JSON parsing errors, etc.)
+      return {
+        'success': false,
+        'message': 'An error occurred: $error',
+      };
+    }
+  }
+
 //get all brand name
 //  Future<Map<String, dynamic>> getAllBrandName(
 //       {int page = 1, int limit = 20, String? name}) async {

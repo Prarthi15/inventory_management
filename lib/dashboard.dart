@@ -7,6 +7,7 @@ import 'package:inventory_management/create-label-page.dart';
 import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/manage-inventory.dart';
+import 'package:inventory_management/manage_inventory.dart';
 import 'package:inventory_management/marketplace_page.dart';
 import 'package:inventory_management/order-page.dart';
 
@@ -653,7 +654,7 @@ class _DashboardPageState extends State<DashboardPage> {
       case 'Products':
         return const Products();
       case 'Manage Inventory':
-        return const ManageInventory();
+        return const ManageInventoryPage();
       case 'Order Page':
         return const OrdersPage();
       case 'Orders Page':
