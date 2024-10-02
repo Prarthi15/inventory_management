@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:inventory_management/model/orders_model.dart';
 import 'package:inventory_management/provider/orders_provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
+import 'package:pagination_flutter/pagination.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
 
@@ -46,6 +48,7 @@ class _OrdersNewPageState extends State<OrdersNewPage>
     currentPage++;
     final ordersProvider = Provider.of<OrdersProvider>(context, listen: false);
     await ordersProvider.fetchOrders(page: currentPage, limit: 20);
+    print('current page = $currentPage');
   }
 
   @override
@@ -151,9 +154,9 @@ class _OrdersNewPageState extends State<OrdersNewPage>
         controller: _tabController,
         children: [
           // Content for "Ready to Confirm"
-          buildOrdersList(context, false),
+          buildOrdersList(context, false, 1),
           // Content for "Failed Orders"
-          buildOrdersList(context, true),
+          buildOrdersList(context, true, 0),
         ],
       ),
     );
@@ -190,7 +193,8 @@ class _OrdersNewPageState extends State<OrdersNewPage>
     });
   }
 
-  Widget buildOrdersList(BuildContext context, bool showConfirmedButton) {
+  Widget buildOrdersList(
+      BuildContext context, bool showConfirmedButton, int statusFilter) {
     final ordersProvider = Provider.of<OrdersProvider>(context);
 
     // Check loading state
@@ -202,6 +206,9 @@ class _OrdersNewPageState extends State<OrdersNewPage>
 
     List<Order> orders =
         _searchQuery.isEmpty ? ordersProvider.orders : _filteredOrders;
+
+    orders =
+        orders.where((order) => order.orderStatus == statusFilter).toList();
 
     return Column(
       children: [
@@ -381,6 +388,183 @@ class _OrdersNewPageState extends State<OrdersNewPage>
                         thickness: 1,
                         color: AppColors.grey,
                       ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              //color: AppColors.primaryBlue,
+                              child: const SizedBox(
+                                height: 50,
+                                width: 200,
+                                child: Text(
+                                  'ORDER DETAILS:',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                            // Container(
+                            //   color: Colors.pink,
+                            //   child: const SizedBox(height: 10, width: 200.0),
+                            // ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Payment Mode: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(order.paymentMode),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'COD Amount: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${order.codAmount}'),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Prepaid Amount: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${order.prepaidAmount}'),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Discount Scheme: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(order.discountScheme),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Discount Percent: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${order.discountPercent}'),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Discount Amount: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${order.discountAmount}'),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Tax Percent: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${order.taxPercent}'),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Shipping Address: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(order.shippingAddress),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                              ],
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Delhivery: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${order.freightCharge!.delhivery}'),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Shiprocket: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('${order.freightCharge!.shiprocket}'),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Agent: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(order.agent),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      'Notes: ',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(order.notes),
+                                  ],
+                                ),
+                                const SizedBox(width: 8.0),
+                              ],
+                            ),
+
+                            const SizedBox(width: 20.0),
+                          ],
+                        ),
+                      ),
+                      const Divider(
+                        thickness: 1,
+                        color: AppColors.grey,
+                      ),
 
                       // Nested cards for each item in the order
                       const SizedBox(height: 10),
@@ -452,121 +636,222 @@ class _OrdersNewPageState extends State<OrdersNewPage>
                                   ),
                                   const SizedBox(width: 8.0),
                                   Expanded(
-                                    child: Column(
+                                    child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
                                         //Text('Item ID: ${item.id}'),
-                                        Row(
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text(
-                                              'SKU: ',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'SKU: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('${item.product?.sku}')
+                                              ],
                                             ),
-                                            Text('${item.product?.sku}')
+                                            const SizedBox(width: 20.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Quantity: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('${item.qty}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Total Item Amount: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('Rs.${item.amount}'),
+                                              ],
+                                            ),
+                                            const SizedBox(height: 4.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Description: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                    '${item.product?.description}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Technical Name: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                    '${item.product?.technicalName}'),
+                                              ],
+                                            ),
                                           ],
                                         ),
 
-                                        const SizedBox(width: 20.0),
-                                        Row(
+                                        const SizedBox(width: 8.0),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text(
-                                              'Quantity:',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Dimensions: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  '${item.product?.dimensions!.length} x ${item.product?.dimensions!.breadth} x ${item.product?.dimensions!.height}',
+                                                ),
+                                              ],
                                             ),
-                                            Text(
-                                              '${item.qty}',
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Tax Rule: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                    '${item.product?.taxRule}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Weight: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('${item.product?.weight}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'MRP: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('Rs.${item.product?.mrp}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Cost: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                    'Rs.${item.product?.cost}'),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Total Item Amount: Rs.${item.amount}'),
 
-                                        const SizedBox(height: 4.0),
-                                        Text(
-                                            'Description: ${item.product?.description}'),
                                         const SizedBox(width: 8.0),
-                                        Text(
-                                            'Technical Name: ${item.product?.technicalName}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Product Weight: ${item.product?.weight}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Product MRP: Rs.${item.product?.mrp}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Product Cost: Rs.${item.product?.cost}'),
-                                        const SizedBox(width: 8.0),
-                                      ],
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        //Text('Item ID: ${item.id}'),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Product Grade: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('${item.product?.grade}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Parent SKU: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                    '${item.product?.parentSku}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Active: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('${item.product?.active}'),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Courier Name: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(order.courierName),
+                                              ],
+                                            ),
+                                            const SizedBox(width: 8.0),
+                                            Row(
+                                              children: [
+                                                const Text(
+                                                  'Order Status: ',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text('${order.orderStatus}'),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
 
-                                        Text(
-                                            'Payment Mode: ${order.paymentMode}'),
                                         const SizedBox(width: 8.0),
-                                        Text('COD Amount: ${order.codAmount}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Prepaid Amount: ${order.prepaidAmount}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Discount Scheme: ${order.discountScheme}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Discount Percent: ${order.discountPercent}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Dicount Amount: ${order.discountAmount}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Tax Percent: ${order.taxPercent}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Shipping Address: ${order.shippingAddress}'),
-                                        const SizedBox(width: 8.0),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8.0),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        //Text('Item ID: ${item.id}'),
-                                        Text(
-                                            'Product Grade: ${item.product?.grade}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Parent SKU: ${item.product?.parentSku}'),
-                                        const SizedBox(width: 8.0),
-                                        Text('Active: ${item.product?.active}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Courier Name: ${order.courierName}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Replacement: ${order.replacement}'),
-                                        const SizedBox(width: 8.0),
-                                        Text('Order Agent: ${order.agent}'),
-                                        const SizedBox(width: 8.0),
-                                        Text(
-                                            'Order Status: ${order.orderStatus}'),
-                                        const SizedBox(width: 8.0),
-                                        Text('Note: ${order.notes}'),
-                                        const SizedBox(width: 8.0),
+
                                         // if (item.product != null) ...[
                                         //   const SizedBox(height: 4.0),
                                         //   Text(
@@ -582,21 +867,21 @@ class _OrdersNewPageState extends State<OrdersNewPage>
                           );
                         },
                       ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: order.orderStatusMap.length,
-                        itemBuilder: (context, itemIndex) {
-                          final orderStatusMap =
-                              order.orderStatusMap[itemIndex];
+                      // ListView.builder(
+                      //   shrinkWrap: true,
+                      //   physics: const NeverScrollableScrollPhysics(),
+                      //   itemCount: order.orderStatusMap.length,
+                      //   itemBuilder: (context, itemIndex) {
+                      //     final orderStatusMap =
+                      //         order.orderStatusMap[itemIndex];
 
-                          // return Row(
-                          //   children: [
-                          //     Text('Order Status :${orderStatusMap.status}')
-                          //   ],
-                          // );
-                        },
-                      ),
+                      //     return Row(
+                      //       children: [
+                      //         Text('Order Status :${orderStatusMap.status}')
+                      //       ],
+                      //     );
+                      //   },
+                      // ),
                     ],
                   ),
                 ),
@@ -607,34 +892,90 @@ class _OrdersNewPageState extends State<OrdersNewPage>
         // Pagination Controls
         if (!ordersProvider.isLoading && ordersProvider.orders.isNotEmpty) ...[
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(10),
-                child: ElevatedButton(
-                  onPressed: currentPage > 1
-                      ? () {
-                          setState(() {
-                            currentPage--;
-                          });
-                          loadMoreOrders();
-                        }
-                      : null,
-                  child: const Text('Previous'),
+              InkWell(
+                child: const FaIcon(FontAwesomeIcons.chevronLeft),
+                onTap: () {
+                  if (ordersProvider.selectedPage > 1) {
+                    ordersProvider
+                        .upDateSelectedPage(ordersProvider.selectedPage - 1);
+                    ordersProvider.fetchOrders(
+                        page: ordersProvider.selectedPage, limit: 20);
+                  }
+                },
+              ),
+              Pagination(
+                numOfPages: ordersProvider.numberofPages,
+                selectedPage: ordersProvider.selectedPage,
+                pagesVisible: 5,
+                spacing: 10,
+                onPageChanged: (page) {
+                  ordersProvider.upDateSelectedPage(page);
+                  ordersProvider.fetchOrders(
+                      page: page, limit: 20); // Fetch orders for the new page
+                },
+                nextIcon: const Icon(Icons.chevron_right_rounded,
+                    color: AppColors.primaryBlue, size: 20),
+                previousIcon: const Icon(Icons.chevron_left_rounded,
+                    color: AppColors.primaryBlue, size: 20),
+                activeTextStyle: const TextStyle(
+                  color: Colors.white, // Example color
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                ),
+                inactiveTextStyle: const TextStyle(
+                  fontSize: 14,
+                  color: AppColors.primaryBlue,
+                  fontWeight: FontWeight.w700,
+                ),
+                activeBtnStyle: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all(AppColors.primaryBlue),
+                  shape: MaterialStateProperty.all(const CircleBorder(
+                    side: BorderSide(
+                      color: AppColors.primaryBlue,
+                      width: 1,
+                    ),
+                  )),
+                ),
+                inactiveBtnStyle: ButtonStyle(
+                  elevation: MaterialStateProperty.all(0),
+                  backgroundColor: MaterialStateProperty.all(Colors.white),
+                  shape: MaterialStateProperty.all(const CircleBorder(
+                    side: BorderSide(
+                      color: AppColors.primaryBlue,
+                      width: 1,
+                    ),
+                  )),
                 ),
               ),
-              Text('Page $currentPage'),
+              InkWell(
+                child: const FaIcon(FontAwesomeIcons.chevronRight),
+                onTap: () {
+                  if (ordersProvider.selectedPage <
+                      ordersProvider.numberofPages) {
+                    ordersProvider
+                        .upDateSelectedPage(ordersProvider.selectedPage + 1);
+                    ordersProvider.fetchOrders(
+                        page: ordersProvider.selectedPage, limit: 20);
+                  }
+                },
+              ),
               Padding(
-                padding: const EdgeInsets.all(8),
-                child: ElevatedButton(
-                  onPressed: () {
-                    loadMoreOrders();
-                  },
-                  child: const Text('Next'),
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  height: 30,
+                  width: 50,
+                  decoration: BoxDecoration(
+                      border: Border.all(color: AppColors.lightBlue)),
+                  child: Center(
+                      child: Text(
+                          '${ordersProvider.selectedPage}/${ordersProvider.numberofPages}')),
                 ),
               ),
             ],
-          )
+          ),
         ],
       ],
     );

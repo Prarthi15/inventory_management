@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:inventory_management/create_location_form.dart';
 import 'package:provider/provider.dart';
+import 'package:inventory_management/create_location_form.dart';
 import 'provider/location_provider.dart';
 import 'Custom-Files/custom-button.dart';
 import 'Custom-Files/colors.dart';
 import 'Custom-Files/data_table.dart';
+import 'Custom-Files/loading_indicator.dart';
 
 class LocationMaster extends StatefulWidget {
-  const LocationMaster({super.key});
+  const LocationMaster({Key? key}) : super(key: key);
 
   @override
   _LocationMasterState createState() => _LocationMasterState();
@@ -18,12 +19,57 @@ class _LocationMasterState extends State<LocationMaster> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<LocationProvider>(context, listen: false).fetchWarehouses();
+      _refreshData(); // Call _refreshData on initial load
     });
   }
 
-  void _refreshData() {
-    Provider.of<LocationProvider>(context, listen: false).fetchWarehouses();
+  void _refreshData() async {
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
+    locationProvider.setLoading(true); // Start loading
+
+    try {
+      await locationProvider.fetchWarehouses(); // Fetch data
+      print("Warehouses fetched successfully."); // Debugging
+    } catch (error) {
+      // Handle errors during fetch
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to refresh warehouses'),
+          backgroundColor: AppColors.cardsred,
+        ),
+      );
+    } finally {
+      locationProvider.setLoading(false); // Ensure loading is stopped
+    }
+  }
+
+  Future<void> _deleteWarehouse(
+      BuildContext context, String warehouseId) async {
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
+
+    locationProvider.setLoading(true);
+    bool isDeleted =
+        await locationProvider.deleteWarehouse(context, warehouseId);
+
+    if (isDeleted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Warehouse deleted successfully'),
+          backgroundColor: AppColors.primaryGreen,
+        ),
+      );
+      _refreshData();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to delete warehouse'),
+          backgroundColor: AppColors.cardsred,
+        ),
+      );
+    }
+    locationProvider.setLoading(false);
   }
 
   @override
@@ -52,7 +98,7 @@ class _LocationMasterState extends State<LocationMaster> {
           const SizedBox(height: 10),
           locationProvider.isCreatingNewLocation
               ? const NewLocationForm()
-              : _buildMainTable(context),
+              : _buildMainTable(context), // Display the main table or form
         ],
       ),
     );
@@ -60,8 +106,6 @@ class _LocationMasterState extends State<LocationMaster> {
 
   Widget _buildButtonRow(BuildContext context, double buttonWidth,
       double buttonHeight, double fontSize) {
-    final locationProvider = Provider.of<LocationProvider>(context);
-
     return Container(
       width: double.infinity,
       height: 60,
@@ -74,7 +118,8 @@ class _LocationMasterState extends State<LocationMaster> {
             width: buttonWidth,
             height: buttonHeight,
             onTap: () {
-              locationProvider.toggleCreatingNewLocation();
+              Provider.of<LocationProvider>(context, listen: false)
+                  .toggleCreatingNewLocation();
             },
             color: AppColors.white,
             textColor: AppColors.primaryGreen,
@@ -86,7 +131,9 @@ class _LocationMasterState extends State<LocationMaster> {
           CustomButton(
             width: buttonWidth,
             height: buttonHeight,
-            onTap: () {},
+            onTap: () {
+              // Implement bulk locations upload functionality here
+            },
             color: AppColors.white,
             textColor: AppColors.primaryGreen,
             fontSize: fontSize,
@@ -112,13 +159,14 @@ class _LocationMasterState extends State<LocationMaster> {
   Widget _buildMainTable(BuildContext context) {
     final locationProvider = Provider.of<LocationProvider>(context);
 
-    // Column names
+    // Column names including delete action
     final columnNames = [
       'Warehouse Name',
       'Warehouse Key',
       'Location',
       'Warehouse Pincode',
       'Pincodes',
+      'Actions', // New column for delete and update actions
     ];
 
     // Rows data
@@ -151,6 +199,22 @@ class _LocationMasterState extends State<LocationMaster> {
         'Location': location,
         'Warehouse Pincode': warehouse['warehousePincode'] ?? 'N/A',
         'Pincodes': pincodeList,
+        'Actions': Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: AppColors.tealcolor),
+              onPressed: () {
+                print("Update icon is clicked");
+                // Implement update functionality here
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete, color: AppColors.cardsred),
+              onPressed: () => _deleteWarehouse(context, warehouse['_id']),
+            ),
+          ],
+        ),
       };
     }).toList();
 
@@ -191,10 +255,14 @@ class _LocationMasterState extends State<LocationMaster> {
               ],
             ),
             const SizedBox(height: 20),
-            CustomDataTable(
-              columnNames: columnNames,
-              rowsData: rowsData,
-            ),
+            locationProvider.isLoading
+                ? const Center(
+                    child: WarehouseLoadingAnimation(),
+                  )
+                : CustomDataTable(
+                    columnNames: columnNames,
+                    rowsData: rowsData,
+                  ),
           ],
         ),
       ),

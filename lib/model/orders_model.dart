@@ -22,7 +22,7 @@ class Order {
   final String shippingAddress;
   final String courierName;
   final bool replacement;
-  final int orderStatus;
+  int orderStatus;
   final List<OrderStatusMap> orderStatusMap;
   final String agent;
   final String filter;

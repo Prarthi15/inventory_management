@@ -7,15 +7,22 @@ class OrdersProvider with ChangeNotifier {
   bool _selectAll = false;
   bool _isLoading = false;
 
+  // pagination state variables
+  int _selectedPage = 1;
+  int _numberofPages = 2;
+  int _firstval = 1;
+  int _lastval = 5;
+  int _jump = 5;
+  get selectedPage => _selectedPage;
+  get numberofPages => _numberofPages;
+  get firstval => _firstval;
+  get lastval => _lastval;
+  get jump => _jump;
+
   // Getters for the private fields
   List<Order> get orders => _orders;
   bool get selectAll => _selectAll;
   bool get isLoading => _isLoading;
-
-  // Pagination state variables
-  int _currentPage = 1; // Track current page
-  int _totalPages = 1; // Track total pages (comes from API)
-  int _limit = 10; // Default limit per page (you can change this as needed)
 
   // Getter for selectedOrders
   List<bool> get selectedOrders {
@@ -60,7 +67,8 @@ class OrdersProvider with ChangeNotifier {
 
       // Check if all orders are selected
       _selectAll = _orders.every((order) => order.isSelected);
-      print('Order ${_orders[index].orderId} selection changed to $value');
+      print(
+          'Order : ${_orders[index].id} - ${_orders[index].orderId} selection changed to $value');
       print('All orders selected: $_selectAll'); // Improved debugging output
 
       notifyListeners();
@@ -85,9 +93,11 @@ class OrdersProvider with ChangeNotifier {
     try {
       final order = await ordersApi.getOrderById(orderId);
       if (order != null) {
+        print('Fetched Order ID: ${order.id}, ${order.orderId}');
         // Return a list with the fetched order
         return [order]; // Return a list containing the order
       } else {
+        print('No order found for ID: $orderId');
         return []; // Return an empty list if no order is found
       }
     } catch (error) {
@@ -97,5 +107,31 @@ class OrdersProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  // pagination controls
+  void upDateSelectedPage(int val) {
+    print("page no. $val");
+    _selectedPage = val;
+    _firstval = (val - 1) * _jump;
+    _lastval = _firstval + _jump;
+    notifyListeners();
+  }
+
+  void upDateJump(int val) {
+    _jump = val;
+
+    notifyListeners();
+  }
+
+  void upNumberofPages(int val) {
+    _numberofPages = val;
+    notifyListeners();
+  }
+
+  void upDateFirstAndLastVal(int firstVal, int lastVal) {
+    _firstval = firstVal;
+    _lastval = lastVal;
+    notifyListeners();
   }
 }

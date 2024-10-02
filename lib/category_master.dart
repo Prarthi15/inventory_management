@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/Custom-Files/loading_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/categoryCard.dart';
@@ -181,8 +182,8 @@ class _CategoryMasterPageState extends State<CategoryMasterPage> {
 
             // Display Loader when fetching data
             if (categoryProvider.isFetching)
-              Center(
-                child: CircularProgressIndicator(),
+              const Center(
+                child: CategoryLoadingAnimation(),
               )
             else
               Expanded(
