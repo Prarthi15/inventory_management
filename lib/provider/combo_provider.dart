@@ -12,11 +12,10 @@ class ComboProvider with ChangeNotifier {
   bool _isFormVisible = false;
   List<Combo> _comboList = [];
   List<DropdownItem<String>> _items = [];
-  List<DropdownItem<String>> get item=>_items;
+  List<DropdownItem<String>> get item => _items;
   List<Product> _products = [];
   List<Product> _selectedProducts = [];
   bool _loading = false;
-
 
   // Pagination state variables
   int _currentPage = 1; // Track current page
@@ -52,9 +51,8 @@ class ComboProvider with ChangeNotifier {
     notifyListeners();
   }
 
-
   // Sets the current combo and notifies listeners
-  void addItem(String label,String value) {
+  void addItem(String label, String value) {
     // _combo = combo;
     _items.add(DropdownItem<String>(label: label, value: value));
 
