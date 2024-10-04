@@ -42,13 +42,13 @@ class ExcelFileUploader extends StatelessWidget {
               for (int i = 0; i < headers.length; i++) {
                 var cellValue = row.length > i && row[i] != null
                     ? _cleanCellValue(row[i])
-                    : 'N/A';
+                    : null;
 
-                if (cellValue != 'N/A') {
+                if (cellValue != null) {
                   hasValidValue = true;
                 }
 
-                dataMap[headers[i]] = cellValue;
+                dataMap[headers[i]] = cellValue ?? '';
               }
 
               if (hasValidValue) {
@@ -109,18 +109,22 @@ class ExcelFileUploader extends StatelessWidget {
     return true;
   }
 
-  String _cleanCellValue(dynamic cell) {
+  String? _cleanCellValue(dynamic cell) {
+    if (cell == null) {
+      return null;
+    }
     if (cell is String) {
-      return cell;
+      return cell.isNotEmpty ? cell.trim() : null;
     } else if (cell is Map) {
-      return cell.toString();
+      return cell.toString().isNotEmpty ? cell.toString().trim() : null;
     } else if (cell.toString().contains('Data(')) {
-      return cell.toString().replaceAllMapped(
+      var cleanedValue = cell.toString().replaceAllMapped(
             RegExp(r'Data\((.*?),.*\)'),
             (match) => match.group(1) ?? '',
           );
+      return cleanedValue.isNotEmpty ? cleanedValue : null;
     }
-    return cell.toString();
+    return cell.toString().isNotEmpty ? cell.toString().trim() : null;
   }
 
   @override

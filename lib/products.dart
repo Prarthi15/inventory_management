@@ -9,6 +9,7 @@ import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
 import 'package:inventory_management/Custom-Files/custom-textfield.dart';
+import 'package:inventory_management/Custom-Files/loading_indicator.dart';
 import 'package:inventory_management/Custom-Files/multi-image-picker.dart';
 import 'package:inventory_management/Custom-Files/textfield-in-alert-box.dart';
 // import 'package:inventory_management/Custom-Files/textfield-in-alert-box.dart';
@@ -27,7 +28,7 @@ class _ProductsState extends State<Products> {
   List<String>? webImages;
   // int variationCount = 1;
 
-  CustomDropdown brandd= CustomDropdown();
+  CustomDropdown brandd = CustomDropdown();
   final TextEditingController _productNameController = TextEditingController();
   final TextEditingController _productIdentifierController =
       TextEditingController();
@@ -62,12 +63,11 @@ class _ProductsState extends State<Products> {
   final TextEditingController _technicalNameController =
       TextEditingController();
   String? token;
-  final GlobalKey<FormState> _formKey =
-      GlobalKey<FormState>(); 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   // final GlobalKey<_CustomDropdownState> dropdownKey = GlobalKey<_CustomDropdownState>();
 // final GlobalKey<CustomDropdownState> dropdownKey = GlobalKey<CustomDropdownState>();
-  // final GlobalKey<CustomDropdown> _scaffoldKey = GlobalKey<CustomDropdown>();   
-      // Add a form key
+  // final GlobalKey<CustomDropdown> _scaffoldKey = GlobalKey<CustomDropdown>();
+  // Add a form key
   // final _brandDropdownKey = GlobalKey<CustomDropdownState>();
   @override
   void dispose() {
@@ -86,8 +86,8 @@ class _ProductsState extends State<Products> {
     _mrpController.dispose();
     _costController.dispose();
     _grossWeightController.dispose();
-     _netWeightController.dispose();
-     _shopifyController.dispose();
+    _netWeightController.dispose();
+    _shopifyController.dispose();
     _lengthController.dispose();
     _widthController.dispose();
     _depthController.dispose();
@@ -164,7 +164,7 @@ class _ProductsState extends State<Products> {
                       : mobileLayout(
                           context,
                         ))
-                  : CircularProgressIndicator()),
+                  : const Center(child: ProductLoadingAnimation())),
     );
   }
 
@@ -296,7 +296,6 @@ class _ProductsState extends State<Products> {
                             onSelectedChanged: (int a) {
                               selectedIndexOfBrand = a;
                             },
-
                           )),
 
                       fieldTitle('Category',
@@ -536,7 +535,7 @@ class _ProductsState extends State<Products> {
                       ),
 
                       fieldTitle('Net Weight',
-                          show: false, height: 50, width:84),
+                          show: false, height: 50, width: 84),
                       SizedBox(
                         child: CustomTextField(
                           controller: _netWeightController,
@@ -547,7 +546,7 @@ class _ProductsState extends State<Products> {
                         ),
                       ),
                       fieldTitle('Gross Weight',
-                          show: false, height: 50, width:100.5),
+                          show: false, height: 50, width: 100.5),
                       SizedBox(
                         child: CustomTextField(
                           controller: _grossWeightController,
@@ -558,10 +557,10 @@ class _ProductsState extends State<Products> {
                         ),
                       ),
                       fieldTitle('Spotify Image Url',
-                          show: false, height: 50, width:126.2),
+                          show: false, height: 50, width: 126.2),
                       SizedBox(
                         child: CustomTextField(
-                          controller:_shopifyController,
+                          controller: _shopifyController,
                           height: 51,
                           // unit: '(in gram)',
                           // icon: Icons.currency_rupee_rounded,
@@ -708,9 +707,13 @@ class _ProductsState extends State<Products> {
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 16.0),
                                 ),
-                                child:productProvider!.saveButtonClick?const CircularProgressIndicator(color:Colors.white,) :const Text(
-                                  "Save Product",
-                                ),
+                                child: productProvider!.saveButtonClick
+                                    ? const CircularProgressIndicator(
+                                        color: Colors.white,
+                                      )
+                                    : const Text(
+                                        "Save Product",
+                                      ),
                               ),
                             ),
                             const SizedBox(width: 20),
@@ -777,135 +780,177 @@ class _ProductsState extends State<Products> {
 // Shopify Image: ${_shopifyController.text}
 // ${productProvider!.activeStatus}
 
-
 // ''');
 
-try{
-  if(productProvider!.selectedProductCategory=='Create Simple Product'){
-  var res=  await ProductPageApi().createProduct(
-  context: context,
-  productName: _productNameController.text,
-  parentSku: _skuController.text,
-  sku: _skuController.text,
-  ean: _eanUpcController.text,
-  description: _descriptionController.text,
-  brandId: (selectedIndexOfBrand - 1 < 0) ? '' : productProvider!.brand[selectedIndexOfBrand - 1]['id'].toString(),
-  category: (selectedIndexOfCategory - 1 < 0) ? '' : productProvider!.cat[selectedIndexOfCategory - 1]['name'].toString(),
-  technicalName: _technicalNameController.text,
-  labelSku: (selectedIndexOfLabel - 1 < 0) ? '' : productProvider!.label[selectedIndexOfLabel - 1]['labelSku'].toString(),
-  colorId: (selectedIndexOfColorDrop - 1 < 0) ? '' : productProvider!.colorDrop[selectedIndexOfColorDrop - 1]['_id'].toString(),
-  taxRule: _predefinedTaxRuleController.text,
-  dimensions: {"length":_lengthController.text, "breadth":_widthController.text, "height":_depthController.text},
-  weight:'12',
-  boxName: (selectedIndexOfBoxSize - 1 < 0) ? '' : productProvider!.boxSize[selectedIndexOfBoxSize - 1]["box_name"],
-  mrp:_mrpController.text,
-  cost:_costController.text,
-  active:productProvider!.activeStatus,
-  netWeight:_netWeightController.text,
-  grossWeight:_grossWeightController.text,
-  shopifyImage: _shopifyController.text,
-);
+    try {
+      if (productProvider!.selectedProductCategory == 'Create Simple Product') {
+        var res = await ProductPageApi().createProduct(
+          context: context,
+          productName: _productNameController.text,
+          parentSku: _skuController.text,
+          sku: _skuController.text,
+          ean: _eanUpcController.text,
+          description: _descriptionController.text,
+          brandId: (selectedIndexOfBrand - 1 < 0)
+              ? ''
+              : productProvider!.brand[selectedIndexOfBrand - 1]['id']
+                  .toString(),
+          category: (selectedIndexOfCategory - 1 < 0)
+              ? ''
+              : productProvider!.cat[selectedIndexOfCategory - 1]['name']
+                  .toString(),
+          technicalName: _technicalNameController.text,
+          labelSku: (selectedIndexOfLabel - 1 < 0)
+              ? ''
+              : productProvider!.label[selectedIndexOfLabel - 1]['labelSku']
+                  .toString(),
+          colorId: (selectedIndexOfColorDrop - 1 < 0)
+              ? ''
+              : productProvider!.colorDrop[selectedIndexOfColorDrop - 1]['_id']
+                  .toString(),
+          taxRule: _predefinedTaxRuleController.text,
+          dimensions: {
+            "length": _lengthController.text,
+            "breadth": _widthController.text,
+            "height": _depthController.text
+          },
+          weight: '12',
+          boxName: (selectedIndexOfBoxSize - 1 < 0)
+              ? ''
+              : productProvider!.boxSize[selectedIndexOfBoxSize - 1]
+                  ["box_name"],
+          mrp: _mrpController.text,
+          cost: _costController.text,
+          active: productProvider!.activeStatus,
+          netWeight: _netWeightController.text,
+          grossWeight: _grossWeightController.text,
+          shopifyImage: _shopifyController.text,
+        );
 
-if (res['message'] == 'Product created successfully') {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content:const Text(
-        ' Product is created successfully!',
-        style:  TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.green, // Change color as needed
-      behavior: SnackBarBehavior.floating, // Optional: Makes it floating
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-      ),
-      duration: Duration(seconds: 3), // Duration for how long it shows
-    ),
-  );
-} else {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content:const Text(
-        'Product creation failed. Please try again.',
-        style: TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.red, // Change color as needed
-      behavior: SnackBarBehavior.floating, // Optional: Makes it floating
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-      ),
-      duration:const Duration(seconds: 3), // Duration for how long it shows
-    ),
-  );
-}
-}else{
-  for(int i=0;i<productProvider!.countVariationFields;i++){
-  var res=  await ProductPageApi().createProduct(
-  context: context,
-  productName: _productNameController.text,
-  parentSku: _skuController.text,
-  sku:productProvider!.sku[i].text,
-  ean: _eanUpcController.text,
-  description: _descriptionController.text,
-  brandId: (selectedIndexOfBrand - 1 < 0) ? '' : productProvider!.brand[selectedIndexOfBrand - 1]['id'].toString(),
-  category: (selectedIndexOfCategory - 1 < 0) ? '' : productProvider!.cat[selectedIndexOfCategory - 1]['name'].toString(),
-  technicalName: _technicalNameController.text,
-  labelSku: (selectedIndexOfLabel - 1 < 0) ? '' : productProvider!.label[selectedIndexOfLabel - 1]['labelSku'].toString(),
-  colorId: (selectedIndexOfColorDrop - 1 < 0) ? '' : productProvider!.colorDrop[selectedIndexOfColorDrop - 1]['_id'].toString(),
-  taxRule: _predefinedTaxRuleController.text,
-  dimensions:  {"length":_lengthController.text, "breadth":_widthController.text, "height":_depthController.text},
-  weight:'12',
-  boxName: (selectedIndexOfBoxSize - 1 < 0) ? '' : productProvider!.boxSize[selectedIndexOfBoxSize - 1]["box_name"],
-  mrp:_mrpController.text,
-  cost:_costController.text,
-  active:productProvider!.activeStatus,
-  netWeight:_netWeightController.text,
-  grossWeight:_grossWeightController.text,
-  shopifyImage: _shopifyController.text,
-);
-if (res['message'] == 'Product created successfully') {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
-        'Variant $i Product is created successfully!',
-        style:const  TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.green, // Change color as needed
-      behavior: SnackBarBehavior.floating, // Optional: Makes it floating
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-      ),
-      duration: Duration(seconds: 3), // Duration for how long it shows
-    ),
-  );
-} else {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content:const Text(
-        'Product creation failed. Please try again.',
-        style: TextStyle(color: Colors.white),
-      ),
-      backgroundColor: Colors.red, // Change color as needed
-      behavior: SnackBarBehavior.floating, // Optional: Makes it floating
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10), // Rounded corners
-      ),
-      duration:const Duration(seconds: 3), // Duration for how long it shows
-    ),
-  );
-}
+        if (res['message'] == 'Product created successfully') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                ' Product is created successfully!',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.green, // Change color as needed
+              behavior:
+                  SnackBarBehavior.floating, // Optional: Makes it floating
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // Rounded corners
+              ),
+              duration: Duration(seconds: 3), // Duration for how long it shows
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Product creation failed. Please try again.',
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red, // Change color as needed
+              behavior:
+                  SnackBarBehavior.floating, // Optional: Makes it floating
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10), // Rounded corners
+              ),
+              duration:
+                  const Duration(seconds: 3), // Duration for how long it shows
+            ),
+          );
+        }
+      } else {
+        for (int i = 0; i < productProvider!.countVariationFields; i++) {
+          var res = await ProductPageApi().createProduct(
+            context: context,
+            productName: _productNameController.text,
+            parentSku: _skuController.text,
+            sku: productProvider!.sku[i].text,
+            ean: _eanUpcController.text,
+            description: _descriptionController.text,
+            brandId: (selectedIndexOfBrand - 1 < 0)
+                ? ''
+                : productProvider!.brand[selectedIndexOfBrand - 1]['id']
+                    .toString(),
+            category: (selectedIndexOfCategory - 1 < 0)
+                ? ''
+                : productProvider!.cat[selectedIndexOfCategory - 1]['name']
+                    .toString(),
+            technicalName: _technicalNameController.text,
+            labelSku: (selectedIndexOfLabel - 1 < 0)
+                ? ''
+                : productProvider!.label[selectedIndexOfLabel - 1]['labelSku']
+                    .toString(),
+            colorId: (selectedIndexOfColorDrop - 1 < 0)
+                ? ''
+                : productProvider!.colorDrop[selectedIndexOfColorDrop - 1]
+                        ['_id']
+                    .toString(),
+            taxRule: _predefinedTaxRuleController.text,
+            dimensions: {
+              "length": _lengthController.text,
+              "breadth": _widthController.text,
+              "height": _depthController.text
+            },
+            weight: '12',
+            boxName: (selectedIndexOfBoxSize - 1 < 0)
+                ? ''
+                : productProvider!.boxSize[selectedIndexOfBoxSize - 1]
+                    ["box_name"],
+            mrp: _mrpController.text,
+            cost: _costController.text,
+            active: productProvider!.activeStatus,
+            netWeight: _netWeightController.text,
+            grossWeight: _grossWeightController.text,
+            shopifyImage: _shopifyController.text,
+          );
+          if (res['message'] == 'Product created successfully') {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  'Variant $i Product is created successfully!',
+                  style: const TextStyle(color: Colors.white),
+                ),
+                backgroundColor: Colors.green, // Change color as needed
+                behavior:
+                    SnackBarBehavior.floating, // Optional: Makes it floating
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                ),
+                duration:
+                    Duration(seconds: 3), // Duration for how long it shows
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text(
+                  'Product creation failed. Please try again.',
+                  style: TextStyle(color: Colors.white),
+                ),
+                backgroundColor: Colors.red, // Change color as needed
+                behavior:
+                    SnackBarBehavior.floating, // Optional: Makes it floating
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                ),
+                duration: const Duration(
+                    seconds: 3), // Duration for how long it shows
+              ),
+            );
+          }
+        }
+        clear();
+      }
+    } catch (e) {
+      // print(e.toString());
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${e.toString()}')));
+    }
 
-
-
-}
-clear();
-  }
-  
-}catch(e){
-  // print(e.toString());
-   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('${e.toString()}')));
-}
-
- productProvider!.saveButtonClickStatus();
+    productProvider!.saveButtonClickStatus();
   }
 
   //for web layout
@@ -1005,8 +1050,7 @@ clear();
                     height: 51,
                     width: 300,
                     child: CustomDropdown(
-                      
-                      selectedIndex:0,
+                      selectedIndex: 0,
                       option: productProvider!.brand,
                       onSelectedChanged: (int a) {
                         selectedIndexOfBrand = a;
@@ -1201,7 +1245,7 @@ clear();
               formLayout(
                 fieldTitle('Net Weight'),
                 CustomTextField(
-                    controller:_netWeightController,
+                    controller: _netWeightController,
                     height: 51,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -1214,7 +1258,7 @@ clear();
               formLayout(
                 fieldTitle('Gross Weight'),
                 CustomTextField(
-                    controller:_grossWeightController,
+                    controller: _grossWeightController,
                     height: 51,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -1227,7 +1271,7 @@ clear();
               formLayout(
                 fieldTitle('Spotify Image'),
                 CustomTextField(
-                    controller:_shopifyController,
+                    controller: _shopifyController,
                     height: 51,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -1239,43 +1283,43 @@ clear();
               const SizedBox(height: 12),
               formLayout(
                 fieldTitle('Package Dimensions'),
-                 SizedBox(
-                        width: 550,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: CustomTextField(
-                                controller: _lengthController,
-                                prefix: 'L',
-                                // width: MediaQuery.of(context).size.width * 0.15,
-                                unit: 'cm',
-                                keyboardType: TextInputType.number,
-                              ),
-                            ),
-                            const Text('x'),
-                            Expanded(
-                              child: CustomTextField(
-                                controller: _widthController,
-                                // width: MediaQuery.of(context).size.width * 0.15,
-                                prefix: 'W',
-                                unit: 'cm',
-                                keyboardType: TextInputType.number,
-                              ),
-                            ),
-                            const Text('x'),
-                            Expanded(
-                              child: CustomTextField(
-                                controller: _depthController,
-                                // width: MediaQuery.of(context).size.width * 0.15,
-                                prefix: 'D',
-                                unit: 'cm',
-                                keyboardType: TextInputType.number,
-                              ),
-                            ),
-                          ],
+                SizedBox(
+                  width: 550,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: CustomTextField(
+                          controller: _lengthController,
+                          prefix: 'L',
+                          // width: MediaQuery.of(context).size.width * 0.15,
+                          unit: 'cm',
+                          keyboardType: TextInputType.number,
                         ),
                       ),
+                      const Text('x'),
+                      Expanded(
+                        child: CustomTextField(
+                          controller: _widthController,
+                          // width: MediaQuery.of(context).size.width * 0.15,
+                          prefix: 'W',
+                          unit: 'cm',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                      const Text('x'),
+                      Expanded(
+                        child: CustomTextField(
+                          controller: _depthController,
+                          // width: MediaQuery.of(context).size.width * 0.15,
+                          prefix: 'D',
+                          unit: 'cm',
+                          keyboardType: TextInputType.number,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
               formLayout(
@@ -1385,26 +1429,28 @@ clear();
                   fieldTitle(''),
                   Row(
                     children: [
-                       SizedBox(
-                        width:150,
-                        height:40,
-                         child: ElevatedButton(
-                                  onPressed: saveButton,
-                                  style: ElevatedButton.styleFrom(
-                                    foregroundColor: Colors.white,
-                                    backgroundColor:
-                                        const Color.fromRGBO(6, 90, 216, 1),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(2.0),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 16.0),
-                                  ),
-                                  child:productProvider!.saveButtonClick?const CircularProgressIndicator(color:Colors.white) :const Text(
-                                    "Save Product",
-                                  ),
+                      SizedBox(
+                        width: 150,
+                        height: 40,
+                        child: ElevatedButton(
+                          onPressed: saveButton,
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor:
+                                const Color.fromRGBO(6, 90, 216, 1),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(2.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          ),
+                          child: productProvider!.saveButtonClick
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
+                              : const Text(
+                                  "Save Product",
                                 ),
-                       ),
+                        ),
+                      ),
                       const SizedBox(width: 4),
                       CustomButton(
                           width: 150,
