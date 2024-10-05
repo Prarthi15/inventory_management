@@ -81,10 +81,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Inventory Management',
+      title: 'StockShip',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        fontFamily: 'Poppins',
         primaryColor: const Color.fromRGBO(6, 90, 216, 1),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xff09254A),
+          primary: const Color(0xff09254A),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
