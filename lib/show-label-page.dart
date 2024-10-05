@@ -26,6 +26,8 @@ class _LabelPageState extends State<LabelPage> {
   }
   TextEditingController searchController=TextEditingController();
 
+  // TextEditingController searchController = TextEditingController();
+
   void getData() async {
     LabelApi po = Provider.of<LabelApi>(context, listen: false);
     await po.getLabel();
@@ -35,7 +37,7 @@ class _LabelPageState extends State<LabelPage> {
   Widget build(BuildContext context) {
     return Consumer<LabelApi>(
       builder: (context, l, child) => Scaffold(
-        body: l.labelInformation.isNotEmpty&&l.loading
+        body: l.labelInformation.isNotEmpty && l.loading
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -47,10 +49,11 @@ class _LabelPageState extends State<LabelPage> {
                         child: SizedBox(
                           width: 300,
                           child: TextField(
-                            controller:searchController,
+                            controller: searchController,
                             decoration: InputDecoration(
                               hintText: 'Search...',
-                              prefixIcon: Icon(Icons.search, color: Colors.grey),
+                              prefixIcon:
+                                  Icon(Icons.search, color: Colors.grey),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(30.0),
                                 borderSide: BorderSide.none, // No border line
@@ -76,27 +79,29 @@ class _LabelPageState extends State<LabelPage> {
                                 ),
                               ),
                             ),
-                            onChanged: (value) async{
-                            l.searchByLabel(value);
-                             
+                            onChanged: (value) async {
+                              l.searchByLabel(value);
                             },
                           ),
                         ),
                       ),
-
                       InkWell(
-                        child:const Icon(Icons.restart_alt),
-                        onTap:(){
+                        child: const Icon(Icons.restart_alt),
+                        onTap: () {
                           l.cancel();
                         },
-                        )
+                      )
                     ],
                   ),
-                  if(searchController.text.isEmpty && l.labelInformation.isEmpty)
-                 const Padding(
-                    padding:  EdgeInsets.all(8.0),
-                    child:  Text("hit reload",style:TextStyle(color:Colors.red),),
-                  ),
+                  if (searchController.text.isEmpty &&
+                      l.labelInformation.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        "hit reload",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
                   Expanded(
                     child: ListView.builder(
                       itemBuilder: (context, index) {
@@ -111,11 +116,11 @@ class _LabelPageState extends State<LabelPage> {
                             elevation: 10,
                             child: Container(
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
+                                gradient:const LinearGradient(
                                   colors: [
                                     Colors.white,
-                                    Colors.white.withOpacity(0.6),
-                                    Colors.lightBlueAccent.withOpacity(0.1)
+                                    Colors.white,
+                                    // Colors.lightBlueAccent.withOpacity(0.1)
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -184,36 +189,51 @@ class _LabelPageState extends State<LabelPage> {
                                                 l.labelInformation[index]
                                                         ["labelSku"] ??
                                                     'null'),
-                                            Row(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Product Details ",
-                                                  style:
-                                                      GoogleFonts.daiBannaSil(
-                                                          fontSize: 20,
+                                            Expanded(
+                                              child: Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Product Details ",
+                                                    style:
+                                                        GoogleFonts.daiBannaSil(
+                                                            fontSize: 20,
+                                                            fontWeight:
+                                                                FontWeight.bold),
+                                                  ),
+                                                  const Text(": ",
+                                                      style: TextStyle(
+                                                          fontSize: 18,
                                                           fontWeight:
-                                                              FontWeight.bold),
-                                                ),
-                                                const Text(": ",
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                                Column(
-                                                 children: [
-                                                   for(int i=0;i<5;i++)
-                                                  const Column(
-                                                    children:[
-                                                       Text("hee;p00"),
-                                                        Text("hee;p01"),
-                                                      Text("hee;p02"),
-                                                    ],
-                                                   )
-                                                 ],
-                                                ),
-                                              ],
+                                                              FontWeight.bold)),
+                                                  Expanded(
+                                                    child: Column(
+                                                      children: [
+                                                        for (int i = 0; i <l.labelInformation[
+                                                                                      index]["products"].length; i++)
+                                                          Expanded(
+                                                            child: Column(
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    Expanded(
+                                                                      child: fieldTitle(
+                                                                          "Product SKU",
+                                                                          l.labelInformation[
+                                                                                      index]["products"][i]["productSku"] ??
+                                                                              'null'),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                             fieldTitle(
                                                 "quantity",
@@ -236,91 +256,86 @@ class _LabelPageState extends State<LabelPage> {
                           ),
                         );
                       },
-                      itemCount:l.labelInformation.length,
+                      itemCount: l.labelInformation.length,
                     ),
                   ),
                   // const Spacer(),
-                   Row(
-                children: [
-                  InkWell(
-                    child: const FaIcon(FontAwesomeIcons.chevronLeft),
-                    onTap: () async{
-                       l.updateCurrentPage(l.totalPage);
-                        await l.getLabel();
-                    },
-                  ),
-                  Pagination(
-                    numOfPages:l.totalPage,
-                    selectedPage:l.currentPage,
-                    pagesVisible: 5,
-                    spacing: 10,
-                    onPageChanged: (page)async {
-                      l.updateCurrentPage(page);
-                       await l.getLabel();
-                    },
-                    nextIcon: const Icon(
-                      Icons.chevron_right_rounded,
-                      color: AppColors.primaryBlue,
-                      size: 20,
-                    ),
-                    previousIcon: const Icon(
-                      Icons.chevron_left_rounded,
-                      color: AppColors.primaryBlue,
-                      size: 20,
-                    ),
-                    activeTextStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    activeBtnStyle: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(AppColors.primaryBlue),
-                      shape: MaterialStateProperty.all(const CircleBorder(
-                        side:
-                            BorderSide(color: AppColors.primaryBlue, width: 1),
-                      )),
-                    ),
-                    inactiveBtnStyle: ButtonStyle(
-                      elevation: MaterialStateProperty.all(0),
-                      backgroundColor: MaterialStateProperty.all(Colors.white),
-                      shape: MaterialStateProperty.all(const CircleBorder(
-                        side:
-                            BorderSide(color: AppColors.primaryBlue, width: 1),
-                      )),
-                    ),
-                    inactiveTextStyle: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.primaryBlue,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  InkWell(
-                    child: const FaIcon(FontAwesomeIcons.chevronRight),
-                    onTap: ()async {
+                  Row(children: [
+                    InkWell(
+                      child: const FaIcon(FontAwesomeIcons.chevronLeft),
+                      onTap: () async {
                         l.updateCurrentPage(l.totalPage);
                         await l.getLabel();
-                        
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: 30,
-                      width: 50,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.lightBlue),
+                      },
+                    ),
+                    Pagination(
+                      numOfPages: l.totalPage,
+                      selectedPage: l.currentPage,
+                      pagesVisible: 5,
+                      spacing: 10,
+                      onPageChanged: (page) async {
+                        l.updateCurrentPage(page);
+                        await l.getLabel();
+                      },
+                      nextIcon: const Icon(
+                        Icons.chevron_right_rounded,
+                        color: AppColors.primaryBlue,
+                        size: 20,
                       ),
-                      child: Center(
-                        child: Text(
-                            '${l.currentPage}/${l.totalPage}'),
+                      previousIcon: const Icon(
+                        Icons.chevron_left_rounded,
+                        color: AppColors.primaryBlue,
+                        size: 20,
+                      ),
+                      activeTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      activeBtnStyle: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(AppColors.primaryBlue),
+                        shape: MaterialStateProperty.all(const CircleBorder(
+                          side: BorderSide(
+                              color: AppColors.primaryBlue, width: 1),
+                        )),
+                      ),
+                      inactiveBtnStyle: ButtonStyle(
+                        elevation: MaterialStateProperty.all(0),
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.white),
+                        shape: MaterialStateProperty.all(const CircleBorder(
+                          side: BorderSide(
+                              color: AppColors.primaryBlue, width: 1),
+                        )),
+                      ),
+                      inactiveTextStyle: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.primaryBlue,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                  ),
-                ]
-              )
-            
-            
+                    InkWell(
+                      child: const FaIcon(FontAwesomeIcons.chevronRight),
+                      onTap: () async {
+                        l.updateCurrentPage(l.totalPage);
+                        await l.getLabel();
+                      },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 30,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: AppColors.lightBlue),
+                        ),
+                        child: Center(
+                          child: Text('${l.currentPage}/${l.totalPage}'),
+                        ),
+                      ),
+                    ),
+                  ])
                 ],
               )
             : const Center(
