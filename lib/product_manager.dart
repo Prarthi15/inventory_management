@@ -282,7 +282,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       },
       hintStyle: const TextStyle(color: Colors.grey),
       itemStyle: const TextStyle(color: Colors.black),
-      dropdownColor: Colors.white,
+      //dropdownColor: Colors.white,
       borderColor: Colors.orange,
       borderWidth: 2.0,
       elevation: 8.0,
