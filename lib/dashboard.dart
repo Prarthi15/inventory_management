@@ -10,7 +10,6 @@ import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/manage_inventory.dart';
 import 'package:inventory_management/marketplace_page.dart';
 import 'package:inventory_management/order-page.dart';
-
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
@@ -21,7 +20,6 @@ import 'package:inventory_management/location_master.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/manifest_page.dart';
 import 'package:inventory_management/marketplace_page.dart';
-import 'package:inventory_management/order-page.dart';
 import 'package:inventory_management/product_upload.dart';
 import 'package:inventory_management/packer_page.dart';
 import 'package:inventory_management/picker_page.dart';
@@ -311,18 +309,6 @@ class _DashboardPageState extends State<DashboardPage> {
             ? const Color.fromRGBO(6, 90, 216, 0.1)
             : null,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: _buildDrawerItem(
-              icon: Icons.menu_book,
-              text: 'Order Page',
-              isSelected: selectedDrawerItem == 'Order Page',
-              onTap: () => _onDrawerItemTapped('Order Page', isSmallScreen),
-              isIndented: true,
-              iconSize: 20,
-              fontSize: 14,
-            ),
-          ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(

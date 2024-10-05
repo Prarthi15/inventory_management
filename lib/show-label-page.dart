@@ -24,8 +24,9 @@ class _LabelPageState extends State<LabelPage> {
     super.initState();
     getData();
   }
+  TextEditingController searchController=TextEditingController();
 
-  TextEditingController searchController = TextEditingController();
+  // TextEditingController searchController = TextEditingController();
 
   void getData() async {
     LabelApi po = Provider.of<LabelApi>(context, listen: false);
