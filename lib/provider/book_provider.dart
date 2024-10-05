@@ -125,6 +125,7 @@ class BookProvider with ChangeNotifier {
     notifyListeners();
   }
 
+
   // Handle individual row checkbox change
   void handleRowCheckboxChange(String? orderId, bool isSelected, bool isB2B) {
     int index;
@@ -174,6 +175,7 @@ class BookProvider with ChangeNotifier {
     }
     notifyListeners();
   }
+
 
   @override
   void dispose() {

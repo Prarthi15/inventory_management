@@ -285,6 +285,7 @@ class _OrdersLoadingAnimatioState extends State<OrdersLoadingAnimation>
   }
 }
 
+
 //orders page loading animation
 class BookLoadingAnimation extends StatefulWidget {
   const BookLoadingAnimation({Key? key}) : super(key: key);
@@ -340,3 +341,4 @@ class _BookLoadingAnimatioState extends State<BookLoadingAnimation>
     );
   }
 }
+
