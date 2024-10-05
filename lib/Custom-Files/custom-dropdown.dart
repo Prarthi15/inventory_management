@@ -11,53 +11,53 @@ import 'package:provider/provider.dart';
 class CustomDropdown extends StatefulWidget {
   final double fontSize;
   int selectedIndex;
-  
-  final List<Map<String,dynamic>>option;
+
+  final List<Map<String, dynamic>> option;
   final String? Function(String?)? validator;
   final bool isboxSize;
   final bool label;
   final bool grade;
   ValueChanged<int>? onSelectedChanged;
 
-
-   CustomDropdown({super.key, this.validator, this.fontSize = 17,this.option=const [],this.isboxSize=false,this.label=false,this.selectedIndex=0,this.onSelectedChanged,this.grade=false});
+  CustomDropdown(
+      {super.key,
+      this.validator,
+      this.fontSize = 17,
+      this.option = const [],
+      this.isboxSize = false,
+      this.label = false,
+      this.selectedIndex = 0,
+      this.onSelectedChanged,
+      this.grade = false});
 
   @override
   State<CustomDropdown> createState() => _CustomDropdownState();
-
 }
 
 class _CustomDropdownState extends State<CustomDropdown> {
   String? _selectedItem = 'Select option';
-   List<String> _items = [
-   'Select option'
-   
-  ];
+  List<String> _items = ['Select option'];
 
-  void updateData(){
+  void updateData() {
     // _items.clear();
-    if(widget.label){
-     for(int i=0;i<widget.option.length;i++){
+    if (widget.label) {
+      for (int i = 0; i < widget.option.length; i++) {
         _items.add(widget.option[i]['labelSku']);
-     }
-     
-    }else if(widget.isboxSize){
-       for(int i=0;i<widget.option.length;i++){
+      }
+    } else if (widget.isboxSize) {
+      for (int i = 0; i < widget.option.length; i++) {
         _items.add('${widget.option[i]['box_name']}');
-     }
-    }else if(widget.grade){
-        _items.addAll(['A','B','C','D']);
-    }else{
-        for(int i=0;i<widget.option.length;i++){
+      }
+    } else if (widget.grade) {
+      _items.addAll(['A', 'B', 'C', 'D']);
+    } else {
+      for (int i = 0; i < widget.option.length; i++) {
         _items.add('${widget.option[i]['name']}');
-     }
+      }
     }
-    _selectedItem=_items[widget.selectedIndex];
-    setState(() {
-       
-     });
+    _selectedItem = _items[widget.selectedIndex];
+    setState(() {});
   }
-
 
   @override
   void initState() {
@@ -69,7 +69,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
 
   @override
   Widget build(BuildContext context) {
-  
     return DropdownButtonHideUnderline(
       child: Container(
         alignment: Alignment.topCenter,
@@ -84,7 +83,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
           items: _items,
           selectedItem: _selectedItem,
           // enabled:false,
-          popupProps:const  PopupProps.menu(
+          popupProps: const PopupProps.menu(
             fit: FlexFit.tight,
             showSelectedItems: true,
             showSearchBox: true,
@@ -92,41 +91,43 @@ class _CustomDropdownState extends State<CustomDropdown> {
               // cursorHeight:3,
               decoration: InputDecoration(
                 hintText: "Search for an option",
-                prefixIcon: Icon(Icons.search,size:20,),
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 20,
+                ),
                 border: OutlineInputBorder(),
-                constraints:BoxConstraints(maxHeight:30),
-                isDense:true,
-                filled:true,
-                label:Text('Search'),
-                contentPadding:EdgeInsets.all(0),
-                
+                constraints: BoxConstraints(maxHeight: 30),
+                isDense: true,
+                filled: true,
+                label: Text('Search'),
+                contentPadding: EdgeInsets.all(0),
               ),
-              
             ),
-        //  itemBuilder: (context, item, isSelected)=>ListTile(
-        //       title: Text(item),
-        //       selected: isSelected,
-        //     ),
-            scrollbarProps:ScrollbarProps(
-              // scrollbarOrientation:ScrollEndNotification
-              // notificationPredicate:(b){
-              //   print("b is ssssss $b");
-              //   return true;
-              // }
-            ),
+            //  itemBuilder: (context, item, isSelected)=>ListTile(
+            //       title: Text(item),
+            //       selected: isSelected,
+            //     ),
+            scrollbarProps: ScrollbarProps(
+                // scrollbarOrientation:ScrollEndNotification
+                // notificationPredicate:(b){
+                //   print("b is ssssss $b");
+                //   return true;
+                // }
+                ),
           ),
           onChanged: (String? newValue) {
-              // _items.fin;
-             widget.selectedIndex= _items.indexWhere((element) => element == newValue);
-             if(widget.onSelectedChanged!=null){
-              widget.onSelectedChanged!( widget.selectedIndex );
-             }
-             if(widget.grade){
-              Provider.of<ProductProvider>(context,listen:false).grade(newValue!);
-             }
+            // _items.fin;
+            widget.selectedIndex =
+                _items.indexWhere((element) => element == newValue);
+            if (widget.onSelectedChanged != null) {
+              widget.onSelectedChanged!(widget.selectedIndex);
+            }
+            if (widget.grade) {
+              Provider.of<ProductProvider>(context, listen: false)
+                  .grade(newValue!);
+            }
             setState(() {
               _selectedItem = newValue;
-              
             });
           },
         ),
@@ -134,7 +135,6 @@ class _CustomDropdownState extends State<CustomDropdown> {
     );
   }
 }
-
 
 class SimpleDropDown extends StatefulWidget {
   const SimpleDropDown({super.key});
@@ -145,21 +145,20 @@ class SimpleDropDown extends StatefulWidget {
 
 class _SimpleDropDownState extends State<SimpleDropDown> {
   // DropdownMenuItem<String> vale='Hwlo';
-  List<String> ans=['option 0','option 1'];
+  List<String> ans = ['option 0', 'option 1'];
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height:40,
-      width:double.infinity,
-      child:DropdownButton(
-        value:'option 0',
-        items:ans.map((e) =>DropdownMenuItem(child:Text(e))).toList(),
-        onChanged:(val){},
-        ),
+      height: 40,
+      width: double.infinity,
+      child: DropdownButton(
+        value: 'option 0',
+        items: ans.map((e) => DropdownMenuItem(child: Text(e))).toList(),
+        onChanged: (val) {},
+      ),
     );
   }
 }
-
 
 class DropDownWithRow extends StatefulWidget {
   const DropDownWithRow({super.key});
@@ -170,73 +169,72 @@ class DropDownWithRow extends StatefulWidget {
 
 class _DropDownWithRowState extends State<DropDownWithRow> {
   // DropdownMenuItem<String> vale='Hwlo';
-  List<String> ans=['option 0','option 1'];
-  
+  List<String> ans = ['option 0', 'option 1'];
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height:40,
-      width:double.infinity,
-      child:DropdownButton(
-        value:'option 0',
-        items:ans.map((e) =>DropdownMenuItem(child:Text(e))).toList(),
-        onChanged:(val){},
-        ),
+      height: 40,
+      width: double.infinity,
+      child: DropdownButton(
+        value: 'option 0',
+        items: ans.map((e) => DropdownMenuItem(child: Text(e))).toList(),
+        onChanged: (val) {},
+      ),
     );
   }
 }
 
-
 class CustomDropdownMultiple extends StatefulWidget {
   final double fontSize;
   int selectedIndex;
-  
-  final List<Map<String,dynamic>>option;
+
+  final List<Map<String, dynamic>> option;
   final String? Function(String?)? validator;
   final bool isboxSize;
   final bool label;
   final bool grade;
   ValueChanged<int>? onSelectedChanged;
 
-
-   CustomDropdownMultiple({super.key, this.validator, this.fontSize = 17,this.option=const [],this.isboxSize=false,this.label=false,this.selectedIndex=0,this.onSelectedChanged,this.grade=false});
+  CustomDropdownMultiple(
+      {super.key,
+      this.validator,
+      this.fontSize = 17,
+      this.option = const [],
+      this.isboxSize = false,
+      this.label = false,
+      this.selectedIndex = 0,
+      this.onSelectedChanged,
+      this.grade = false});
 
   @override
   State<CustomDropdownMultiple> createState() => _CustomDropdownMultipleState();
-
 }
 
 class _CustomDropdownMultipleState extends State<CustomDropdownMultiple> {
   String? _selectedItem = 'Select option';
-   List<String> _items = [
-   'Select option'
-   
-  ];
+  List<String> _items = ['Select option'];
 
-  void updateData(){
+  void updateData() {
     // _items.clear();
-    if(widget.label){
-     for(int i=0;i<widget.option.length;i++){
+    if (widget.label) {
+      for (int i = 0; i < widget.option.length; i++) {
         _items.add(widget.option[i]['labelSku']);
-     }
-     
-    }else if(widget.isboxSize){
-       for(int i=0;i<widget.option.length;i++){
+      }
+    } else if (widget.isboxSize) {
+      for (int i = 0; i < widget.option.length; i++) {
         _items.add('${widget.option[i]['box_name']}');
-     }
-    }else if(widget.grade){
-        _items.addAll(['A','B','C','D']);
-    }else{
-        for(int i=0;i<widget.option.length;i++){
+      }
+    } else if (widget.grade) {
+      _items.addAll(['A', 'B', 'C', 'D']);
+    } else {
+      for (int i = 0; i < widget.option.length; i++) {
         _items.add('${widget.option[i]['name']}');
-     }
+      }
     }
-    _selectedItem=_items[widget.selectedIndex];
-    setState(() {
-       
-     });
+    _selectedItem = _items[widget.selectedIndex];
+    setState(() {});
   }
-
 
   @override
   void initState() {
@@ -248,7 +246,6 @@ class _CustomDropdownMultipleState extends State<CustomDropdownMultiple> {
 
   @override
   Widget build(BuildContext context) {
-  
     return DropdownButtonHideUnderline(
       child: Container(
         alignment: Alignment.topCenter,
@@ -260,57 +257,58 @@ class _CustomDropdownMultipleState extends State<CustomDropdownMultiple> {
           color: Colors.blue.shade100,
         ),
         child: DropdownSearch<String>.multiSelection(
-          items: _items,
-          // selectedItem: _selectedItem,
-          // enabled:false,
-          popupProps:const  PopupPropsMultiSelection.menu(
-            fit: FlexFit.tight,
-            showSelectedItems: true,
-            showSearchBox: true,
-            searchFieldProps: TextFieldProps(
-              // cursorHeight:3,
-              decoration: InputDecoration(
-                hintText: "Search for an option",
-                prefixIcon: Icon(Icons.search,size:20,),
-                border: OutlineInputBorder(),
-                constraints:BoxConstraints(maxHeight:30),
-                isDense:true,
-                filled:true,
-                label:Text('Search'),
-                contentPadding:EdgeInsets.all(0),
-                
+            items: _items,
+            // selectedItem: _selectedItem,
+            // enabled:false,
+            popupProps: const PopupPropsMultiSelection.menu(
+              fit: FlexFit.tight,
+              showSelectedItems: true,
+              showSearchBox: true,
+              searchFieldProps: TextFieldProps(
+                // cursorHeight:3,
+                decoration: InputDecoration(
+                  hintText: "Search for an option",
+                  prefixIcon: Icon(
+                    Icons.search,
+                    size: 20,
+                  ),
+                  border: OutlineInputBorder(),
+                  constraints: BoxConstraints(maxHeight: 30),
+                  isDense: true,
+                  filled: true,
+                  label: Text('Search'),
+                  contentPadding: EdgeInsets.all(0),
+                ),
               ),
-              
+            )
+            // //  itemBuilder: (context, item, isSelected)=>ListTile(
+            // //       title: Text(item),
+            // //       selected: isSelected,
+            // //     ),
+            //     scrollbarProps:ScrollbarProps(
+            //       // scrollbarOrientation:ScrollEndNotification
+            //       // notificationPredicate:(b){
+            //       //   print("b is ssssss $b");
+            //       //   return true;
+            //       // }
+            //     ),
+            //   ),
+            // onChanged: (String? newValue) {
+            //     // _items.fin;
+            //    widget.selectedIndex= _items.indexWhere((element) => element == newValue);
+            //    if(widget.onSelectedChanged!=null){
+            //     widget.onSelectedChanged!( widget.selectedIndex );
+            //    }
+            //    if(widget.grade){
+            //     Provider.of<ProductProvider>(context,listen:false).grade(newValue!);
+            //    }
+            //   setState(() {
+            //     _selectedItem = newValue;
+
+            //   }
+            //   );
+            // },
             ),
-          )
-        // //  itemBuilder: (context, item, isSelected)=>ListTile(
-        // //       title: Text(item),
-        // //       selected: isSelected,
-        // //     ),
-        //     scrollbarProps:ScrollbarProps(
-        //       // scrollbarOrientation:ScrollEndNotification
-        //       // notificationPredicate:(b){
-        //       //   print("b is ssssss $b");
-        //       //   return true;
-        //       // }
-        //     ),
-        //   ),
-          // onChanged: (String? newValue) {
-          //     // _items.fin;
-          //    widget.selectedIndex= _items.indexWhere((element) => element == newValue);
-          //    if(widget.onSelectedChanged!=null){
-          //     widget.onSelectedChanged!( widget.selectedIndex );
-          //    }
-          //    if(widget.grade){
-          //     Provider.of<ProductProvider>(context,listen:false).grade(newValue!);
-          //    }
-          //   setState(() {
-          //     _selectedItem = newValue;
-              
-          //   }
-          //   );
-          // },
-        ),
       ),
     );
   }
