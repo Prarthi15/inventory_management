@@ -78,7 +78,7 @@ class _CustomDropdownState extends State<CustomDropdown> {
           // errorStyle:'',
           border: Border.all(color: Colors.blue.withOpacity(0.2)),
           borderRadius: BorderRadius.circular(8),
-          color: Colors.blue.shade100,
+          color: Colors.white,
         ),
         child: DropdownSearch<String>(
           items: _items,
