@@ -289,6 +289,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20.0),
+         collapsedBackgroundColor:["Orders Page","Book Page","Picker Page","Packer Page","Checker Page","Racked Page","Manifest Page"].contains(selectedDrawerItem)?AppColors.blueAccent:AppColors.white,
         title: Text(
           'Orders',
           style: TextStyle(
@@ -410,6 +411,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20.0),
+         collapsedBackgroundColor:["Manage Inventory"].contains(selectedDrawerItem)?AppColors.blueAccent:AppColors.white,
         title: Text(
           'Inventory',
           style: TextStyle(
@@ -458,6 +460,9 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20.0),
+        collapsedBackgroundColor:["Label Page","Create Label Page","Product Master","Category Master","Combo Master","Marketplace Master","Location Master"].contains(selectedDrawerItem)?AppColors.blueAccent:AppColors.white,
+        
+        
         title: Text(
           'Master',
           style: TextStyle(
