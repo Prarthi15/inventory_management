@@ -93,12 +93,20 @@ class _LocationMasterState extends State<LocationMaster> {
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (!locationProvider.isCreatingNewLocation)
+          if (!locationProvider.isCreatingNewLocation &&
+              !locationProvider.isEditingLocation)
             _buildButtonRow(context, buttonWidth, buttonHeight, fontSize),
           const SizedBox(height: 10),
-          locationProvider.isCreatingNewLocation
-              ? const NewLocationForm()
-              : _buildMainTable(context), // Display the main table or form
+          locationProvider.isEditingLocation
+              ? NewLocationForm(
+                  // This should handle prefilled data based on warehouseData
+                  isEditing: true,
+                  warehouseData: locationProvider
+                      .warehouseData, // If you want to pass this as a flag, ensure your form handles it
+                )
+              : locationProvider.isCreatingNewLocation
+                  ? const NewLocationForm()
+                  : _buildMainTable(context), // Display the main table or form
         ],
       ),
     );
@@ -204,8 +212,16 @@ class _LocationMasterState extends State<LocationMaster> {
           children: [
             IconButton(
               icon: const Icon(Icons.edit, color: AppColors.tealcolor),
-              onPressed: () {
-                _showDetailsDialog(context, warehouse); // Show details on click
+              onPressed: () async {
+                // Call the fetchWarehouse method using the warehouse ID
+                await Provider.of<LocationProvider>(context, listen: false)
+                    .fetchWarehouseById(warehouse['_id']);
+
+                // Enable editing mode in LocationProvider
+                Provider.of<LocationProvider>(context, listen: false)
+                    .toggleEditingLocation();
+
+                setState(() {});
               },
             ),
             IconButton(
@@ -289,7 +305,7 @@ void _showDetailsDialog(BuildContext context, Map<String, dynamic> warehouse) {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        contentPadding: EdgeInsets.all(16.0),
+        contentPadding: const EdgeInsets.all(16.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
         ),
@@ -387,7 +403,7 @@ void _showDetailsDialog(BuildContext context, Map<String, dynamic> warehouse) {
 
 Widget _buildListTile(IconData icon, String title, String value) {
   return ListTile(
-    contentPadding: EdgeInsets.symmetric(vertical: 4.0),
+    contentPadding: const EdgeInsets.symmetric(vertical: 4.0),
     leading: Icon(icon, color: AppColors.primaryGreen),
     title: Text(title),
     subtitle: Text(value),

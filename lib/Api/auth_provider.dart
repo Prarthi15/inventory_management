@@ -421,8 +421,8 @@ class AuthProvider with ChangeNotifier {
           };
 
           // Print each product's required fields
-          print('Product Details: $extractedProduct');
-          print('------------------------------------------------');
+          //print('Product Details: $extractedProduct');
+          //print('------------------------------------------------');
           return extractedProduct;
         }).toList();
 
@@ -584,6 +584,28 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       print('Error occurred while creating warehouse: $e');
       throw Exception('Error creating warehouse: $e');
+    }
+  }
+
+  // Method to fetch warehouse data using the warehouse ID
+  Future<Map<String, dynamic>> fetchWarehouseById(String warehouseId) async {
+    try {
+      final token = await getToken();
+      final response = await http.get(
+        Uri.parse('$_baseUrl/warehouse/$warehouseId'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        throw Exception('Failed to load warehouse data');
+      }
+    } catch (error) {
+      print('Error fetching warehouse data: $error');
+      throw error;
     }
   }
 
@@ -768,7 +790,8 @@ class AuthProvider with ChangeNotifier {
 
   Future<Map<String, dynamic>> searchProductsByDisplayName(
       String displayName) async {
-    final url = '$_baseUrl?displayName=${Uri.encodeComponent(displayName)}';
+    final url =
+        '$_baseUrl/products?displayName=${Uri.encodeComponent(displayName)}';
 
     try {
       final token = await getToken();
@@ -789,7 +812,65 @@ class AuthProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         print("Response Status: ${response.statusCode}");
         print("Response Body: ${response.body}");
-        return json.decode(response.body);
+
+        // Return the whole response as a Map
+        return {
+          'success': true,
+          'products': json.decode(response.body)['products'],
+          'totalProducts': json.decode(response.body)['totalProducts'],
+          'totalPages': json.decode(response.body)['totalPages'],
+          'currentPage': json.decode(response.body)['currentPage'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message':
+              'Failed to load products, status code: ${response.statusCode}',
+        };
+      }
+    } catch (error) {
+      // Handle exceptions (network errors, JSON parsing errors, etc.)
+      return {
+        'success': false,
+        'message': 'An error occurred: $error',
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> searchProductsBySKU(String sku) async {
+    final url = '$_baseUrl/products?sku=${Uri.encodeComponent(sku)}';
+
+    try {
+      final token = await getToken();
+      if (token == null) {
+        return {'success': false, 'message': 'No token found'};
+      }
+
+      // Make the HTTP GET request
+      final response = await http.get(
+        Uri.parse(url),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      // Check the response status code
+      if (response.statusCode == 200) {
+        //print("Response Status: ${response.statusCode}");
+        //print("Response Body: ${response.body}");
+
+        // Correctly parsing the 'products' key from the response
+        final data = json.decode(response.body);
+
+        if (data != null && data['products'] != null) {
+          return {'success': true, 'data': data['products']};
+        } else {
+          return {
+            'success': false,
+            'message': 'No products found',
+          };
+        }
       } else {
         return {
           'success': false,

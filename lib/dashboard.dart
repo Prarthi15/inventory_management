@@ -42,7 +42,7 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  String selectedDrawerItem = 'Label Page';
+  String selectedDrawerItem = 'Dashboard';
 
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -89,10 +89,10 @@ class _DashboardPageState extends State<DashboardPage> {
               Expanded(
                 child: Container(
                   color: AppColors.white,
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
+                      // const SizedBox(height: 20),
                       Row(
                         children: <Widget>[
                           if (isSmallScreen)
@@ -103,51 +103,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                 _scaffoldKey.currentState?.openDrawer();
                               },
                             ),
-                          const Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Search...',
-                                prefixIcon: Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                  borderSide: BorderSide.none,
-                                ),
-                                filled: true,
-                                fillColor: AppColors.greyBackground,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          IconButton(
-                            icon: const Icon(Icons.notifications,
-                                color: AppColors.grey),
-                            onPressed: () {},
-                          ),
-                          const SizedBox(width: 10),
-                          Row(
-                            children: [
-                              const CircleAvatar(
-                                backgroundColor: AppColors.grey,
-                                child:
-                                    Icon(Icons.person, color: AppColors.white),
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Prarthi',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryBlue,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              IconButton(
-                                icon: const Icon(Icons.keyboard_arrow_down),
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -176,17 +131,20 @@ class _DashboardPageState extends State<DashboardPage> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text(
-                    'Katyayani',
-                    style: TextStyle(
-                      fontSize: 27,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryBlue,
-                    ),
-                  ),
-                ),
+                Image(
+                  fit: BoxFit.cover,
+                  image: const AssetImage('assets/homeLogo.png'),
+                ), // const Padding(
+                //   padding: EdgeInsets.all(20.0),
+                //   child: Text(
+                //     'StockShip',
+                //     style: TextStyle(
+                //       fontSize: 27,
+                //       fontWeight: FontWeight.bold,
+                //       color: AppColors.primaryBlue,
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 20),
                 _buildDrawerItem(
                   icon: Icons.dashboard,
@@ -217,63 +175,49 @@ class _DashboardPageState extends State<DashboardPage> {
                   onTap: () =>
                       _onDrawerItemTapped('Upload Labels', isSmallScreen),
                 ),
-              ],
-            ),
-          ),
-        ),
-        // const Spacer(),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
-          child: Column(
-            children: [
-              _buildDrawerItem(
-                icon: Icons.logout,
-                text: 'Logout',
-                isSelected: selectedDrawerItem == 'Logout',
-                onTap: () async {
-                  try {
-                    SharedPreferences _pref =
-                        await SharedPreferences.getInstance();
-                    bool cleared = await _pref.clear();
+                _buildDrawerItem(
+                  icon: Icons.logout,
+                  text: 'Logout',
+                  isSelected: selectedDrawerItem == 'Logout',
+                  onTap: () async {
+                    try {
+                      SharedPreferences _pref =
+                          await SharedPreferences.getInstance();
+                      bool cleared = await _pref.clear();
 
-                    if (cleared) {
+                      if (cleared) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Logout successful!'),
+                            backgroundColor: AppColors.primaryGreen,
+                          ),
+                        );
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error: Could not clear session.'),
+                            backgroundColor: AppColors.cardsred,
+                          ),
+                        );
+                      }
+                    } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Logout successful!'),
-                          backgroundColor: AppColors.primaryGreen,
-                        ),
-                      );
-
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginPage()),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Error: Could not clear session.'),
+                          content: Text('An error occurred during logout.'),
                           backgroundColor: AppColors.cardsred,
                         ),
                       );
                     }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('An error occurred during logout.'),
-                        backgroundColor: AppColors.cardsred,
-                      ),
-                    );
-                  }
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.settings,
-                text: 'Settings',
-                isSelected: selectedDrawerItem == 'Settings',
-                onTap: () => _onDrawerItemTapped('Settings', isSmallScreen),
-              ),
-            ],
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -682,8 +626,7 @@ class _DashboardPageState extends State<DashboardPage> {
         return const ProductDataDisplay();
       case 'Upload Labels':
         return const LabelUpload();
-      case 'Settings':
-        return const Center(child: Text("Settings content goes here"));
+
       default:
         return const Center(child: Text("Select a menu item"));
     }
@@ -695,7 +638,7 @@ class _DashboardPageState extends State<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Text(
-            'Hello, Prarthi',
+            'Hello, Saksham',
             style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
