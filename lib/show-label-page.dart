@@ -24,7 +24,8 @@ class _LabelPageState extends State<LabelPage> {
     super.initState();
     getData();
   }
-  TextEditingController searchController=TextEditingController();
+
+  TextEditingController searchController = TextEditingController();
 
   // TextEditingController searchController = TextEditingController();
 
@@ -116,7 +117,7 @@ class _LabelPageState extends State<LabelPage> {
                             elevation: 10,
                             child: Container(
                               decoration: BoxDecoration(
-                                gradient:const LinearGradient(
+                                gradient: const LinearGradient(
                                   colors: [
                                     Colors.white,
                                     Colors.white,
@@ -164,7 +165,7 @@ class _LabelPageState extends State<LabelPage> {
                                                     .isNotEmpty
                                                 ? l.labelInformation[index]
                                                     ["images"][0]
-                                                : "https://cdn.pixabay.com/photo/2024/05/26/10/15/bird-8788491_1280.jpg",
+                                                : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKIAAACUCAMAAAAnDwKZAAAAaVBMVEX///9NTU1JSUnJycne3t7q6uouLS5jY2NCQkJgYGDw8PD7+/vh4eFGRkZzc3MnJyd9fX2EhIQ1NTU7OzukpKTQ0NCUlJRra2vAwMDX19eurq6amppWVla6uroaGhq0tLSMjIwAAAALCwuxY5kvAAAFIElEQVR4nO2b6ZKrKhSFUUJEcEDBAcXo6fd/yItmjsPpToGdU5fvR6raIFmuzd4g2gA4HA6Hw+FwOBwOh8PhcDgcvwCtoU0KExJTzyJx8vESfWMSfSsYlRjYwZzEmCFig8g3KJEa6GgO+XyJyEk0gAu0CZyLJvgHJLpAm2APF2kEuwK93fUOLkaZl3Ou2nc9ti8xivG05MOMvNe19UCTKr4snXn5XtfWXaz5bXnP3xuPtiXSAd8k5v1bXdsONE3im0TcvtW1dRfZXSJv3uraerqI+1jM5aqKrWS3ni7SvyqMw1UhItvo2n5d7C82+v6qiQXeGgM7TIACc/0jPF7fl1Gxr6LVb/dYRkRtqKpmvSi2fHPX5gMWY3DKeb5akX5/MUaDc1ny1wbC70u8Tj9xsDIUfj3Q8FY3MVtu8dsuosC/l/Z6sclvu5jdJx/NYamJTRe/oRgeHxXiRSUWJRbLpjz9eug/SvS4WGhkL9ARxuovtwKPi8mLjwuVx5qLkTYID9uxrvmLQs+v5ldly8UojjenjBE0U6jPmFceSy6iy5TBl+vI+ZQsnkv0criPRHS77Vud1u6rtJdQq9cksxJoEtzSYHVa0+m0pHCsPC8D2IaLhD38Oq5WzkhWJM4qjwWJJHmKIB8WTxBrCvVwfB4c5iXS7GWMxUu3z1L5y/rG4Rg8VR7jY5GWM3viWZICEC5l821wDFYllvM89fEsZUS+ofBlzWM60GKpksTJy5whNwVq1MNFGZa4qHA2Z5BgK8yvF2U20JSt5Onx6T65Xb6Qp4u6Vx6zLtJsrZT4DylTrNebO/ltkjHs4rrE+0z49zBPJ9y2V/Zy0YvVdV5rv2OirjzXTd3dJOobvLPG4rja5JnjpfLsFWjvugP6ei+wxbny7OeiztJON5xPPqtcZtQdXZzuTOD2tPJyTVPl2dNFvT6Q3vfDPGo87C3RO78Y9H2myrNroH/OWHn2dfHncPjpLo4PQv4BiR8faOMushyb5WjaRYAiwxyIWRcjZANpTqLnhXb4/BdVfZMSrWFG4p+jRdLQhER5sMn6Q0yHw/F/RQQEIO9h001tPNBYxuuouuyrdN74ScKF3dP3KfMSoJMuYPSyMyLGN0ro5e/zwcs3160T+vBsYNzBaSU9wfPh5jS2IuNeKH3nMfciLY4PKI2AZNV5NyYrSNZULQwYArAKBgq6ijUCRCxoJtVNUDVk0DcniTwkYRYBVtAjpEIfBg0WgZgk9lWy+vbMDykrFqAUHXDZecN44NihrxLmYaFKknSQ15ILmGcUD3LaoS+UFCkZQiAUycrIa8Gpp6mUYdGcSJ/2NW4ohzCvG+/9V0hfJB7yJkddDsbf1AfyDqUFiDvAGEDdgLsmpoBlUdr2YTCeIZskJ0V8SFpAOuGXINUSoT7MjqQ/ARAMJIelapovE/96NUoMQBnnqOf0LjGXVEvMGArbQnW9lphoiaKGYxZAXHecAMViRJNEVpPEo4R+U+eTxGogvBjCrq5NuRgCitMo4i30psGYahcl5aOL8lR0vEd46LkOdCnDcQNK8KhNEehPFUCx0ANkDPRJCk+KLx1oUXOtGBZ53SlDEptBl4ogAkWlyikHK4iqA00gaFvaKpE1OpMEY1QmYTm6rNNGMAlIpS3tVSZaWkEaHBCr9OE6E6qlJCmACIPa5NvY9/pyrjdPdaaoOqJa8FB07p9Ty0vzh1Me+9sDWoaKffrKD6EdHXE4HA6Hw+FwOBwOh8PhcHw6/wFnwnFzLAiC/AAAAABJRU5ErkJggg==",
                                             width: 200,
                                             height:
                                                 150, // Fixed height for consistent sizing
@@ -189,62 +190,64 @@ class _LabelPageState extends State<LabelPage> {
                                                 l.labelInformation[index]
                                                         ["labelSku"] ??
                                                     'null'),
-                                            Expanded(
-                                              child: Row(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "Product Details ",
-                                                    style:
-                                                        GoogleFonts.daiBannaSil(
-                                                            fontSize: 20,
-                                                            fontWeight:
-                                                                FontWeight.bold),
-                                                  ),
-                                                  const Text(": ",
-                                                      style: TextStyle(
-                                                          fontSize: 18,
+                                            Row(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "Product Details ",
+                                                  style:
+                                                      GoogleFonts.daiBannaSil(
+                                                          fontSize: 20,
                                                           fontWeight:
-                                                              FontWeight.bold)),
-                                                  Expanded(
-                                                    child: Column(
-                                                      children: [
-                                                        for (int i = 0; i <l.labelInformation[
-                                                                                      index]["products"].length; i++)
-                                                          Expanded(
-                                                            child: Column(
-                                                              children: [
-                                                                Row(
-                                                                  children: [
-                                                                    Expanded(
-                                                                      child: fieldTitle(
-                                                                          "Product SKU",
-                                                                          l.labelInformation[
-                                                                                      index]["products"][i]["productSku"] ??
-                                                                              'null'),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          )
-                                                      ],
+                                                              FontWeight
+                                                                  .bold),
+                                                ),
+                                                const Text(": ",
+                                                    style: TextStyle(
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold)),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "Products SKU : ",
+                                                      style: GoogleFonts
+                                                          .daiBannaSil(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
+                                                    for (int i = 0;
+                                                        i <
+                                                            l
+                                                                .labelInformation[
+                                                                    index][
+                                                                    "products"]
+                                                                .length;
+                                                        i++)
+                                                      Text(
+                                                        "${l.labelInformation[index]["products"][i]["productSku"]}${i == l.labelInformation[index]["products"].length - 1 ? '' : ', '}",
+                                                        style: GoogleFonts
+                                                            .daiBannaSil(
+                                                          fontSize: 20,
+                                                        ),
+                                                      )
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                             fieldTitle(
                                                 "quantity",
                                                 l.labelInformation[index]
                                                         ["quantity"]
                                                     .toString()),
-                                            fieldTitle(
-                                                "Description ${index}",
-                                                l.labelInformation[index]
-                                                        ["description"] ??
-                                                    'null'),
+                                            // fieldTitle(
+                                            //     "Description ",
+                                            //     l.labelInformation[index]
+                                            //             ["description"] ??
+                                            //         'null'),
                                           ],
                                         ),
                                       ),
