@@ -49,7 +49,7 @@ class CustomPaginationFooter extends StatelessWidget {
                   icon: const Icon(Icons.chevron_left),
                   onPressed: onPreviousPage,
                   iconSize: arrowButtonSize,
-                  color: currentPage > 0 ? AppColors.primaryGreen : Colors.grey,
+                  color: currentPage >0 ? AppColors.primaryGreen : Colors.grey,
                 ),
                 ..._buildPageButtons(currentPage, totalPages, buttonSize),
                 IconButton(

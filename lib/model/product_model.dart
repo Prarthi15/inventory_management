@@ -5,6 +5,7 @@ class Product {
   final String imageUrl;
   final String brand;
   final String mrp;
+  final String boxsize;
   final String amazonLink;
   final String flipkartLink;
   final String snapdealLink;
@@ -20,12 +21,14 @@ class Product {
     required this.imageUrl,
     required this.brand,
     required this.mrp,
+    required this.boxsize,
     required this.amazonLink,
     required this.flipkartLink,
     required this.snapdealLink,
     // Initialize new fields
     required this.modelNo,
     required this.companyName,
+
   });
 
   // Factory constructor to create a Product object from JSON
@@ -37,12 +40,14 @@ class Product {
       imageUrl: json['shopifyImage'] ?? '',
       brand: json['brand'] ?? 'No Brand',
       mrp: json['mrp'] != null ? json['mrp'].toString() : '0',
+      boxsize: json['boxSize']??'',
       amazonLink: json['amazonLink'] ?? '',
       flipkartLink: json['flipkartLink'] ?? '',
       snapdealLink: json['snapdealLink'] ?? '',
       // Parse new fields
       modelNo: json['modelNo'] ?? 'Unknown Model No',
       companyName: json['companyName'] ?? 'Unknown Company',
+
     );
   }
 
@@ -55,6 +60,7 @@ class Product {
       'imageUrl': imageUrl,
       'brand': brand,
       'mrp': mrp,
+      'boxSize':boxsize,
       'amazonLink': amazonLink,
       'flipkartLink': flipkartLink,
       'snapdealLink': snapdealLink,

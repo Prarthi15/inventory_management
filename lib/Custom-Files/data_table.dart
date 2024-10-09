@@ -213,6 +213,9 @@ class InventoryDataTable extends StatelessWidget {
   void _showUpdateQuantityDialog(
       BuildContext context, Map<String, dynamic> data) {
     TextEditingController quantityController = TextEditingController();
+    TextEditingController reasonController = TextEditingController();
+
+    // Pre-fill the quantity field
     quantityController.text = data['QUANTITY'].toString();
 
     showDialog(
@@ -220,16 +223,43 @@ class InventoryDataTable extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Update Quantity'),
-          content: TextField(
-            controller: quantityController,
-            decoration: const InputDecoration(labelText: 'New Quantity'),
-            keyboardType: TextInputType.number,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: quantityController,
+                decoration: InputDecoration(
+                  labelText: 'New Quantity',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 16.0), // Add space between the two fields
+              TextField(
+                controller: reasonController,
+                decoration: InputDecoration(
+                  labelText: 'Reason',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                keyboardType: TextInputType.multiline, // Allow multiple lines of input
+                minLines: 2, // Minimum 2 lines
+                maxLines: 3, // Maximum 3 lines
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () {
+                // Print the updated quantity and reason (if provided)
                 print(
                     'Updated quantity for ${data['PRODUCT NAME']}: ${quantityController.text}');
+                if (reasonController.text.isNotEmpty) {
+                  print('Reason: ${reasonController.text}');
+                }
                 Navigator.of(context).pop();
               },
               child: const Text('Update'),
@@ -246,29 +276,167 @@ class InventoryDataTable extends StatelessWidget {
     );
   }
 
+
+  // void _showDetailsDialog(BuildContext context, Map<String, dynamic> data) {
+  //   List<dynamic> inventoryLogs = data['inventoryLogs'] ?? [];
+  //
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         title: Text('Details for ${data['PRODUCT NAME']}'),
+  //         content: SingleChildScrollView(
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               // Scrollable List for Inventory Logs
+  //               Container(
+  //                 height: 200,  // Define the height for the scrollable area
+  //                 child: SingleChildScrollView(
+  //                   child: ListView.builder(
+  //                     shrinkWrap: true,
+  //                     itemCount: inventoryLogs.length,
+  //                     itemBuilder: (context, index) {
+  //                       var log = inventoryLogs[index];
+  //                       return Card(
+  //                         margin: const EdgeInsets.symmetric(vertical: 8),
+  //                         elevation: 2,
+  //                         child: Padding(
+  //                           padding: const EdgeInsets.all(8.0),
+  //                           child: Column(
+  //                             crossAxisAlignment: CrossAxisAlignment.start,
+  //                             children: [
+  //                               Text('Action: ${log['actionType']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+  //                               Text('Quantity Changed: ${log['quantityChanged']}'),
+  //                               Text('Previous Total: ${log['previousTotal']}'),
+  //                               Text('New Total: ${log['newTotal']}'),
+  //                               Text('Updated By: ${log['updatedBy']}'),
+  //                               Text('Source: ${log['source']}'),
+  //                               Text('Timestamp: ${log['timestamp']}'),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       );
+  //                     },
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.of(context).pop();
+  //             },
+  //             child: const Text('Close'),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
   void _showDetailsDialog(BuildContext context, Map<String, dynamic> data) {
+    List<dynamic> inventoryLogs = data['inventoryLogs'] ?? [];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Details for ${data['PRODUCT NAME']}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          title: Column(
             children: [
-              Text('Company Name: ${data['COMPANY NAME']}'),
-              Text('Category: ${data['CATEGORY']}'),
-              Text('Brand: ${data['BRAND']}'),
-              Text('SKU: ${data['SKU']}'),
-              Text('Model No: ${data['MODEL NO']}'),
-              Text('MRP: ${data['MRP']}'),
-              Text('Quantity: ${data['QUANTITY']}'),
+              Container(
+                  height:30,
+                  width:200,
+                  child: Text('Details for ${data['PRODUCT NAME']}',
+                    style: TextStyle(fontSize:20),
+
+                  ),),
             ],
+          ),
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.4, // Max height 60% of screen
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Inventory Logs:',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Check if there are any logs, and render them in a Column
+                  if (inventoryLogs.isNotEmpty)
+                    Column(
+                      children: inventoryLogs.map((log) {
+                        return Row(
+                          children: [
+                            // Card containing log details
+                            Expanded(
+                              child: Card(
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                elevation: 2,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Action: ${log['actionType']}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text('Quantity Changed: ${log['quantityChanged']}'),
+                                      Text('Previous Total: ${log['previousTotal']}'),
+                                      Text('New Total: ${log['newTotal']}'),
+                                      Text('Updated By: ${log['updatedBy']}'),
+                                      Text('Source: ${log['source']}'),
+                                      Text('Timestamp: ${log['timestamp']}'),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // "+" and "-" Icon Buttons to the right of the card
+                            Column(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.add),
+                                  onPressed: () {
+                                    // TODO: Add functionality here
+                                  },
+                                ),
+                                // IconButton(
+                                //   icon: const Icon(Icons.remove),
+                                //   onPressed: () {
+                                //     // TODO: Remove functionality here
+                                //   },
+                                // ),
+                              ],
+                            ),
+                          ],
+                        );
+                      }).toList(), // Convert logs to widgets
+                    )
+                  else
+                    const Center(
+                      child: Text('No inventory logs available'),
+                    ),
+                ],
+              ),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(); // Close dialog
               },
               child: const Text('Close'),
             ),
@@ -277,4 +445,5 @@ class InventoryDataTable extends StatelessWidget {
       },
     );
   }
+
 }
