@@ -9,6 +9,7 @@ import 'package:inventory_management/login_page.dart';
 import 'package:inventory_management/manage-inventory.dart';
 import 'package:inventory_management/manage_inventory.dart';
 import 'package:inventory_management/marketplace_page.dart';
+import 'package:inventory_management/order-page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
