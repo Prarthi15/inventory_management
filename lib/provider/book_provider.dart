@@ -33,7 +33,7 @@ class BookProvider with ChangeNotifier {
     notifyListeners();
   }
 
-// Fetch orders based on type (B2B or B2C)
+  // Fetch orders based on type (B2B or B2C)
   Future<void> fetchOrders(String type) async {
     String? token = await _getToken();
     if (token == null) {
@@ -54,6 +54,9 @@ class BookProvider with ChangeNotifier {
       isLoadingB2B = type == 'B2B';
       isLoadingB2C = type == 'B2C';
       notifyListeners();
+
+      // Clear checkboxes when page changes
+      clearAllSelections();
 
       while (hasMoreData) {
         String paginatedUrl = '$url&page=$page';
@@ -110,6 +113,56 @@ class BookProvider with ChangeNotifier {
       isLoadingB2B = false;
       isLoadingB2C = false;
       notifyListeners();
+    }
+  }
+
+  // Function to book orders
+  Future<String> bookOrders(BuildContext context, List<String> orderIds) async {
+    const String baseUrl =
+        'https://inventory-management-backend-s37u.onrender.com';
+    const String bookOrderUrl = '$baseUrl/orders/book';
+    final String? token = await _getToken();
+
+    if (token == null) {
+      return 'No auth token found';
+    }
+
+    // Headers for the API request
+    final headers = {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+
+    // Request body containing the order IDs
+    final body = json.encode({
+      'orderIds': orderIds,
+    });
+
+    try {
+      // Make the POST request to book the orders
+      final response = await http.post(
+        Uri.parse(bookOrderUrl),
+        headers: headers,
+        body: body,
+      );
+
+      // Log response status and body
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      // Parse the response
+      final responseData = json.decode(response.body);
+
+      // Check if the response is successful
+      if (response.statusCode == 200) {
+        return responseData['message'] ?? 'Orders booked successfully';
+      } else {
+        // If the API returns an error, return the error message
+        return responseData['message'] ?? 'Failed to book orders';
+      }
+    } catch (error) {
+      print('Error during API request: $error');
+      return 'An error occurred: $error';
     }
   }
 
@@ -172,6 +225,15 @@ class BookProvider with ChangeNotifier {
         ordersB2C[i].isSelected = selectAllB2C;
       }
     }
+    notifyListeners();
+  }
+
+  // Clear all checkboxes when the page is changed
+  void clearAllSelections() {
+    selectedB2BItems.fillRange(0, selectedB2BItems.length, false);
+    selectedB2CItems.fillRange(0, selectedB2CItems.length, false);
+    selectAllB2B = false;
+    selectAllB2C = false;
     notifyListeners();
   }
 
