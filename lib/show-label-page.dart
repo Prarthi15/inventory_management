@@ -1,5 +1,7 @@
+import 'dart:math';
 import 'dart:ui';
 
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -10,6 +12,9 @@ import 'package:inventory_management/Custom-Files/colors.dart';
 import 'package:pagination_flutter/pagination.dart';
 import 'package:provider/provider.dart';
 
+import 'Api/lable-page-api.dart';
+import 'create-label-page.dart';
+
 class LabelPage extends StatefulWidget {
   const LabelPage({super.key});
 
@@ -18,11 +23,24 @@ class LabelPage extends StatefulWidget {
 }
 
 class _LabelPageState extends State<LabelPage> {
-  @override
+
+  LabelPageApi ? labelPageProvider;
+  //final ScrollController controller = ScrollController();
+  final GlobalKey<DropdownSearchState<String>> _dropdownKey = GlobalKey<DropdownSearchState<String>>();
+
+
+  bool showLabelForm = false;
+  void _toggleFormVisibility() {
+    setState(() {
+      // Toggle the flag value to show or hide the form
+      showLabelForm = !showLabelForm;
+    });
+  }
   void initState() {
     // TODO: implement initState
     super.initState();
     getData();
+    getDataProduct();
   }
 
   TextEditingController searchController = TextEditingController();
@@ -31,11 +49,19 @@ class _LabelPageState extends State<LabelPage> {
 
   void getData() async {
     LabelApi po = Provider.of<LabelApi>(context, listen: false);
+    labelPageProvider = Provider.of<LabelPageApi>(context, listen: false);
+    await labelPageProvider!.getProductDetails();
     await po.getLabel();
+  }
+
+  void getDataProduct()async{
+
+    await labelPageProvider!.getProductDetails();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return Consumer<LabelApi>(
       builder: (context, l, child) => Scaffold(
         body: l.labelInformation.isNotEmpty && l.loading
@@ -43,57 +69,108 @@ class _LabelPageState extends State<LabelPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: SizedBox(
-                          width: 300,
-                          child: TextField(
-                            controller: searchController,
-                            decoration: InputDecoration(
-                              hintText: 'Search...',
-                              prefixIcon:
-                                  Icon(Icons.search, color: Colors.grey),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide.none, // No border line
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 15.0, horizontal: 20.0),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: const BorderSide(
-                                  color: AppColors
-                                      .primaryBlue, // Border color when focused
-                                  width: 2.0,
+                  Center(
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: SizedBox(
+                              width: 300,
+                              child: TextField(
+                                controller: searchController,
+                                decoration: InputDecoration(
+                                  hintText: 'Search...',
+                                  prefixIcon:
+                                      Icon(Icons.search, color: Colors.grey),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: BorderSide.none, // No border line
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.white,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 15.0, horizontal: 20.0),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: const BorderSide(
+                                      color: AppColors
+                                          .primaryBlue, // Border color when focused
+                                      width: 2.0,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30.0),
+                                    borderSide: BorderSide(
+                                      color: Colors.grey.withOpacity(
+                                          0.5), // Border color when enabled
+                                      width: 1.0,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide(
-                                  color: Colors.grey.withOpacity(
-                                      0.5), // Border color when enabled
-                                  width: 1.0,
-                                ),
+                                onChanged: (value) async {
+                                  l.searchByLabel(value);
+                                },
                               ),
                             ),
-                            onChanged: (value) async {
-                              l.searchByLabel(value);
-                            },
                           ),
                         ),
-                      ),
-                      InkWell(
-                        child: const Icon(Icons.restart_alt),
-                        onTap: () {
-                          l.cancel();
-                        },
-                      )
-                    ],
+                        InkWell(
+                          child: const Icon(Icons.restart_alt),
+                          onTap: () {
+                            l.cancel();
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                             _toggleFormVisibility(); // Toggle form visibility
+                          },
+                          child: Text(showLabelForm? 'Back':
+                              'Create Label'),
+                        ),
+                      ],
+                    ),
                   ),
+                  // Conditionally show LabelFormFields and LabelButtons
+                  if (showLabelForm) ...[
+                    //const SizedBox(height: 5),
+                    Padding(
+                      padding:  EdgeInsets.only(top: 2,left: 2),
+                      child: const Text("Create Label",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.bold)),
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8,vertical: 5),
+                      child: Container(
+                        width: 620,
+
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(10),
+
+                          boxShadow:[
+                            BoxShadow(
+                                spreadRadius: 5,
+                                blurStyle: BlurStyle.normal,
+                                //blurRadius: 5,
+                                color: Colors.white,
+                                offset: Offset(5, 5))],
+                        ),
+                        child: SingleChildScrollView(
+                            child: LabelFormFields(labelPageProvider: labelPageProvider)),
+                      ),
+                    ),
+                    const SizedBox(height: 7),
+                    LabelButtons(
+                      labelPageProvider: labelPageProvider,
+                      dropdownKey: _dropdownKey,
+                    ),
+                    SizedBox(height: 62,)
+                  ],
+                  if (!showLabelForm) ...[
                   if (searchController.text.isEmpty &&
                       l.labelInformation.isEmpty)
                     const Padding(
@@ -129,11 +206,13 @@ class _LabelPageState extends State<LabelPage> {
                                 borderRadius: BorderRadius.circular(15.0),
                                 boxShadow: const [
                                   BoxShadow(
+
                                     color: Colors.black26,
                                     blurRadius: 10,
                                     offset: Offset(0, 4),
                                   ),
                                 ],
+
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
@@ -340,9 +419,11 @@ class _LabelPageState extends State<LabelPage> {
                     ),
                   ])
                 ],
+    ]
               )
-            : const Center(
-                child: Text("Loading"),
+
+            : Center(
+                child: LoadingLabelAnimation()
               ),
       ),
     );
@@ -385,6 +466,190 @@ class _LabelPageState extends State<LabelPage> {
     );
   }
 }
+class LoadingLabelAnimation extends StatefulWidget {
+  @override
+  _LoadingLabelAnimationState createState() =>
+      _LoadingLabelAnimationState();
+}
+
+class _LoadingLabelAnimationState
+    extends State<LoadingLabelAnimation> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<Color?> _colorAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.2).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+
+    _colorAnimation = ColorTween(
+      begin: Colors.grey.shade400,
+      end: Colors.blue, // You can use AppColors.primaryGreen or any color you prefer
+    ).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _scaleAnimation.value,
+          child: Icon(Icons.label_important,color: _colorAnimation.value,size: 80,),
+
+        );
+      },
+    );
+  }
+}
+
+class LabelFormFields extends StatelessWidget {
+  final LabelPageApi? labelPageProvider;
+
+  const LabelFormFields({Key? key, this.labelPageProvider}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        _buildCardTextField(labelPageProvider!.nameController, "Name"),
+        _buildCardTextField(labelPageProvider!.labelSkuController, "Label SKU"),
+        _buildCardTextField(labelPageProvider!.imageController, "Image URL"),
+        _buildCardTextField(labelPageProvider!.descriptionController, "Description"),
+        _buildCardTextField(labelPageProvider!.quantityController, "Quantity", keyboardType: TextInputType.number),
+      ],
+    );
+  }
+
+  Widget _buildCardTextField(TextEditingController controller, String label,
+      {TextInputType? keyboardType}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Center(
+        child: SizedBox(
+          width: 600, // Set the desired width here
+          child: Card(
+            elevation: 10,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.0),
+            ),
+            child: TextField(
+              controller: controller,
+              keyboardType: keyboardType,
+              decoration: InputDecoration(
+                labelText: label,
+                labelStyle: GoogleFonts.daiBannaSil(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                contentPadding: const EdgeInsets.all(16.0),
+              ),
+              style: GoogleFonts.daiBannaSil(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Colors.purple.withOpacity(0.9),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class LabelButtons extends StatelessWidget {
+  final LabelPageApi? labelPageProvider;
+  final GlobalKey<DropdownSearchState<String>> dropdownKey;
+
+  const LabelButtons({Key? key, this.labelPageProvider, required this.dropdownKey}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        _buildRoundedButton("Reset", Colors.grey, () {
+          labelPageProvider!.clearControllers(dropdownKey);
+        }),
+        SizedBox(width: 450,),
+        _buildRoundedButton("Save", Colors.blueAccent, _saveLabel, loader: true),
+
+      ],
+    );
+  }
+
+  Widget _buildRoundedButton(String text, Color color, VoidCallback onPressed, {bool loader = false}) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+
+      child: ElevatedButton(
+        onPressed: !(labelPageProvider!.buttonTap) ? onPressed : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        ),
+        child: (!(labelPageProvider!.buttonTap) || !loader)
+            ? Text(text, style: const TextStyle(fontSize: 16))
+            : const CircularProgressIndicator(),
+      ),
+    );
+  }
+
+  void _saveLabel() async {
+    try {
+      labelPageProvider!.buttonTapStatus();
+      var res = await labelPageProvider!.createLabel();
+      if (res["res"] == "success") {
+        print("Label created successfully" );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   const SnackBar(
+        //     content: Text("Label created successfully"),
+        //     backgroundColor: Colors.green,
+        //   ),
+        // );
+        labelPageProvider!.clearControllers(dropdownKey);
+      } else {
+        throw res["res"];
+      }
+    } catch (e) {
+      labelPageProvider!.buttonTapStatus();
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text("Error: ${e.toString()}"),
+      //     backgroundColor: Colors.red,
+      //   ),
+      // );
+      print("Error");
+    }
+  }
+}
+
 
 /*
  "labels": [
@@ -407,7 +672,7 @@ class _LabelPageState extends State<LabelPage> {
           "brand": "66c0a09dba2bb6d30be80f10",
           "category": "66c0a1a8cbe12342b3849e93",
           "technicalName": "some name",
-          
+
         },
         "quantity": 9,
         "createdAt": "2024-09-13T10:15:49.471Z",

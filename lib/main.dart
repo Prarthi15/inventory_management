@@ -136,7 +136,7 @@ class _HomeState extends State<Home> {
               return const CircularProgressIndicator();
             } else if (snap.hasData) {
               if (authprovider.isAuthenticated) {
-                return const DashboardPage();
+                return const DashboardPage(inventoryId: '',);
               } else {
                 return const LoginPage();
               }

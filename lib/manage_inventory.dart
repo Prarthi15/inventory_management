@@ -12,7 +12,8 @@ import 'Custom-Files/data_table.dart';
 import 'Custom-Files/loading_indicator.dart';
 
 class ManageInventoryPage extends StatefulWidget {
-  const ManageInventoryPage({super.key});
+
+  const ManageInventoryPage({super.key,});
 
   @override
   _ManageInventoryPageState createState() => _ManageInventoryPageState();

@@ -27,8 +27,8 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   final TextEditingController _searchbarController = TextEditingController();
 
   String _searchQuery = '';
-  String? _selectedSearchOption;
-
+  //String? _selectedSearchOption;
+  String? _selectedSearchOption = 'Display Name';
   final List<String> _searchOptions = [
     'Display Name',
     // 'Description',
@@ -232,9 +232,9 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       children: [
         _buildActionButtons(),
         const SizedBox(width: 16),
-        if (!_showCreateProduct)
-          Text('Total Products: ${_products.length}',
-              style: const TextStyle(fontSize: 16)),
+        // if (!_showCreateProduct)
+        //   Text('Total Products: ${_products.length}',
+        //       style: const TextStyle(fontSize: 16)),
       ],
     );
   }
@@ -242,6 +242,18 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   Widget _buildActionButtons() {
     return Row(
       children: [
+
+        _buildSearchDropdown(),
+        const SizedBox(width: 16),
+        if (_selectedSearchOption != null &&
+            _selectedSearchOption != 'Show All Products')
+          _buildConditionalSearchBar(),
+        const SizedBox(width: 300),
+        if (!_showCreateProduct)
+          Text('Total Products: ${_products.length}',
+              style: const TextStyle(fontSize: 16)),
+        const SizedBox(width: 20),
+
         CustomButton(
           width: 150,
           height: 37,
@@ -252,25 +264,21 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
           text: _showCreateProduct ? 'Back' : 'Create Products',
           borderRadius: BorderRadius.circular(8.0),
         ),
-        const SizedBox(width: 16),
-        _buildSearchDropdown(),
-        const SizedBox(width: 16),
-        if (_selectedSearchOption != null &&
-            _selectedSearchOption != 'Show All Products')
-          _buildConditionalSearchBar(),
       ],
     );
   }
 
+
   Widget _buildSearchDropdown() {
     return CustomDropdown<String>(
       items: _searchOptions,
-      selectedItem: _selectedSearchOption,
+      selectedItem: _selectedSearchOption, // Default selected value
       hint: 'Search by',
       onChanged: (String? newValue) {
         setState(() {
-          _selectedSearchOption = newValue;
+          _selectedSearchOption = newValue; // Update the selected option
           _searchbarController.clear();
+
           // Load all products if "Show All Products" is selected
           if (_selectedSearchOption == 'Show All Products') {
             _currentPage = 1; // Reset the current page
@@ -288,6 +296,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       elevation: 8.0,
     );
   }
+
 
   Widget _buildConditionalSearchBar() {
     return SizedBox(
