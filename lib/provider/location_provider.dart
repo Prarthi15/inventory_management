@@ -10,25 +10,34 @@ class LocationProvider with ChangeNotifier {
 
   List<Map<String, dynamic>> _warehouses = [];
   List<Map<String, dynamic>> _filteredWarehouses = [];
+  Map<String, dynamic>? warehouseData; // for get warehouse by ID
 
   List<Map<String, dynamic>> get warehouses =>
       _filteredWarehouses.isNotEmpty ? _filteredWarehouses : _warehouses;
 
   bool _isCreatingNewLocation = false;
-  int _selectedCountryIndex = 0;
-  int _selectedStateIndex = 0;
+  int _selectedBillingCountryIndex = 0;
+  int _selectedBillingStateIndex = 0;
+  int _selectedShippingCountryIndex = 0;
+  int _selectedShippingStateIndex = 0;
   int _selectedLocationTypeIndex = 0;
   bool? _holdsStock;
   bool? _copysku;
   bool _copyAddress = false;
 
+  bool _isEditingLocation = false; // Add this property to track editing state
+
   bool get isCreatingNewLocation => _isCreatingNewLocation;
-  int get selectedCountryIndex => _selectedCountryIndex;
-  int get selectedStateIndex => _selectedStateIndex;
+  int get selectedBillingCountryIndex => _selectedBillingCountryIndex;
+  int get selectedBillingStateIndex => _selectedBillingStateIndex;
+  int get selectedShippingCountryIndex => _selectedShippingCountryIndex;
+  int get selectedShippingStateIndex => _selectedShippingStateIndex;
   int get selectedLocationTypeIndex => _selectedLocationTypeIndex;
   bool? get holdsStock => _holdsStock;
   bool? get copysku => _copysku;
   bool get copyAddress => _copyAddress;
+
+  bool get isEditingLocation => _isEditingLocation;
 
   final List<Map<String, dynamic>> _locations = [];
   List<Map<String, dynamic>> get locations => _locations;
@@ -116,13 +125,31 @@ class LocationProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void selectCountry(int index) {
-    _selectedCountryIndex = index;
+  void toggleEditingLocation() {
+    _isEditingLocation = !_isEditingLocation;
     notifyListeners();
   }
 
-  void selectState(int index) {
-    _selectedStateIndex = index;
+  void selectBillingCountry(int index) {
+    _selectedBillingCountryIndex = index;
+    // print(
+    //     "selected billing contry index in provider : $_selectedBillingCountryIndex");
+    // print("called notifylisteners() after this line");
+    notifyListeners();
+  }
+
+  void selectBillingState(int index) {
+    _selectedBillingStateIndex = index;
+    notifyListeners();
+  }
+
+  void selectShippingCountry(int index) {
+    _selectedShippingCountryIndex = index;
+    notifyListeners();
+  }
+
+  void selectShippingState(int index) {
+    _selectedShippingStateIndex = index;
     notifyListeners();
   }
 
@@ -254,8 +281,8 @@ class LocationProvider with ChangeNotifier {
             location['billingAddress']['addressLine1'] as String,
         billingAddressLine2:
             location['billingAddress']['addressLine2'] as String,
-        billingCountry: countries[_selectedCountryIndex]['name'],
-        billingState: states[_selectedStateIndex]['name'],
+        billingCountry: countries[_selectedBillingCountryIndex]['name'],
+        billingState: states[_selectedBillingStateIndex]['name'],
         billingCity: location['billingAddress']['city'] as String,
         billingZipCode: location['billingAddress']['zipCode'] as int,
         billingPhoneNumber: location['billingAddress']['phoneNumber'] as int,
@@ -263,8 +290,8 @@ class LocationProvider with ChangeNotifier {
             location['shippingAddress']['addressLine1'] as String,
         shippingAddressLine2:
             location['shippingAddress']['addressLine2'] as String,
-        shippingCountry: countries[_selectedCountryIndex]['name'],
-        shippingState: states[_selectedStateIndex]['name'],
+        shippingCountry: countries[_selectedShippingCountryIndex]['name'],
+        shippingState: states[_selectedShippingStateIndex]['name'],
         shippingCity: location['shippingAddress']['city'] as String,
         shippingZipCode: location['shippingAddress']['zipCode'] as int,
         shippingPhoneNumber: location['shippingAddress']['phoneNumber'] as int,
@@ -318,12 +345,32 @@ class LocationProvider with ChangeNotifier {
 
   void resetForm() {
     pincodes.clear();
-    _selectedCountryIndex =
-        _selectedStateIndex = _selectedLocationTypeIndex = 0;
+    _selectedBillingCountryIndex =
+        _selectedBillingStateIndex = _selectedLocationTypeIndex = 0;
+    _selectedShippingCountryIndex =
+        _selectedShippingStateIndex = _selectedLocationTypeIndex = 0;
     _holdsStock = _copysku = null;
     _copyAddress = false;
     validationMessage = _errorMessage = _successMessage = null;
 
     notifyListeners();
+  }
+
+// Method to fetch warehouse data by ID
+  Future<void> fetchWarehouseById(String warehouseId) async {
+    _isLoading = true; // Set loading to true
+    notifyListeners(); // Notify listeners about the change
+
+    try {
+      // Call your API method
+      warehouseData = await authProvider.fetchWarehouseById(warehouseId);
+      // print("Open $warehouseData in editing mode");
+    } catch (error) {
+      // Handle error here if needed or let it propagate
+      rethrow; // Rethrow the error to be handled in the UI
+    } finally {
+      _isLoading = false; // Set loading to false
+      notifyListeners(); // Notify listeners about the change
+    }
   }
 }

@@ -22,7 +22,6 @@ class _BookPageState extends State<BookPage>
   late ScrollController _scrollController;
   bool _showBackToTopButton = false;
 
-
   @override
   void initState() {
     super.initState();

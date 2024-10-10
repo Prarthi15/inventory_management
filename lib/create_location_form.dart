@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:inventory_management/Custom-Files/custom-dropdown.dart';
+import 'package:inventory_management/location_master.dart';
 import 'package:provider/provider.dart';
 import 'package:inventory_management/provider/location_provider.dart';
 import 'package:inventory_management/Custom-Files/custom-button.dart';
 import 'package:inventory_management/Custom-Files/colors.dart';
 
 class NewLocationForm extends StatefulWidget {
-  const NewLocationForm({super.key});
+  final bool isEditing;
+  final Map<String, dynamic>? warehouseData;
+
+  const NewLocationForm({
+    super.key,
+    this.isEditing = false,
+    this.warehouseData,
+  });
 
   @override
   _NewLocationFormState createState() => _NewLocationFormState();
@@ -38,12 +46,147 @@ class _NewLocationFormState extends State<NewLocationForm> {
   @override
   void initState() {
     super.initState();
+
     _userEmailController.addListener(_onEmailChanged);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final locationProvider =
+          Provider.of<LocationProvider>(context, listen: false);
+
+      if (widget.isEditing && widget.warehouseData != null) {
+        //print("1");
+        //print("Data loaded in form - ${widget.warehouseData}");
+        _warehouseNameController.text = widget.warehouseData!['name'] ?? '';
+        _userEmailController.text = widget.warehouseData!['userEmail'] ??
+            ''; // Adjust based on your data
+        _taxIdController.text = widget.warehouseData!['location']
+                    ['otherDetails']?['taxIdentificationNumber']
+                ?.toString() ??
+            '';
+
+        _billingAddress1Controller.text = widget.warehouseData!['location']
+                ['billingAddress']['addressLine1'] ??
+            '';
+        _billingAddress2Controller.text = widget.warehouseData!['location']
+                ['billingAddress']['addressLine2'] ??
+            '';
+
+        final billingAddress =
+            widget.warehouseData!['location']['billingAddress'];
+
+        // Get country index based on warehouseData
+        final selectedBillingCountryIndex =
+            locationProvider.countries.indexWhere(
+          (country) => country['name'] == billingAddress['country'],
+        );
+        if (selectedBillingCountryIndex != -1) {
+          locationProvider.selectBillingCountry(selectedBillingCountryIndex);
+        }
+
+        // Get state index based on warehouseData
+        final selectedBillingStateIndex = locationProvider.states.indexWhere(
+          (state) => state['name'] == billingAddress['state'],
+        );
+        if (selectedBillingStateIndex != -1) {
+          locationProvider.selectBillingState(selectedBillingStateIndex);
+        }
+
+        final shippingAddress =
+            widget.warehouseData!['location']['shippingAddress'];
+
+        // Get country index based on warehouseData
+        final selectedShippingCountryIndex =
+            locationProvider.countries.indexWhere(
+          (country) => country['name'] == shippingAddress['country'],
+        );
+        if (selectedShippingCountryIndex != -1) {
+          locationProvider.selectShippingCountry(selectedShippingCountryIndex);
+        }
+
+        // Get state index based on warehouseData
+        final selectedShippingStateIndex = locationProvider.states.indexWhere(
+          (state) => state['name'] == shippingAddress['state'],
+        );
+        if (selectedShippingStateIndex != -1) {
+          locationProvider.selectShippingState(selectedShippingStateIndex);
+          // }
+
+          // Get location type index based on warehouseData
+          final selectedLocationTypeIndex =
+              locationProvider.locationTypes.indexWhere(
+            (type) =>
+                type['name'] ==
+                widget.warehouseData!['location']['locationType'],
+          );
+          if (selectedLocationTypeIndex != -1) {
+            locationProvider.selectLocationType(selectedLocationTypeIndex);
+          }
+
+          _cityController.text =
+              widget.warehouseData!['location']['billingAddress']['city'] ?? '';
+          _zipCodeController.text = widget.warehouseData!['location']
+                      ['billingAddress']['zipCode']
+                  ?.toString() ??
+              '';
+          _phoneNumberController.text = widget.warehouseData!['location']
+                      ['billingAddress']['phoneNumber']
+                  ?.toString() ??
+              '';
+          _shippingAddress1Controller.text = widget.warehouseData!['location']
+                  ['shippingAddress']['addressLine1'] ??
+              '';
+          _shippingAddress2Controller.text = widget.warehouseData!['location']
+                  ['shippingAddress']['addressLine2'] ??
+              '';
+          _shippingCityController.text = widget.warehouseData!['location']
+                  ['shippingAddress']['city'] ??
+              '';
+          _shippingZipCodeController.text = widget.warehouseData!['location']
+                      ['shippingAddress']['zipCode']
+                  ?.toString() ??
+              '';
+          _shippingPhoneNumberController.text = widget
+                  .warehouseData!['location']['shippingAddress']['phoneNumber']
+                  ?.toString() ??
+              '';
+          _warehousePincodeController.text =
+              widget.warehouseData!['warehousePincode']?.toString() ?? '';
+          _pincodeController.text = (widget
+                      .warehouseData!['pincode']?.isNotEmpty ==
+                  true)
+              ? widget.warehouseData!['pincode'][0]
+                  .toString() // Just an example, modify according to your needs
+              : '';
+
+          // // Prefill holdsStock
+          // locationProvider
+          //     .updateHoldsStock(widget.warehouseData!['holdStocks'] ?? false);
+
+          // // Prefill copyStock
+          // locationProvider.updateCopysku(
+          //     widget.warehouseData!['copyMasterSkuFromPrimary'] ?? false);
+        }
+      }
+    });
   }
 
   @override
   void dispose() {
+    _warehouseNameController.dispose();
     _userEmailController.dispose();
+    _taxIdController.dispose();
+    _billingAddress1Controller.dispose();
+    _billingAddress2Controller.dispose();
+    _cityController.dispose();
+    _zipCodeController.dispose();
+    _phoneNumberController.dispose();
+    _shippingAddress1Controller.dispose();
+    _shippingAddress2Controller.dispose();
+    _shippingCityController.dispose();
+    _shippingZipCodeController.dispose();
+    _shippingPhoneNumberController.dispose();
+    _warehousePincodeController.dispose();
+    _pincodeController.dispose();
     super.dispose();
   }
 
@@ -60,6 +203,9 @@ class _NewLocationFormState extends State<NewLocationForm> {
     String? _errorMessage;
     final isEmailValid = Provider.of<LocationProvider>(context).isEmailValid;
 
+    // print(
+    //     "Selected Billing Country Index in UI: ${locationProvider.selectedBillingCountryIndex}");
+
     return Expanded(
       child: SingleChildScrollView(
         child: Padding(
@@ -69,13 +215,39 @@ class _NewLocationFormState extends State<NewLocationForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'New Location',
-                  style: TextStyle(
-                    fontSize: 27,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primaryBlue,
-                  ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_rounded,
+                          color: AppColors.primaryBlue), // Back icon
+                      onPressed: () {
+                        locationProvider.resetForm();
+                        _pincodeController.clear();
+                        // Check current mode and toggle accordingly
+                        if (locationProvider.isEditingLocation) {
+                          locationProvider
+                              .toggleEditingLocation(); // Turn off editing mode
+                        } else if (locationProvider.isCreatingNewLocation) {
+                          locationProvider
+                              .toggleCreatingNewLocation(); // Turn off creating mode
+                        }
+                      },
+                    ),
+                    const SizedBox(width: 8), // Space between icon and text
+                    Text(
+                      locationProvider.isEditingLocation
+                          ? 'Edit Location'
+                          : 'New Location',
+                      style: const TextStyle(
+                        fontSize: 27,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primaryBlue,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 if (isWideScreen)
@@ -279,9 +451,9 @@ class _NewLocationFormState extends State<NewLocationForm> {
                 const SizedBox(height: 8),
                 CustomDropdown(
                   option: locationProvider.countries,
-                  selectedIndex: locationProvider.selectedCountryIndex,
+                  selectedIndex: locationProvider.selectedBillingCountryIndex,
                   onSelectedChanged: (country) {
-                    locationProvider.selectCountry(country);
+                    locationProvider.selectBillingCountry(country);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -296,9 +468,9 @@ class _NewLocationFormState extends State<NewLocationForm> {
                 const SizedBox(height: 8),
                 CustomDropdown(
                   option: locationProvider.states,
-                  selectedIndex: locationProvider.selectedStateIndex,
+                  selectedIndex: locationProvider.selectedBillingStateIndex,
                   onSelectedChanged: (state) {
-                    locationProvider.selectState(state);
+                    locationProvider.selectBillingState(state);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -455,9 +627,9 @@ class _NewLocationFormState extends State<NewLocationForm> {
                 const SizedBox(height: 8),
                 CustomDropdown(
                   option: locationProvider.countries,
-                  selectedIndex: locationProvider.selectedCountryIndex,
+                  selectedIndex: locationProvider.selectedShippingCountryIndex,
                   onSelectedChanged: (country) {
-                    locationProvider.selectCountry(country);
+                    locationProvider.selectShippingCountry(country);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -472,9 +644,9 @@ class _NewLocationFormState extends State<NewLocationForm> {
                 const SizedBox(height: 8),
                 CustomDropdown(
                     option: locationProvider.states,
-                    selectedIndex: locationProvider.selectedStateIndex,
+                    selectedIndex: locationProvider.selectedShippingStateIndex,
                     onSelectedChanged: (state) {
-                      locationProvider.selectState(state);
+                      locationProvider.selectShippingState(state);
                     }),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -720,7 +892,14 @@ class _NewLocationFormState extends State<NewLocationForm> {
                       onTap: () {
                         locationProvider.resetForm();
                         _pincodeController.clear();
-                        locationProvider.toggleCreatingNewLocation();
+                        // Check current mode and toggle accordingly
+                        if (locationProvider.isEditingLocation) {
+                          locationProvider
+                              .toggleEditingLocation(); // Turn off editing mode
+                        } else if (locationProvider.isCreatingNewLocation) {
+                          locationProvider
+                              .toggleCreatingNewLocation(); // Turn off creating mode
+                        }
                       },
                       color: AppColors.grey,
                       textColor: AppColors.white,
@@ -745,10 +924,12 @@ class _NewLocationFormState extends State<NewLocationForm> {
                             'billingAddress': {
                               'addressLine1': _billingAddress1Controller.text,
                               'addressLine2': _billingAddress2Controller.text,
-                              'country': locationProvider.selectedCountryIndex
+                              'country': locationProvider
+                                      .selectedBillingCountryIndex
                                       ?.toString() ??
                                   '',
-                              'state': locationProvider.selectedStateIndex
+                              'state': locationProvider
+                                      .selectedBillingStateIndex
                                       ?.toString() ??
                                   '',
                               'city': _cityController.text,
@@ -763,10 +944,12 @@ class _NewLocationFormState extends State<NewLocationForm> {
                             'shippingAddress': {
                               'addressLine1': _shippingAddress1Controller.text,
                               'addressLine2': _shippingAddress2Controller.text,
-                              'country': locationProvider.selectedCountryIndex
+                              'country': locationProvider
+                                      .selectedShippingCountryIndex
                                       ?.toString() ??
                                   '',
-                              'state': locationProvider.selectedStateIndex
+                              'state': locationProvider
+                                      .selectedShippingStateIndex
                                       ?.toString() ??
                                   '',
                               'city': _shippingCityController.text,
@@ -830,7 +1013,9 @@ class _NewLocationFormState extends State<NewLocationForm> {
                       color: AppColors.primaryGreen,
                       textColor: AppColors.white,
                       fontSize: 14,
-                      text: 'Save Location',
+                      text: locationProvider.isEditingLocation
+                          ? 'Update Location'
+                          : 'Save Location',
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ],

@@ -1,11 +1,16 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:inventory_management/Api/auth_provider.dart';
 import 'package:inventory_management/model/combo_model.dart';
 import 'package:inventory_management/Api/combo_api.dart';
 import 'package:multi_dropdown/multi_dropdown.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
+import '../Api/inventory_api.dart';
 
 class ComboProvider with ChangeNotifier {
   Combo? _combo;
@@ -16,11 +21,6 @@ class ComboProvider with ChangeNotifier {
   List<Product> _products = [];
   List<Product> _selectedProducts = [];
   bool _loading = false;
-
-  // Pagination state variables
-  int _currentPage = 1; // Track current page
-  int _totalPages = 1; // Track total pages (comes from API)
-  int _limit = 10; // Default limit per page (you can change this as needed)
 
   Combo? get combo => _combo;
   bool get isFormVisible => _isFormVisible;
@@ -40,7 +40,6 @@ class ComboProvider with ChangeNotifier {
     fetchCombos();
   }
 
-  // Toggles the visibility of the combo creation form
   void toggleFormVisibility() {
     _isFormVisible = !_isFormVisible;
     notifyListeners();
@@ -51,7 +50,6 @@ class ComboProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Sets the current combo and notifies listeners
   void addItem(String label, String value) {
     // _combo = combo;
     _items.add(DropdownItem<String>(label: label, value: value));
@@ -126,7 +124,6 @@ class ComboProvider with ChangeNotifier {
     await prefs.setStringList('combos', jsonList);
   }
 
-  // Clears the current combo
   void clearCombo() {
     _combo = null;
     notifyListeners();
@@ -137,42 +134,71 @@ class ComboProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // fetch products
+
   Future<void> fetchProducts() async {
     _loading = true;
-    notifyListeners(); // Notify listeners to show loading state
+    notifyListeners();
     try {
       final api = ComboApi();
 
-      // Fetch the full response (which contains the 'products' array)
       final response = await api.getAllProducts();
 
-      // Extract the 'products' array from the response
-      final productList = response['products'];
+      if (response.containsKey('products') && response['products'] is List) {
 
-      // Print raw productList for debugging
-      //print("productList in provider: $productList");
+        final productList = response['products'];
+        print("Raw productList in provider: $productList");
 
-      // Map the 'products' array into the Product model list
-      _products =
-          productList.map<Product>((json) => Product.fromJson(json)).toList();
+        _products = productList.map<Product>((json) => Product.fromJson(json)).toList();
+        print("Mapped products in provider: $_products");
+      }
 
-      // Print the mapped products for debugging
-      //print("products in provider: $_products");
+      else {
+        print("Error: 'products' key not found or not a list in response.");
+      }
     } catch (e, stacktrace) {
       // Log error details
       print('Error fetching products: $e');
       print('Stacktrace: $stacktrace');
     } finally {
-      _loading = false; // Stop loading once the process is done
-      notifyListeners(); // Notify listeners to hide loading state and update UI
+      _loading = false;
+      notifyListeners();
     }
   }
 
-  // void selectProducts(List<Product> products) {
-  //   _selectedProducts = products;
-  //   notifyListeners();
-  // }
+
+  List<Map<String, dynamic>> _warehouses = [];
+
+  List<Map<String, dynamic>> get warehouses => _warehouses;
+  Future<void> fetchWarehouses() async {
+    _loading = true;
+    notifyListeners();
+
+    try {
+      final api = AuthProvider();
+      final response = await api.getAllWarehouses();
+
+
+      if (response['success'] == true) {
+        final warehouseList = response['data']['warehouses'];
+        print("Raw warehouseList in provider: $warehouseList");
+
+        _warehouses = warehouseList;
+
+        print("Mapped warehouses in provider: $_warehouses");
+      } else {
+        print("Error: ${response['message']}");
+      }
+    } catch (e, stacktrace) {
+
+      print('Error fetching warehouses: $e');
+      print('Stacktrace: $stacktrace');
+    } finally {
+      _loading = false;
+      notifyListeners();
+    }
+  }
+
+
 
   // Method to select products by IDs
   void selectProductsByIds(List<String?> productIds) {

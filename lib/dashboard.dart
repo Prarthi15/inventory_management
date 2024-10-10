@@ -27,14 +27,17 @@ import 'package:inventory_management/orders_page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
+import 'package:inventory_management/provider/inventory_provider.dart';
 import 'package:inventory_management/racked_page.dart';
 import 'package:inventory_management/show-label-page.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Custom-Files/colors.dart';
 import 'package:inventory_management/product_manager.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final String inventoryId;
+  const DashboardPage({super.key, required this.inventoryId});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -46,6 +49,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   @override
   void initState() {
@@ -61,6 +65,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider =Provider.of<InventoryProvider>(context, listen: false);
     return LayoutBuilder(
       builder: (context, constraints) {
         bool isSmallScreen = constraints.maxWidth < 800;
@@ -89,10 +94,10 @@ class _DashboardPageState extends State<DashboardPage> {
               Expanded(
                 child: Container(
                   color: AppColors.white,
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: Column(
                     children: [
-                      const SizedBox(height: 20),
+                      // const SizedBox(height: 20),
                       Row(
                         children: <Widget>[
                           if (isSmallScreen)
@@ -103,51 +108,6 @@ class _DashboardPageState extends State<DashboardPage> {
                                 _scaffoldKey.currentState?.openDrawer();
                               },
                             ),
-                          const Expanded(
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Search...',
-                                prefixIcon: Icon(Icons.search),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                  borderSide: BorderSide.none,
-                                ),
-                                filled: true,
-                                fillColor: AppColors.greyBackground,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          IconButton(
-                            icon: const Icon(Icons.notifications,
-                                color: AppColors.grey),
-                            onPressed: () {},
-                          ),
-                          const SizedBox(width: 10),
-                          Row(
-                            children: [
-                              const CircleAvatar(
-                                backgroundColor: AppColors.grey,
-                                child:
-                                    Icon(Icons.person, color: AppColors.white),
-                              ),
-                              const SizedBox(width: 10),
-                              const Text(
-                                'Prarthi',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryBlue,
-                                ),
-                              ),
-                              const SizedBox(width: 5),
-                              IconButton(
-                                icon: const Icon(Icons.keyboard_arrow_down),
-                                onPressed: () {},
-                              ),
-                            ],
-                          ),
                         ],
                       ),
                       const SizedBox(height: 20),
@@ -176,17 +136,20 @@ class _DashboardPageState extends State<DashboardPage> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                const Padding(
-                  padding: EdgeInsets.all(20.0),
-                  child: Text(
-                    'Katyayani',
-                    style: TextStyle(
-                      fontSize: 27,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primaryBlue,
-                    ),
-                  ),
-                ),
+                Image(
+                  fit: BoxFit.cover,
+                  image: const AssetImage('assets/homeLogo.png'),
+                ), // const Padding(
+                //   padding: EdgeInsets.all(20.0),
+                //   child: Text(
+                //     'StockShip',
+                //     style: TextStyle(
+                //       fontSize: 27,
+                //       fontWeight: FontWeight.bold,
+                //       color: AppColors.primaryBlue,
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 20),
                 _buildDrawerItem(
                   icon: Icons.dashboard,
@@ -217,63 +180,49 @@ class _DashboardPageState extends State<DashboardPage> {
                   onTap: () =>
                       _onDrawerItemTapped('Upload Labels', isSmallScreen),
                 ),
-              ],
-            ),
-          ),
-        ),
-        // const Spacer(),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 20.0),
-          child: Column(
-            children: [
-              _buildDrawerItem(
-                icon: Icons.logout,
-                text: 'Logout',
-                isSelected: selectedDrawerItem == 'Logout',
-                onTap: () async {
-                  try {
-                    SharedPreferences _pref =
-                        await SharedPreferences.getInstance();
-                    bool cleared = await _pref.clear();
+                _buildDrawerItem(
+                  icon: Icons.logout,
+                  text: 'Logout',
+                  isSelected: selectedDrawerItem == 'Logout',
+                  onTap: () async {
+                    try {
+                      SharedPreferences _pref =
+                          await SharedPreferences.getInstance();
+                      bool cleared = await _pref.clear();
 
-                    if (cleared) {
+                      if (cleared) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Logout successful!'),
+                            backgroundColor: AppColors.primaryGreen,
+                          ),
+                        );
+
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const LoginPage()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error: Could not clear session.'),
+                            backgroundColor: AppColors.cardsred,
+                          ),
+                        );
+                      }
+                    } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Logout successful!'),
-                          backgroundColor: AppColors.primaryGreen,
-                        ),
-                      );
-
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const LoginPage()),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Error: Could not clear session.'),
+                          content: Text('An error occurred during logout.'),
                           backgroundColor: AppColors.cardsred,
                         ),
                       );
                     }
-                  } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('An error occurred during logout.'),
-                        backgroundColor: AppColors.cardsred,
-                      ),
-                    );
-                  }
-                },
-              ),
-              _buildDrawerItem(
-                icon: Icons.settings,
-                text: 'Settings',
-                isSelected: selectedDrawerItem == 'Settings',
-                onTap: () => _onDrawerItemTapped('Settings', isSmallScreen),
-              ),
-            ],
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -289,6 +238,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20.0),
+         collapsedBackgroundColor:["Orders Page","Book Page","Picker Page","Packer Page","Checker Page","Racked Page","Manifest Page"].contains(selectedDrawerItem)?Colors.blue.withOpacity(0.2):AppColors.white,
         title: Text(
           'Orders',
           style: TextStyle(
@@ -410,6 +360,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20.0),
+         collapsedBackgroundColor:["Manage Inventory"].contains(selectedDrawerItem)?Colors.blue.withOpacity(0.2):AppColors.white,
         title: Text(
           'Inventory',
           style: TextStyle(
@@ -458,6 +409,9 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
       child: ExpansionTile(
         tilePadding: const EdgeInsets.symmetric(horizontal: 20.0),
+        collapsedBackgroundColor:["Label Page","Create Label Page","Product Master","Category Master","Combo Master","Marketplace Master","Location Master"].contains(selectedDrawerItem)?Colors.blue.withOpacity(0.2):AppColors.white,
+        
+        
         title: Text(
           'Master',
           style: TextStyle(
@@ -481,8 +435,8 @@ class _DashboardPageState extends State<DashboardPage> {
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
-              icon: Icons.production_quantity_limits,
-              text: 'Label Page',
+              icon: Icons.label_important,
+              text: 'Label Master',
               isSelected: selectedDrawerItem == 'Label Page',
               onTap: () => _onDrawerItemTapped('Label Page', isSmallScreen),
               isIndented: true,
@@ -490,19 +444,19 @@ class _DashboardPageState extends State<DashboardPage> {
               fontSize: 14,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: _buildDrawerItem(
-              icon: Icons.production_quantity_limits,
-              text: 'Create Label Page',
-              isSelected: selectedDrawerItem == 'Create Label Page',
-              onTap: () =>
-                  _onDrawerItemTapped('Create Label Page', isSmallScreen),
-              isIndented: true,
-              iconSize: 20,
-              fontSize: 14,
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 10.0),
+          //   child: _buildDrawerItem(
+          //     icon: Icons.production_quantity_limits,
+          //     text: 'Create Label Page',
+          //     isSelected: selectedDrawerItem == 'Create Label Page',
+          //     onTap: () =>
+          //         _onDrawerItemTapped('Create Label Page', isSmallScreen),
+          //     isIndented: true,
+          //     iconSize: 20,
+          //     fontSize: 14,
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
@@ -629,6 +583,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildMainContent(String selectedDrawerItem, bool isSmallScreen) {
+    final provider =Provider.of<InventoryProvider>(context, listen: false);
     switch (selectedDrawerItem) {
       case 'Dashboard':
         // return Products();
@@ -675,8 +630,7 @@ class _DashboardPageState extends State<DashboardPage> {
         return const ProductDataDisplay();
       case 'Upload Labels':
         return const LabelUpload();
-      case 'Settings':
-        return const Center(child: Text("Settings content goes here"));
+
       default:
         return const Center(child: Text("Select a menu item"));
     }
@@ -688,7 +642,7 @@ class _DashboardPageState extends State<DashboardPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           const Text(
-            'Hello, Prarthi',
+            'Hello, Saksham',
             style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,

@@ -27,12 +27,12 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   final TextEditingController _searchbarController = TextEditingController();
 
   String _searchQuery = '';
-  String? _selectedSearchOption;
-
+  //String? _selectedSearchOption;
+  String? _selectedSearchOption = 'Display Name';
   final List<String> _searchOptions = [
     'Display Name',
-    'Description',
-    'Category',
+    // 'Description',
+    // 'Category',
     'SKU',
     'Show All Products'
   ];
@@ -126,7 +126,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       body: Row(
         children: [
           // Left Sidebar
-          if (isWideScreen && !_showCreateProduct) _buildSidebar(),
+          //if (isWideScreen && !_showCreateProduct) _buildSidebar(),
           // Main content area
           Expanded(
             child: Container(
@@ -150,26 +150,26 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
     );
   }
 
-  Widget _buildSidebar() {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        maxWidth: 240,
-        minHeight: MediaQuery.of(context).size.height,
-      ),
-      child: Container(
-        color: Colors.grey[200],
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSearchField(),
-            const SizedBox(height: 16),
-            Expanded(child: _buildFilterSections()),
-          ],
-        ),
-      ),
-    );
-  }
+  // Widget _buildSidebar() {
+  //   return ConstrainedBox(
+  //     constraints: BoxConstraints(
+  //       maxWidth: 240,
+  //       minHeight: MediaQuery.of(context).size.height,
+  //     ),
+  //     child: Container(
+  //       color: Colors.grey[200],
+  //       padding: const EdgeInsets.all(16.0),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           _buildSearchField(),
+  //           const SizedBox(height: 16),
+  //           Expanded(child: _buildFilterSections()),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildSearchField() {
     return SizedBox(
@@ -232,9 +232,9 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
       children: [
         _buildActionButtons(),
         const SizedBox(width: 16),
-        if (!_showCreateProduct)
-          Text('Total Products: ${_products.length}',
-              style: const TextStyle(fontSize: 16)),
+        // if (!_showCreateProduct)
+        //   Text('Total Products: ${_products.length}',
+        //       style: const TextStyle(fontSize: 16)),
       ],
     );
   }
@@ -242,6 +242,18 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
   Widget _buildActionButtons() {
     return Row(
       children: [
+
+        _buildSearchDropdown(),
+        const SizedBox(width: 16),
+        if (_selectedSearchOption != null &&
+            _selectedSearchOption != 'Show All Products')
+          _buildConditionalSearchBar(),
+        const SizedBox(width: 300),
+        if (!_showCreateProduct)
+          Text('Total Products: ${_products.length}',
+              style: const TextStyle(fontSize: 16)),
+        const SizedBox(width: 20),
+
         CustomButton(
           width: 150,
           height: 37,
@@ -252,36 +264,39 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
           text: _showCreateProduct ? 'Back' : 'Create Products',
           borderRadius: BorderRadius.circular(8.0),
         ),
-        const SizedBox(width: 16),
-        _buildSearchDropdown(),
-        const SizedBox(width: 16),
-        if (_selectedSearchOption != null &&
-            _selectedSearchOption != 'Show All Products')
-          _buildConditionalSearchBar(),
       ],
     );
   }
 
+
   Widget _buildSearchDropdown() {
     return CustomDropdown<String>(
       items: _searchOptions,
-      selectedItem: _selectedSearchOption,
+      selectedItem: _selectedSearchOption, // Default selected value
       hint: 'Search by',
       onChanged: (String? newValue) {
         setState(() {
-          _selectedSearchOption = newValue;
-          _searchbarController
-              .clear(); // Clear search input when changing option
+          _selectedSearchOption = newValue; // Update the selected option
+          _searchbarController.clear();
+
+          // Load all products if "Show All Products" is selected
+          if (_selectedSearchOption == 'Show All Products') {
+            _currentPage = 1; // Reset the current page
+            _hasMore = true;
+            _products.clear(); // Clear the existing products
+            _loadMoreProducts(); // Call the method to load products
+          }
         });
       },
       hintStyle: const TextStyle(color: Colors.grey),
       itemStyle: const TextStyle(color: Colors.black),
-      //dropdownColor: Colors.white,
+      // dropdownColor: Colors.white,
       borderColor: Colors.orange,
       borderWidth: 2.0,
       elevation: 8.0,
     );
   }
+
 
   Widget _buildConditionalSearchBar() {
     return SizedBox(
@@ -293,9 +308,7 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
             child: TextField(
               controller: _searchbarController,
               decoration: InputDecoration(
-                hintText: _selectedSearchOption == 'Display Name'
-                    ? 'Search by Display Name'
-                    : 'Search by SKU',
+                hintText: _getSearchHint(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12.0),
                   borderSide:
@@ -316,82 +329,130 @@ class _ProductDashboardPageState extends State<ProductDashboardPage> {
     );
   }
 
+  String _getSearchHint() {
+    switch (_selectedSearchOption) {
+      case 'Display Name':
+        return 'Search by Display Name';
+      case 'SKU':
+        return 'Search by SKU';
+      default:
+        return '';
+    }
+  }
+
   void _performSearch() async {
-    if (_searchbarController.text.isEmpty) {
-      // Optionally handle case where search input is empty
+    // Check if search option is selected and search term is not empty
+    if (_selectedSearchOption == null || _searchbarController.text.isEmpty) {
+      _refreshPage();
       return;
     }
 
+    // Show loading indicator
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true;
+      _hasMore = false;
     });
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final displayName = _searchbarController.text;
+    final searchTerm = _searchbarController.text;
 
     try {
-      // Use the search method based on the selected search option
       Map<String, dynamic> response;
+
+      // Fetch products based on selected search option
       if (_selectedSearchOption == 'Display Name') {
-        response = await authProvider.searchProductsByDisplayName(displayName);
+        response = await authProvider.searchProductsByDisplayName(searchTerm);
+        print("response in UI page - $response");
+      } else if (_selectedSearchOption == 'SKU') {
+        response = await authProvider.searchProductsBySKU(searchTerm);
+        print("response in UI page - $response");
       } else {
-        // You can add more conditions for other search options
-        // e.g. search by description, category, etc.
-        return; // Exit if no valid option is selected
+        _refreshPage();
+        return;
       }
 
-      if (response['success']) {
-        // Clear previous products and add new results
-        setState(() {
-          _products.clear();
-          final List<dynamic> productData = response['data'];
-          _products.addAll(productData
-              .map((data) => Product(
-                    sku: data['sku'],
-                    parentSku: data['parentSku'],
-                    ean: data['ean'],
-                    description: data['description'],
-                    categoryName: data['categoryName'] ?? '-',
-                    colour: data['colour'] ?? '-',
-                    netWeight: data['netWeight']?.toString() ?? '-',
-                    grossWeight: data['grossWeight']?.toString() ?? '-',
-                    labelSku: data['labelSku'] ?? '-',
-                    box_name: data['box_name'] ?? '-',
-                    grade: data['grade'] ?? '-',
-                    technicalName: data['technicalName'] ?? '-',
-                    length: data['length']?.toString() ?? '-',
-                    width: data['width']?.toString() ?? '-',
-                    height: data['height']?.toString() ?? '-',
-                    mrp: data['mrp']?.toString() ?? '-',
-                    cost: data['cost']?.toString() ?? '-',
-                    tax_rule: data['tax_rule']?.toString() ?? '-',
-                    shopifyImage: data['shopifyImage'] ?? '',
-                    createdDate: data['createdAt'],
-                    lastUpdated: data['updatedAt'],
-                    displayName: data['displayName'] ?? '-',
-                  ))
-              .toList());
-        });
+      // Check if the response is successful
+      if (response['success'] == true) {
+        print("1");
+        final List<dynamic>? productData =
+            response['products'] ?? response['data'];
+
+        if (productData != null) {
+          print("Products retrieved successfully.");
+
+          // Clear previous products and add new results
+          setState(() {
+            _products.clear();
+            _products.addAll(productData
+                .map((data) => Product(
+                      sku: data['sku'] ?? '',
+                      parentSku: data['parentSku'] ?? '',
+                      ean: data['ean'] ?? '',
+                      description: data['description'] ?? '',
+                      categoryName: data['category']?['name'] ?? '',
+                      colour: data['colour'] ?? '',
+                      netWeight: data['netWeight']?.toString() ?? '',
+                      grossWeight: data['grossWeight']?.toString() ?? '',
+                      labelSku: data['labelSku'] ?? '',
+                      box_name: data['boxSize']?['box_name'] ?? '',
+                      grade: data['grade'] ?? '-',
+                      technicalName: data['technicalName'] ?? '',
+                      length: data['dimensions']?['length']?.toString() ?? '',
+                      width: data['dimensions']?['width']?.toString() ?? '',
+                      height: data['dimensions']?['height']?.toString() ?? '',
+                      mrp: data['mrp']?.toString() ?? '',
+                      cost: data['cost']?.toString() ?? '',
+                      tax_rule: data['tax_rule']?.toString() ?? '',
+                      shopifyImage: data['shopifyImage'] ?? '',
+                      createdDate: data['createdAt'] ?? '',
+                      lastUpdated: data['updatedAt'] ?? '',
+                      displayName: data['displayName'] ?? '',
+                    ))
+                .toList());
+          });
+        } else {
+          // Handle case when no product data is found
+          setState(() {
+            _products.clear(); // Clear previous products
+          });
+
+          // Optionally show a message to the user
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(response['message'])),
+          );
+        }
       } else {
         // Handle failure response
         setState(() {
           _products.clear(); // Clear previous products
         });
-        // Optionally show a message to the user
+
+        // Show failure message to the user
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(response['message'])),
         );
       }
     } catch (error) {
+      print("error - $error");
+
       // Handle exceptions
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $error')),
       );
     } finally {
+      // Hide loading indicator
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false;
       });
     }
+  }
+
+  void _refreshPage() {
+    setState(() {
+      _products.clear(); // Clear the displayed products
+      _selectedSearchOption = null; // Reset the selected option
+      _searchbarController.clear(); // Clear the search input
+    });
   }
 
   Widget _buildProductList() {

@@ -81,10 +81,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Inventory Management',
+      title: 'StockShip',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        fontFamily: 'Poppins',
         primaryColor: const Color.fromRGBO(6, 90, 216, 1),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xff09254A),
+          primary: const Color(0xff09254A),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             foregroundColor: Colors.white,
@@ -132,7 +136,7 @@ class _HomeState extends State<Home> {
               return const CircularProgressIndicator();
             } else if (snap.hasData) {
               if (authprovider.isAuthenticated) {
-                return const DashboardPage();
+                return const DashboardPage(inventoryId: '',);
               } else {
                 return const LoginPage();
               }
