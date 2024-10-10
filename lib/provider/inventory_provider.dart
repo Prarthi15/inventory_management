@@ -77,6 +77,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:inventory_management/model/Inventory.dart';
 import '../Api/auth_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -111,14 +112,72 @@ class InventoryProvider extends ChangeNotifier {
     _currentPage = page;
     notifyListeners();
   }
+  Map<String, dynamic> ?_inventoryDetail;
+  Map<String, dynamic>? get inventoryDetail => _inventoryDetail;
+  List<dynamic> inventoryD = [];
+  //bool isLoading = false;
 
-  // Fetch inventory for a specific page
+
+  Future<void> fetchInventoryById(String inventoryId) async {
+    //_isLoading=true;
+    _errorMessage = null; // Reset error message
+    _inventoryDetail=null ; // Reset the inventory detail
+    notifyListeners();
+
+    final url = Uri.parse('$_baseUrl/inventory/$inventoryId'); // URL for fetching by ID
+
+    try {
+      final token = await AuthProvider().getToken(); // Get the authentication token
+      if (token == null) {
+        _errorMessage = 'No token found';
+        notifyListeners();
+        return;
+      }
+
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      // Print the raw response for debugging purposes
+      print('Response Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Check if the data contains what you're expecting
+        if (data != null && data is Map<String, dynamic>) {
+          print('Parsed Data: $data'); // Log parsed data for debugging
+
+          // Assuming the API returns a single inventory item object
+          _inventoryDetail = data; // Store the fetched inventory detail
+          notifyListeners();
+        } else {
+          _errorMessage = 'No data found for this inventory ID or unexpected response structure';
+          print('Data structure issue: $data');
+        }
+      } else {
+        _errorMessage = 'Failed to fetch inventory. Status code: ${response.statusCode}';
+      }
+    } catch (error) {
+      _errorMessage = 'An error occurred: $error';
+      print('Error: $error');
+    } finally {
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchInventory({int page = 1}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
-    final url = Uri.parse('$_baseUrl/inventory?page=$page&limit=20'); // Adjust limit as needed
+    final url = Uri.parse(
+        '$_baseUrl/inventory?page=$page&limit=20'); // Adjust limit as needed
 
     try {
       final token = await AuthProvider().getToken();
@@ -141,7 +200,10 @@ class InventoryProvider extends ChangeNotifier {
         final data = json.decode(response.body);
         if (data.containsKey('data')) {
           // Process inventory data with default values
-          List<Map<String, dynamic>> fetchedInventory = List<Map<String, dynamic>>.from(data['data']['inventories']).map((item) {
+          List<Map<String, dynamic>> fetchedInventory = List<
+              Map<String, dynamic>>.from(data['data']['inventories']).map((
+              item) {
+                final inventoryId = item['_id'] ?? '';
             final product = item['product_id'] ?? {};
             final category = product['category'] ?? {};
             final brand = product['brand'] ?? {};
@@ -161,11 +223,12 @@ class InventoryProvider extends ChangeNotifier {
               'SNAPDEAL': product['snapdeal']?.toString() ?? '-',
               'AMAZON.IN': product['amazon']?.toString() ?? '-',
               'inventoryLogs': item['inventoryLogs'] ?? [],
+              'inventoryId': inventoryId??'',
             };
           }).toList();
 
           _inventory = fetchedInventory;
-          _totalPages = data['data']['totalPages'] ?? 1 ;
+          _totalPages = data['data']['totalPages'] ?? 1;
           _currentPage = page;
           notifyListeners();
         } else {
@@ -173,7 +236,8 @@ class InventoryProvider extends ChangeNotifier {
           print('Unexpected response format: $data');
         }
       } else {
-        _errorMessage = 'Failed to fetch inventory. Status code: ${response.statusCode}';
+        _errorMessage =
+        'Failed to fetch inventory. Status code: ${response.statusCode}';
         print('Failed to fetch inventory: ${response.statusCode}');
       }
     } catch (error) {
@@ -184,6 +248,8 @@ class InventoryProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+
   // Go to a specific page
   void goToPage(int page) {
     if (page >=1 && page <= _totalPages) {
@@ -289,4 +355,78 @@ class InventoryProvider extends ChangeNotifier {
     _inventory = List<Map<String, dynamic>>.from(_replicationInventory);
     notifyListeners(); // Notify listeners about the change
   }
+
+
+  Future<void> updateInventoryQuantity(String inventoryId, int newQuantity, String warehousId, String reason) async {
+    if (inventoryId == null) {
+      print('Inventory ID is null. Cannot update inventory.');
+      return; // Exit early if inventoryId is null
+    }
+
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    print("Id $inventoryId");
+
+    final url = Uri.parse('$_baseUrl/inventory/$inventoryId');
+    print("Id 1: $inventoryId");
+
+
+
+    try {
+      final token = await AuthProvider().getToken();
+      if (token == null) {
+        _errorMessage = 'No token found';
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({
+          'newTotal': newQuantity,
+          'warehouseId': warehousId,
+          'additionalInfo': {
+            'reason': reason
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Inventory updated successfully
+        final data = json.decode(response.body);
+        print('Inventory updated: $data');
+
+        final index = _inventory.indexWhere((item) => item['_id'] == inventoryId);
+        if (index != -1) {
+          _inventory[index]['QUANTITY'] = newQuantity.toString();
+          notifyListeners();
+
+          // if (data['additionalInfo'] != null && data['additionalInfo']['reason'] != null) {
+          //   _inventory[index]['REASON'] = data['additionalInfo']['reason'];
+          //   print('Reason for update: ${data['additionalInfo']['reason']}');
+          // }
+          notifyListeners();
+
+        }
+      } else {
+        // Print error details for better debugging
+        _errorMessage = 'Failed to update inventory. Status code: ${response.statusCode}. Response: ${response.body}';
+        print(_errorMessage);
+      }
+    } catch (error) {
+      _errorMessage = 'An error occurred: $error';
+      print('An error occurred: $error');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
 }

@@ -27,14 +27,17 @@ import 'package:inventory_management/orders_page.dart';
 import 'package:inventory_management/products.dart';
 import 'package:inventory_management/category_master.dart';
 import 'package:inventory_management/dashboard_cards.dart';
+import 'package:inventory_management/provider/inventory_provider.dart';
 import 'package:inventory_management/racked_page.dart';
 import 'package:inventory_management/show-label-page.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'Custom-Files/colors.dart';
 import 'package:inventory_management/product_manager.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final String inventoryId;
+  const DashboardPage({super.key, required this.inventoryId});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -46,6 +49,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   DateTime? lastUpdatedTime;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
 
   @override
   void initState() {
@@ -61,6 +65,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final provider =Provider.of<InventoryProvider>(context, listen: false);
     return LayoutBuilder(
       builder: (context, constraints) {
         bool isSmallScreen = constraints.maxWidth < 800;
@@ -430,8 +435,8 @@ class _DashboardPageState extends State<DashboardPage> {
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
-              icon: Icons.production_quantity_limits,
-              text: 'Label Page',
+              icon: Icons.label_important,
+              text: 'Label Master',
               isSelected: selectedDrawerItem == 'Label Page',
               onTap: () => _onDrawerItemTapped('Label Page', isSmallScreen),
               isIndented: true,
@@ -439,19 +444,19 @@ class _DashboardPageState extends State<DashboardPage> {
               fontSize: 14,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 10.0),
-            child: _buildDrawerItem(
-              icon: Icons.production_quantity_limits,
-              text: 'Create Label Page',
-              isSelected: selectedDrawerItem == 'Create Label Page',
-              onTap: () =>
-                  _onDrawerItemTapped('Create Label Page', isSmallScreen),
-              isIndented: true,
-              iconSize: 20,
-              fontSize: 14,
-            ),
-          ),
+          // Padding(
+          //   padding: const EdgeInsets.only(left: 10.0),
+          //   child: _buildDrawerItem(
+          //     icon: Icons.production_quantity_limits,
+          //     text: 'Create Label Page',
+          //     isSelected: selectedDrawerItem == 'Create Label Page',
+          //     onTap: () =>
+          //         _onDrawerItemTapped('Create Label Page', isSmallScreen),
+          //     isIndented: true,
+          //     iconSize: 20,
+          //     fontSize: 14,
+          //   ),
+          // ),
           Padding(
             padding: const EdgeInsets.only(left: 10.0),
             child: _buildDrawerItem(
@@ -578,6 +583,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Widget _buildMainContent(String selectedDrawerItem, bool isSmallScreen) {
+    final provider =Provider.of<InventoryProvider>(context, listen: false);
     switch (selectedDrawerItem) {
       case 'Dashboard':
         // return Products();
